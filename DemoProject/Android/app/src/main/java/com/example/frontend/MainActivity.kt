@@ -2,7 +2,11 @@ package com.example.frontend
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.AbsListView
+import android.widget.ListView
 import android.widget.TextView
+import com.example.frontend.adapters.MovieAdapter
 import com.example.frontend.api.JsonPlaceHolderApi
 import com.example.frontend.models.Movie
 import retrofit2.Call
@@ -12,14 +16,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
-
-    lateinit var textViewResult : TextView;
-
+    private lateinit var listView: ListView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        textViewResult = findViewById(R.id.text_view_result);
         var retrofit : Retrofit;
 
         retrofit = Retrofit.Builder()
@@ -35,30 +36,31 @@ class MainActivity : AppCompatActivity() {
 
         call = jsonPlaceHolderApi.getMovies();
 
+        val nes = this
         call.enqueue(object:Callback<List<Movie>>{
             override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
-                if(!response.isSuccessful){
-                    textViewResult.setText("Code: " +  response.code());
-                    return;
-                }
                 var movies : List<Movie>
                 movies = response.body()!!;
-
-                for(movie in movies){
+                Log.i("test",movies.toString())
+                /*for(movie in movies){
                     var content : String = "";
                     content += "ID: " + movie.id + "\n";
                     content += "Name: " + movie.name + "\n";
-                    content += "Genre: " + movie.genre + "\n";
 
                     textViewResult.append(content);
-                }
-
+                }*/
+                listView = findViewById(R.id.list_id)
+                val adapter = MovieAdapter(nes,movies)
+                listView.adapter = adapter
+                listView.showContextMenu()
+                Log.i("test",listView.count.toString())
             }
 
             override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
-                textViewResult.setText(t.message);
+
             }
 
         })
+
     }
 }
