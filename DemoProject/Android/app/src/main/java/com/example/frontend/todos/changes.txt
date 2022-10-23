@@ -1,0 +1,7 @@
+1. promeniti ip adresu unutar res/xml/network_security_config.xml
+2. promeniti ip adresu unutar MainActivity.baseURL()
+
+
+
+
+
