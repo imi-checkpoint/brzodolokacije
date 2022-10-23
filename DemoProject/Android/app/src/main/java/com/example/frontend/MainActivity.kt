@@ -54,6 +54,15 @@ class MainActivity : AppCompatActivity() {
                 listView.adapter = adapter
                 listView.showContextMenu()
                 Log.i("test",listView.count.toString())
+                listView.setOnItemClickListener{_,_,position,_->
+                    val selectedMovie = movies[position]
+                    println(selectedMovie.id)
+                    println(selectedMovie.name)
+                    println(selectedMovie.genre)
+                    println(position)
+                    val detailIntent = MovieDetailActivity.newIntent(nes,selectedMovie)
+                    startActivity(detailIntent)
+                }
             }
 
             override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
