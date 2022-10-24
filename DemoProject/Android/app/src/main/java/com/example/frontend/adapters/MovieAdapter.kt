@@ -41,6 +41,7 @@ class MovieAdapter(
         idTextView.text = item.id.toString()
         titleTextView.text = item.name
         subtitleTextView.text = item.genre
+
         return rowView
     }
 }

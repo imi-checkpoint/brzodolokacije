@@ -33,10 +33,18 @@ class AddMovieActivity: AppCompatActivity() {
                 saveMovie(this,movie)
             }
         }
+
+
+        val btn_back = findViewById<Button>(R.id.btn_add_back)
+        btn_back.setOnClickListener {
+            val intent = Intent(this,MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
     fun saveMovie(context: Context, movie:Movie){
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.0.16:8080/")
+            .baseUrl(Constants.BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
