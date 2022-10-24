@@ -45,6 +45,12 @@ class MovieDetailActivity: AppCompatActivity() {
             var movie :Movie = Movie(id!!,nameField.text.toString(),genreField.text.toString())
             update(this,movie)
         }
+        val btn_back = findViewById<Button>(R.id.btn_back)
+        btn_back.setOnClickListener {
+            val intent = Intent(this,MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     companion object {
