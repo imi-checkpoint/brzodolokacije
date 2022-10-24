@@ -30,7 +30,7 @@ public class MovieController {
     @PutMapping("/update_movie")
     @ResponseBody
     public String updateMovie(@RequestBody Movie movie){
-        movieService.saveMovie(movie);
+        movieService.updateMovie(movie);
         return "Movie updated";
     }
 

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Service
@@ -26,7 +27,15 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public void updateMovie(Movie movie) {
-        movieRepository.save(movie);
+        Movie movieToEdit = movieRepository.findById(movie.getId())
+                .orElseThrow(() -> new IllegalStateException("movie does not exist"));
+
+        if (movie.getName() != null && movie.getName().length() > 0 && !Objects.equals(movieToEdit.getName(), movie.getName())) {
+            movieToEdit.setName(movie.getName());
+        }
+        if (movie.getGenre() != null && movie.getGenre().length() > 0 && !Objects.equals(movieToEdit.getGenre(), movie.getGenre())) {
+            movieToEdit.setGenre(movie.getGenre());
+        }
     }
 
     @Override
