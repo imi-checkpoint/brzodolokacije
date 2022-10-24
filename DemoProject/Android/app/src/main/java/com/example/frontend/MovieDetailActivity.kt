@@ -16,6 +16,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class MovieDetailActivity: AppCompatActivity() {
     private lateinit var webView: WebView
@@ -38,6 +40,11 @@ class MovieDetailActivity: AppCompatActivity() {
         btn_delete.setOnClickListener {
             deleteMethod(id!!)
         }
+        val btn_update = findViewById<Button>(R.id.btn_update)
+        btn_update.setOnClickListener {
+            var movie :Movie = Movie(id!!,nameField.text.toString(),genreField.text.toString())
+            update(this,movie)
+        }
     }
 
     companion object {
@@ -58,7 +65,8 @@ class MovieDetailActivity: AppCompatActivity() {
     fun deleteMethod(movieId: Long) {
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.7:8080/")
+            .baseUrl("http://192.168.42.232:8080/")
+            .addConverterFactory(ScalarsConverterFactory.create())
             .build()
 
         var jsonPlaceHolderApi : JsonPlaceHolderApi;
@@ -73,6 +81,8 @@ class MovieDetailActivity: AppCompatActivity() {
                 var res : String = response.body()!!;
                 Log.i("!!!!!!!!!!! ~~~~~~  test delete: ", res)
                 //vrati na pocetnu
+                val intent = Intent(nes,MainActivity::class.java)
+                startActivity(intent)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
@@ -80,4 +90,36 @@ class MovieDetailActivity: AppCompatActivity() {
         })
     }
 
-}
+
+
+    fun update(context:Context,movie:Movie){
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://192.168.42.232:8080/")
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        var jsonPlaceHolderApi : JsonPlaceHolderApi;
+        jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi::class.java);
+
+        var call : Call<String>;
+        call = jsonPlaceHolderApi.updateMovie(movie)
+        val nes = this
+        call.enqueue(object: Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                var res : String = response.body()!!;
+                Log.i("!!!!!!!!!!! ~~~~~~  test update: ", res)
+                //vrati na pocetnu
+                val intent = Intent(context,MainActivity::class.java)
+                startActivity(intent)
+                finish()
+                Log.i("test123","test123")
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.i("test123",t.toString())
+                Log.i("test123",call.request().toString())
+            }
+        })
+    }
+    }

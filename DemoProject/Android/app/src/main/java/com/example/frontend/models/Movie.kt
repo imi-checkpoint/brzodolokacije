@@ -1,7 +1,9 @@
 package com.example.frontend.models
 
+import com.google.gson.annotations.SerializedName
+
 data class Movie (
-    val id: Long,
-    val name: String,
-    val genre: String
+    @SerializedName("id") val id: Long,
+    @SerializedName("name") val name: String,
+    @SerializedName("genre") val genre: String
 )
