@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:hint="Naziv filma"
+            android:hint="Movie name"
             android:textColor="@color/black" />
 
         <EditText
@@ -38,14 +38,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:hint="Žanr"
+            android:hint="Movie genre"
             android:textColor="@color/black" />
 
         <Button
             android:id="@+id/btn_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sačuvaj" />
+            android:text="Save" />
 
     </LinearLayout>
 
