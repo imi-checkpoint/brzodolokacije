@@ -32,6 +32,9 @@
         <activity android:name=".MovieDetailActivity">
 
         </activity>
+        <activity android:name=".AddMovieActivity">
+
+        </activity>
     </application>
 
 </manifest>

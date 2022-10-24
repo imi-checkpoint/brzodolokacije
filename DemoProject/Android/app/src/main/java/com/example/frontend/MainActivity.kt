@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         var retrofit : Retrofit;
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.7:8080/")
+            .baseUrl("http://192.168.0.16:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -72,5 +72,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+        val btn_add = findViewById<Button>(R.id.btn_add)
+        btn_add.setOnClickListener {
+            val intent = Intent(this,AddMovieActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
     }
 }

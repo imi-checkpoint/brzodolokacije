@@ -7,6 +7,16 @@
     android:padding="8dp"
     tools:context=".MainActivity">
 
+        <Button
+            android:id="@+id/btn_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="2dp"
+            android:text="Dodaj film"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ListView
             android:id="@+id/list_id"
             android:layout_width="wrap_content"

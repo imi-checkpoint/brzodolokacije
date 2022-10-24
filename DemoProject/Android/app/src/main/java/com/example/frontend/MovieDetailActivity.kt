@@ -71,7 +71,7 @@ class MovieDetailActivity: AppCompatActivity() {
     fun deleteMethod(movieId: Long) {
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.42.232:8080/")
+            .baseUrl("http://192.168.0.16:8080/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .build()
 
@@ -100,7 +100,7 @@ class MovieDetailActivity: AppCompatActivity() {
 
     fun update(context:Context,movie:Movie){
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.42.232:8080/")
+            .baseUrl("http://192.168.0.16:8080/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
