@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
@@ -30,7 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.frontend.R
 
-class LoginActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
         setContent {
@@ -38,14 +37,14 @@ class LoginActivity : AppCompatActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background,
             ) {
-                Login(this);
+                Register(this);
             }
         }
     }
 }
 
 @Composable
-fun Login(context : Context){
+fun Register(context : Context){
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
 
@@ -67,13 +66,22 @@ fun Login(context : Context){
             keyboardActions = KeyboardActions(onNext = {
                 passwordFocusRequester.requestFocus()
             }))
+        TextInput(InputType.Mail,
+            keyboardActions = KeyboardActions(onNext = {
+                passwordFocusRequester.requestFocus()
+            }))
         TextInput(InputType.Password,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
             }), focusRequester = passwordFocusRequester)
+        TextInput(InputType.PasswordConfirm,
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }), focusRequester = passwordFocusRequester)
+
         Button(
             onClick = {
-                signInUser(context);
+                registerUser(context);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -81,7 +89,7 @@ fun Login(context : Context){
                 contentColor = Color.White
             )
         ){
-            Text("SIGN IN", Modifier.padding(8.dp))
+            Text("REGISTER", Modifier.padding(8.dp))
         }
 
         Divider(color = Color.White.copy(alpha = 0.3f),
@@ -90,79 +98,24 @@ fun Login(context : Context){
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Don't have an account?", color = Color.Black)
+            Text("Already have an account?", color = Color.Black)
             TextButton(onClick = {
-                goToRegister(context)
+                goToLogIn(context)
             }) {
-                Text("SIGN UP");
+                Text("LOGIN");
             }
         }
     }
 }
 
-fun goToRegister(context : Context) {
-    Log.d("GO TO REGISTER", "Go to sign new user page")
-    val intent = Intent(context,RegisterActivity::class.java);
+
+fun goToLogIn(context : Context) {
+    Log.d("GO TO SIGN UP", "Go to login user page")
+    val intent = Intent(context,LoginActivity::class.java);
     context.startActivity(intent)
 }
 
-fun signInUser(context: Context) {
+fun registerUser(context : Context) {
     Log.d("SING IN USER" , "User sign in function");
-    // kontakt sa bekom
-}
-
-sealed class InputType(val label:String,
-                       val icon: ImageVector,
-                       val keyboardOptions: KeyboardOptions,
-                       val visualTransformation : VisualTransformation
-){
-    object Name : InputType(label = "Username",
-        icon = Icons.Default.Person,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        visualTransformation = VisualTransformation.None
-    )
-    object Mail : InputType(label = "Email",
-        icon = Icons.Default.Email,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        visualTransformation = VisualTransformation.None
-    )
-    object Password : InputType(label = "Password",
-        icon = Icons.Default.Lock,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
-        visualTransformation = PasswordVisualTransformation()
-    )
-    object PasswordConfirm : InputType(label = "Confirm Password",
-        icon = Icons.Default.Lock,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
-        visualTransformation = PasswordVisualTransformation()
-    )
-
-}
-
-@Composable
-fun TextInput(inputType: InputType,
-              focusRequester: FocusRequester?= null,
-              keyboardActions: KeyboardActions) {
-    var value by remember {
-        mutableStateOf("")
-    }
-    TextField(
-        value = value,
-        onValueChange = {value = it},
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusOrder(focusRequester ?: FocusRequester()),
-        leadingIcon = { Icon(imageVector = inputType.icon, contentDescription = null)},
-        label = { Text(text = inputType.label)},
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Gray,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        singleLine = true,
-        keyboardOptions = inputType.keyboardOptions,
-        visualTransformation = inputType.visualTransformation,
-        keyboardActions = keyboardActions
-    )
+    //kontakt sa bekom
 }
