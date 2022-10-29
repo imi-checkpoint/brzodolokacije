@@ -39,7 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/api/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers("/api/register",  "/api/register/**","/api/register**").permitAll();
         http.authorizeRequests().antMatchers("/api/login",  "/api/login/**","/api/login**").permitAll();
-//        http.authorizeRequests().antMatchers(HttpMethod.GET, "api/user/**").hasAuthority("ROLE_USER");
         http.authorizeRequests().anyRequest().authenticated().and().formLogin();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -50,32 +49,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception{
         return super.authenticationManagerBean();
     }
-
-
-//    private final AppUserService appUserService;
-//    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-//    private final AuthenticationManager authenticationManager;
-//
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-//        http
-//                .csrf().disable()
-//                .headers().frameOptions().disable();
-//
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        http.authorizeRequests().anyRequest().permitAll();
-//
-//        http.addFilter(new CustomAuthenticationFilter(authenticationManager));
-//        return http.build();
-//    }
-//
-//    @Bean
-//    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class)
-//                .userDetailsService(appUserService)
-//                .passwordEncoder(bCryptPasswordEncoder)
-//                .and()
-//                .build();
-//    }
-
 }

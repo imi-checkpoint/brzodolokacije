@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,25 +22,8 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class AppUserServiceImpl implements AppUserService {
-
     private final AppUserRepository appUserRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = appUserRepository.findByUsername(username);
-        if(user==null){
-            log.error("User {} not found in database", username);
-            throw new UsernameNotFoundException("User not found.");
-        }
-        else{
-            log.info("User {} found in database", username);
-        }
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("user"));
-
-        return new User(user.getUsername(), user.getPassword(), authorities);
-    }
 
     @Override
     public AppUser saveUser(AppUser user) {
@@ -62,5 +44,21 @@ public class AppUserServiceImpl implements AppUserService {
         return appUserRepository.findAll();
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser user = appUserRepository.findByUsername(username);
 
+        if(user==null){
+            log.error("User {} not found in database", username);
+            throw new UsernameNotFoundException("User not found.");
+        }
+        else{
+            log.info("User {} found in database", username);
+        }
+
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("user"));
+
+        return new User(user.getUsername(), user.getPassword(), authorities);
+    }
 }
