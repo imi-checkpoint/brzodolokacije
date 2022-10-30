@@ -2,7 +2,6 @@ package imi.spring.backend.services.implementations;
 
 import imi.spring.backend.models.Location;
 import imi.spring.backend.repositories.LocationRepository;
-import imi.spring.backend.repositories.LocationSearchRepository;
 import imi.spring.backend.services.LocationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

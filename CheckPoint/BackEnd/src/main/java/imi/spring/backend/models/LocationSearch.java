@@ -18,10 +18,10 @@ public class LocationSearch {
     private Long id;
     private LocalDateTime time;
     @ManyToOne()
-    @JoinColumn(name = "id_location", referencedColumnName = "id")
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
     @ManyToOne()
-    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
 
     public LocationSearch(AppUser user, Location location, LocalDateTime dateTime) {

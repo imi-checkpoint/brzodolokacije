@@ -1,6 +1,5 @@
 package imi.spring.backend.services;
 
-import imi.spring.backend.models.Location;
 import imi.spring.backend.models.LocationSearch;
 
 import java.util.List;
