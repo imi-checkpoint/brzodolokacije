@@ -12,18 +12,22 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping(path = "location_searches")
+@RequestMapping(path = "/location_searches")
 public class LocationSearchController {
 
     private final LocationSearchService locationSearchService;
 
-    @GetMapping("all")
+    @GetMapping("/all")
     @ResponseBody
     public List<LocationSearch> getAllLocationSearches() { return locationSearchService.getLocationSearches(); }
 
-    @PostMapping("save_search/{locationId}")
+    @GetMapping("/{id}")
     @ResponseBody
-    LocationSearch saveLocationSearch(@PathVariable Long locationId) {
+    public LocationSearch getLocationSearchById(@PathVariable Long id) { return locationSearchService.getLocationSearchById(id); }
+
+    @PostMapping("/save_search/{locationId}")
+    @ResponseBody
+    String saveLocationSearch(@PathVariable Long locationId) {
         return locationSearchService.saveSearchForLocation(locationId);
     }
 

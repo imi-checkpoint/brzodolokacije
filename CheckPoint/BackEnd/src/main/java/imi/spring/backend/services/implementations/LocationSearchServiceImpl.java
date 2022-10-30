@@ -2,9 +2,10 @@ package imi.spring.backend.services.implementations;
 
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.LocationSearch;
-import imi.spring.backend.repositories.LocationRepository;
 import imi.spring.backend.repositories.LocationSearchRepository;
+import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.LocationSearchService;
+import imi.spring.backend.services.LocationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,8 @@ import java.util.Optional;
 public class LocationSearchServiceImpl implements LocationSearchService {
 
     private final LocationSearchRepository locationSearchRepository;
-    private final LocationRepository locationRepository;
+    private final LocationService locationService;
+    private final AppUserService appUserService;
 
     @Override
     public List<LocationSearch> getLocationSearches() {
@@ -26,20 +28,20 @@ public class LocationSearchServiceImpl implements LocationSearchService {
 
     @Override
     public LocationSearch getLocationSearchById(Long id) {
-        return locationSearchRepository.findById(id).get();
+        Optional<LocationSearch> locationSearch = locationSearchRepository.findById(id);
+        if (locationSearch.isPresent())
+            return locationSearch.get();
+        return null;
     }
 
     @Override
-    public LocationSearch saveSearchForLocation(Long locationId) {
-        Optional<Location> locationOptional = locationRepository.findById(locationId);
-        if (locationOptional.isPresent()) {
-            LocationSearch locationSearch = new LocationSearch(1L, locationOptional.get(), LocalDateTime.now());
-            return locationSearchRepository.save(locationSearch);
+    public String saveSearchForLocation(Long locationId) {
+        Location location = locationService.getLocationById(locationId);
+        if (location != null) {
+            locationSearchRepository.save(new LocationSearch(appUserService.getAllUsers().get(0), location, LocalDateTime.now()));
+            return "location search has been saved successfully";
         }
-        else {
-            System.out.println("LOCATION NOT FOUND:" + locationOptional);
-            return null;
-        }
+        return"location with that id does not exist";
     }
 
 }

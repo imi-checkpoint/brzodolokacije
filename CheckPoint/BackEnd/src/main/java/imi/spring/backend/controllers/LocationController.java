@@ -20,7 +20,15 @@ public class LocationController {
     @ResponseBody
     public List<Location> getAllLocations() { return locationService.getLocations(); }
 
+    @GetMapping("/{id}")
+    @ResponseBody
+    public Location getLocationById(@PathVariable Long id) { return locationService.getLocationById(id); }
+
     @PostMapping("/save")
     @ResponseBody
     public Location saveLocation(@RequestBody Location location) { return locationService.saveLocation(location); }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public String deleteLocation(@PathVariable Long id) { return locationService.deleteLocation(id); }
 }

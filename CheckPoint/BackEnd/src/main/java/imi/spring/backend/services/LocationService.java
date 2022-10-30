@@ -8,4 +8,8 @@ public interface LocationService {
     List<Location> getLocations();
 
     Location saveLocation(Location location);
+
+    String deleteLocation(Long id);
+
+    Location getLocationById(Long id);
 }

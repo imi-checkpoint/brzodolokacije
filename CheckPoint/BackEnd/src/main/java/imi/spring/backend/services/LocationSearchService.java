@@ -12,5 +12,5 @@ public interface LocationSearchService {
 
     LocationSearch getLocationSearchById(Long id);
 
-    LocationSearch saveSearchForLocation(Long locationId);
+    String saveSearchForLocation(Long locationId);
 }
