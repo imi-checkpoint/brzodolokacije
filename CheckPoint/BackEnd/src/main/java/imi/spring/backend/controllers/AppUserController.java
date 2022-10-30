@@ -1,17 +1,11 @@
 package imi.spring.backend.controllers;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import imi.spring.backend.models.AppUser;
+import imi.spring.backend.models.UserDTO;
 import imi.spring.backend.services.AppUserService;
+import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +20,13 @@ import java.net.URI;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class AppUserController {
     private final AppUserService appUserService;
+    private final JWTService jwtService;
 
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getAllUsers(){
@@ -41,50 +34,25 @@ public class AppUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody AppUser user){
+    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(appUserService.saveUser(user));
+        AppUser appUser = new AppUser(null, user.getEmail(), user.getUsername(), user.getPassword());
+        return ResponseEntity.created(uri).body(appUserService.saveUser(appUser));
     }
 
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        try{
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            String accessToken = jwtService.createNewJWT(request, appUser.getUsername());
+            String refreshToken = request.getHeader(AUTHORIZATION).substring("Bearer".length());
 
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            try{
-                String refreshToken = authorizationHeader.substring("Bearer ".length());
-                Algorithm algorithm = Algorithm.HMAC256("sEcReT".getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refreshToken);
-                String username = decodedJWT.getSubject();
-
-                AppUser appUser = appUserService.getUserByUsername(username);
-
-                String accessToken = JWT.create()
-                        .withSubject(appUser.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10*60*1000))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("role", "user")
-                        .sign(algorithm);
-
-                Map<String,String> tokens = new HashMap<>();
-                tokens.put("access_token", accessToken);
-                tokens.put("refresh_token", refreshToken);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            }catch (Exception e){
-                response.setHeader("error",  e.getMessage());
-                response.setStatus(FORBIDDEN.value());
-                Map<String,String> error = new HashMap<>();
-                error.put("error_message", e.getMessage());
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
+            jwtService.returnJWTokens(response, accessToken, refreshToken);
+        }catch (Exception exception){
+            jwtService.tokenErrorResponse(response, exception);
         }
-        else {
-            throw new RuntimeException("Refresh token is missing");
-        }
+
     }
 
 
