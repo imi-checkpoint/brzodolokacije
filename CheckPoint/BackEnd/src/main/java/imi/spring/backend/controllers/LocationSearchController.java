@@ -1,13 +1,13 @@
 package imi.spring.backend.controllers;
 
-import imi.spring.backend.models.Location;
 import imi.spring.backend.models.LocationSearch;
 import imi.spring.backend.services.LocationSearchService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -19,7 +19,13 @@ public class LocationSearchController {
 
     @GetMapping("/all")
     @ResponseBody
-    public List<LocationSearch> getAllLocationSearches() { return locationSearchService.getLocationSearches(); }
+    public List<LocationSearch> getAllLocationSearches() { return locationSearchService.getAllLocationSearches(); }
+
+    @GetMapping("/my")
+    @ResponseBody
+    public List<LocationSearch> getMyLocationSearches(HttpServletRequest request) throws ServletException {
+        return locationSearchService.getLocationSearchesByUser(request);
+    }
 
     @GetMapping("/{id}")
     @ResponseBody
@@ -27,8 +33,14 @@ public class LocationSearchController {
 
     @PostMapping("/save_search/{locationId}")
     @ResponseBody
-    String saveLocationSearch(@PathVariable Long locationId) {
-        return locationSearchService.saveSearchForLocation(locationId);
+    String saveLocationSearch(HttpServletRequest request, @PathVariable Long locationId) throws ServletException {
+        return locationSearchService.saveSearchForLocation(request, locationId);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public String deleteLocationSearchById(HttpServletRequest request, @PathVariable Long id) throws ServletException {
+        return locationSearchService.deleteLocationSearchById(request, id);
     }
 
 }

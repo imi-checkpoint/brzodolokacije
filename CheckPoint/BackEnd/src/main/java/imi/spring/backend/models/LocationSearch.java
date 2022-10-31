@@ -17,6 +17,7 @@ public class LocationSearch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime time;
+
     @ManyToOne()
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
@@ -24,9 +25,4 @@ public class LocationSearch {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
 
-    public LocationSearch(AppUser user, Location location, LocalDateTime dateTime) {
-        this.user = user;
-        this.location = location;
-        this.time = dateTime;
-    }
 }

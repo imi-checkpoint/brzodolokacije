@@ -23,10 +23,10 @@ public class BackendApplication {
 	@Bean
 	CommandLineRunner run(AppUserService appUserService){
 		return args -> {
-			appUserService.saveUser(new AppUser(null,"user1@gmail.com", "user1", "user1"));
-			appUserService.saveUser(new AppUser(null,"user2@gmail.com", "user2", "user2"));
-			appUserService.saveUser(new AppUser(null,"user3@gmail.com", "user3", "user3"));
-			appUserService.saveUser(new AppUser(null,"user4@gmail.com", "user4", "user4"));
+			appUserService.saveUser(new AppUser(null,"user1@gmail.com", "user1", "user1", null));
+			appUserService.saveUser(new AppUser(null,"user2@gmail.com", "user2", "user2", null));
+			appUserService.saveUser(new AppUser(null,"user3@gmail.com", "user3", "user3", null));
+			appUserService.saveUser(new AppUser(null,"user4@gmail.com", "user4", "user4", null));
 		};
 	}
 

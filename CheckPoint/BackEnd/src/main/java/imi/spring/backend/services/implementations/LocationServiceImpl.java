@@ -28,15 +28,13 @@ public class LocationServiceImpl implements LocationService {
     public String deleteLocation(Long id) {
         if (locationRepository.existsById(id)) {
             locationRepository.deleteById(id);
-            return "location has been deleted successfully";
+            return "Location has been successfully deleted.";
         }
-        return "location with that id does not exist";
+        return "Location with that id does not exist!";
     }
 
     @Override
     public Location getLocationById(Long id) {
-        if (locationRepository.findById(id).isPresent())
-            return locationRepository.findById(id).get();
-        return null;
+        return locationRepository.findById(id).orElse(null);
     }
 }
