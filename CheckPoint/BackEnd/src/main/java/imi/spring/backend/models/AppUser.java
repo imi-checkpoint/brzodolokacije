@@ -28,4 +28,14 @@ public class AppUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] image = null;
+
+    public AppUser(String email, String username, String password) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
+
 }

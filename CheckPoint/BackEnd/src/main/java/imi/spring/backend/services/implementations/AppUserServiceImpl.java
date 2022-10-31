@@ -5,6 +5,7 @@ import imi.spring.backend.repositories.AppUserRepository;
 import imi.spring.backend.services.AppUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +28,20 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUser saveUser(AppUser user) {
+
+        if(appUserRepository.findByUsername(user.getUsername()) != null){
+            log.error("Username {} is taken", user.getUsername());
+            throw new BadCredentialsException("Username is taken");
+        }
+
+        if(appUserRepository.findByEmail(user.getEmail()) != null){
+            log.error("Email {} is taken", user.getEmail());
+            throw new BadCredentialsException("Email is taken");
+        }
+
         log.info("Saving user {} to database.", user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
         return appUserRepository.save(user);
     }
 

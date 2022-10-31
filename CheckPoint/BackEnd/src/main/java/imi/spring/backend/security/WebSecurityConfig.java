@@ -39,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/api/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers("/api/login",  "/api/login/**","/api/login**").permitAll();
         http.authorizeRequests().antMatchers("/api/user/save").permitAll();
+        http.authorizeRequests().antMatchers("/api/register").permitAll();
         http.authorizeRequests().anyRequest().authenticated().and().formLogin();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
