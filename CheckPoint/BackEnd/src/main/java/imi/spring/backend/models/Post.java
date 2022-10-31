@@ -11,18 +11,21 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationSearch {
-
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String description;
+
     private LocalDateTime time;
 
     @ManyToOne()
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
-    private Location location;
-    @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
+    @ManyToOne()
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;
 
+    //slike i videi, ocene, komentari
 }

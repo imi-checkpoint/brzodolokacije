@@ -23,13 +23,9 @@ public class AppUser {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<LocationSearch> locationSearchList = new ArrayList<LocationSearch>();
-
-    public AppUser(Long id, String email, String username, String password) {
-        this.id = id;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-    }
+    private List<LocationSearch> locationSearchList = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> postList = new ArrayList<>();
 
 }

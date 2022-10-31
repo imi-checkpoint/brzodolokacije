@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +29,9 @@ public class Location {
 
     @JsonIgnore
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
-    private List<LocationSearch> locationSearchList = new ArrayList<LocationSearch>();
+    private List<LocationSearch> locationSearchList = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    private List<Post> postList = new ArrayList<>();
 
-    public Location(String name, Double coordinateX, Double coordinateY) {
-        this.name = name;
-        this.coordinateX = coordinateX;
-        this.coordinateY = coordinateY;
-    }
 }

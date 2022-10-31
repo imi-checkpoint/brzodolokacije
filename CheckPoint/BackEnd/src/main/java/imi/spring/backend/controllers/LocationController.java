@@ -1,7 +1,6 @@
 package imi.spring.backend.controllers;
 
 import imi.spring.backend.models.Location;
-import imi.spring.backend.models.LocationSearch;
 import imi.spring.backend.services.LocationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
