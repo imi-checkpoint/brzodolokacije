@@ -108,7 +108,6 @@ fun Register(context : Context){
     }
 }
 
-
 fun goToLogIn(context : Context) {
     Log.d("GO TO SIGN UP", "Go to login user page")
     val intent = Intent(context,LoginActivity::class.java);
