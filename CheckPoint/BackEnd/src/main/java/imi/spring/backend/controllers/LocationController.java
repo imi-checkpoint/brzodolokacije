@@ -23,6 +23,10 @@ public class LocationController {
     @ResponseBody
     public Location getLocationById(@PathVariable Long id) { return locationService.getLocationById(id); }
 
+    @GetMapping("keyword/{name}")
+    @ResponseBody
+    public List<Location> getLocationsById(@PathVariable String name) { return locationService.getLocationsByNameKeyword(name); }
+
     @PostMapping("/save")
     @ResponseBody
     public Location saveLocation(@RequestBody Location location) { return locationService.saveLocation(location); }
