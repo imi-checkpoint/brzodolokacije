@@ -37,4 +37,9 @@ public class LocationServiceImpl implements LocationService {
     public Location getLocationById(Long id) {
         return locationRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public List<Location> getLocationsByNameKeyword(String name) {
+        return locationRepository.findByNameLike("%" + name + "%");
+    }
 }
