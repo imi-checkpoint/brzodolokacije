@@ -6,17 +6,20 @@ import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -36,7 +39,7 @@ public class AppUserController {
     @PostMapping("/user/save")
     public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        AppUser appUser = new AppUser(null, user.getEmail(), user.getUsername(), user.getPassword(), null, null);
+        AppUser appUser = new AppUser(user.getEmail(), user.getUsername(), user.getPassword());
         return ResponseEntity.created(uri).body(appUserService.saveUser(appUser));
     }
 
@@ -52,7 +55,34 @@ public class AppUserController {
         }catch (Exception exception){
             jwtService.tokenErrorResponse(response, exception);
         }
+    }
 
+    @GetMapping("/register")
+    public String registerForm(Model model){
+        model.addAttribute("appUser", new AppUser());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    @ResponseBody
+    public String registerProces(AppUser appUser, @RequestParam("profile_image") MultipartFile profileImage) throws IOException {
+
+        if(!profileImage.isEmpty()){
+            appUser.setImage(profileImage.getBytes());
+        }
+        else {
+            appUser.setImage(Files.readAllBytes(Path.of("src" + File.separator+ "main" + File.separator+ "resources" + File.separator +
+                    "static" + File.separator+ "images" + File.separator+ "default-user.jpeg")));
+        }
+
+        try {
+            appUserService.saveUser(appUser);
+        }
+        catch (BadCredentialsException badCredentialsException){
+            return badCredentialsException.getMessage();
+        }
+
+        return "Successfully registered.";
     }
 
 
