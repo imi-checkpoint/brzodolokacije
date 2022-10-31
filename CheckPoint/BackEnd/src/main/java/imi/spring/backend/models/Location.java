@@ -30,5 +30,8 @@ public class Location {
     @JsonIgnore
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<LocationSearch> locationSearchList = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    private List<Post> postList = new ArrayList<>();
 
 }

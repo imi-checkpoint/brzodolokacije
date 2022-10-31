@@ -24,5 +24,8 @@ public class AppUser {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<LocationSearch> locationSearchList = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> postList = new ArrayList<>();
 
 }
