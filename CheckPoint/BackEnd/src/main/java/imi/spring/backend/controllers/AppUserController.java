@@ -5,6 +5,7 @@ import imi.spring.backend.models.UserDTO;
 import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class AppUserController {
 
     @PostMapping("/register")
     @ResponseBody
-    public String registerProces(AppUser appUser, @RequestParam(name = "profile_image", required = false) MultipartFile profileImage) throws IOException {
+    public String registerProces(@RequestBody AppUser appUser, @RequestParam(name = "profile_image", required = false) MultipartFile profileImage) throws IOException {
 
         if(profileImage!=null && !profileImage.isEmpty()){
             appUser.setImage(profileImage.getBytes());
@@ -84,6 +86,4 @@ public class AppUserController {
 
         return "Successfully registered.";
     }
-
-
 }

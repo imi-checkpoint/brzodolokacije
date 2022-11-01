@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,12 +24,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
+import com.example.frontend.Constants
 import com.example.frontend.R
+import com.example.frontend.api.Requests
+import com.example.frontend.api.RequestsInterface
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +54,8 @@ class LoginActivity : AppCompatActivity() {
 fun Login(context : Context){
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
+    val username : String = "";
+    val password : String = "";
 
     Column(
         Modifier
@@ -63,17 +71,23 @@ fun Login(context : Context){
             tint = Color.Black
         )
 
+        var usernameValue = "";
         TextInput(InputType.Name,
             keyboardActions = KeyboardActions(onNext = {
                 passwordFocusRequester.requestFocus()
-            }))
+            }), valuePar = usernameValue, onChange = {usernameValue = it})
+
+        var passwordValue = "";
         TextInput(InputType.Password,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-            }), focusRequester = passwordFocusRequester)
+            }),
+            focusRequester = passwordFocusRequester
+            ,valuePar = passwordValue, onChange = {passwordValue = it}
+        )
         Button(
             onClick = {
-                signInUser(context);
+                signInUser(context, usernameValue, passwordValue);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -100,15 +114,15 @@ fun Login(context : Context){
     }
 }
 
+
 fun goToRegister(context : Context) {
-    Log.d("GO TO REGISTER", "Go to sign new user page")
     val intent = Intent(context,RegisterActivity::class.java);
     context.startActivity(intent)
 }
 
-fun signInUser(context: Context) {
-    Log.d("SING IN USER" , "User sign in function");
-    // kontakt sa bekom
+fun signInUser(context: Context, name : String, password : String) {
+    val loginRequest = Requests();
+    loginRequest.login(name, password);
 }
 
 sealed class InputType(val label:String,
@@ -142,13 +156,18 @@ sealed class InputType(val label:String,
 @Composable
 fun TextInput(inputType: InputType,
               focusRequester: FocusRequester?= null,
-              keyboardActions: KeyboardActions) {
-    var value by remember {
-        mutableStateOf("")
+              keyboardActions: KeyboardActions,
+              valuePar : String,
+              onChange: (String) -> Unit = {}
+)
+{
+    var valueChange by remember {
+        mutableStateOf(valuePar)
     }
     TextField(
-        value = value,
-        onValueChange = {value = it},
+        value = valueChange,
+        onValueChange = {valueChange = it
+                        onChange(it)},
         modifier = Modifier
             .fillMaxWidth()
             .focusOrder(focusRequester ?: FocusRequester()),
