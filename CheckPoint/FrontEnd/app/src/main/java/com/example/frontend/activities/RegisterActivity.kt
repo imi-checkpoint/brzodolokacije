@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.frontend.R
+import com.example.frontend.api.Requests
 
 class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,26 +53,37 @@ fun Register(context : Context){
             tint = Color.Black
         )
 
+        var usernameValue = "";
         TextInput(InputType.Name,
             keyboardActions = KeyboardActions(onNext = {
                 passwordFocusRequester.requestFocus()
-            }))
+            }),
+            valuePar = usernameValue, onChange = {usernameValue = it})
+
+        var mailValue = "";
         TextInput(InputType.Mail,
             keyboardActions = KeyboardActions(onNext = {
                 passwordFocusRequester.requestFocus()
-            }))
+            }),
+            valuePar = mailValue, onChange = {mailValue = it})
+
+        var passwordValue = "";
         TextInput(InputType.Password,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-            }), focusRequester = passwordFocusRequester)
+            }), focusRequester = passwordFocusRequester,
+            valuePar = passwordValue, onChange = {passwordValue = it})
+
+        var passwordConfirmValue = "";
         TextInput(InputType.PasswordConfirm,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-            }), focusRequester = passwordFocusRequester)
+            }), focusRequester = passwordFocusRequester,
+            valuePar = passwordConfirmValue, onChange = {passwordConfirmValue = it})
 
         Button(
             onClick = {
-                registerUser(context);
+                registerUser(context, mailValue, usernameValue, passwordValue, passwordConfirmValue);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -99,12 +111,12 @@ fun Register(context : Context){
 }
 
 fun goToLogIn(context : Context) {
-    Log.d("GO TO SIGN UP", "Go to login user page")
     val intent = Intent(context,LoginActivity::class.java);
     context.startActivity(intent)
 }
 
-fun registerUser(context : Context) {
-    Log.d("SING IN USER" , "User sign in function");
-    //kontakt sa bekom
+fun registerUser(context : Context,
+                mail: String, username : String, password: String, passwordConfirm : String) {
+    val registerRequest = Requests();
+    registerRequest.register(mail, username, password, passwordConfirm, context);
 }
