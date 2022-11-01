@@ -38,7 +38,7 @@ fun LandingPage(context: Context) {
             .navigationBarsPadding()
             .padding(24.dp)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.Bottom),
+        verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Icon(painter = painterResource(id = R.drawable.logo),

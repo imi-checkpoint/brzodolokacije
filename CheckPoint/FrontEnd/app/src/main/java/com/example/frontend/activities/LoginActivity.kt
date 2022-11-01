@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -26,15 +24,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import com.example.frontend.Constants
 import com.example.frontend.R
 import com.example.frontend.api.Requests
-import com.example.frontend.api.RequestsInterface
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +53,7 @@ fun Login(context : Context){
             .navigationBarsPadding()
             .padding(24.dp)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.Bottom),
+        verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Bottom),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Icon(painter = painterResource(id = R.drawable.logo),
@@ -174,7 +165,7 @@ fun TextInput(inputType: InputType,
         leadingIcon = { Icon(imageVector = inputType.icon, contentDescription = null)},
         label = { Text(text = inputType.label)},
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Gray,
+            backgroundColor = Color.LightGray,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
