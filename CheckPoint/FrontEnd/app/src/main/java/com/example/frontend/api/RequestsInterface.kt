@@ -1,5 +1,6 @@
 package com.example.frontend.api
 
+import com.example.frontend.models.LocationDTO
 import com.example.frontend.models.RegisterDTO
 import com.example.frontend.models.Tokens
 import retrofit2.Call
@@ -15,4 +16,6 @@ interface RequestsInterface {
     @POST("api/login")
     fun login(@Field("username") username:String, @Field("password") password:String):Call<Tokens>
 
+    @GET("api/Location/keyword/{name}")
+    fun searchLocation(@Path("name") name:String):Call<List<LocationDTO>>
 }

@@ -127,5 +127,5 @@ fun registerUser(context : Context,
         return;
     }
     val registerRequest = Requests();
-    registerRequest.register(mail.trim(), username.trim(), password.trim(), passwordConfirm.trim(), context);
+    Requests.register(mail.trim(), username.trim(), password.trim(), passwordConfirm.trim(), context);
 }

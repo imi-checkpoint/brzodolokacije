@@ -113,7 +113,7 @@ fun goToRegister(context : Context) {
 
 fun signInUser(context: Context, name : String, password : String) {
     val loginRequest = Requests();
-    loginRequest.login(name.trim(), password.trim(),context);
+    Requests.login(name.trim(), password.trim(),context);
 }
 
 sealed class InputType(val label:String,

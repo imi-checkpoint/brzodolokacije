@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.frontend.Constants
 import com.example.frontend.activities.LoginActivity
+import com.example.frontend.models.LocationDTO
 import com.example.frontend.models.LoginDTO
 import com.example.frontend.models.RegisterDTO
 import com.example.frontend.models.Tokens
@@ -18,6 +19,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class Requests {
+    companion object{
+
 
     var token : Tokens? = null;
 
@@ -98,5 +101,28 @@ class Requests {
                 ).show();
             }
         })
+    }
+
+        fun search(searchText: String): List<LocationDTO> {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            var requestsInterface : RequestsInterface = retrofit.create(RequestsInterface::class.java)
+
+            var call: Call<List<LocationDTO>> = requestsInterface.searchLocation(searchText);
+
+            var lista:List<LocationDTO> = emptyList()
+            call.enqueue(object:Callback<List<LocationDTO>>{
+                override fun onResponse(call: Call<List<LocationDTO>>, response: Response<List<LocationDTO>>) {
+                    lista = response.body()!!
+                }
+                override fun onFailure(call: Call<List<LocationDTO>>, t: Throwable) {
+
+                }
+            })
+            return lista
+        }
     }
 }
