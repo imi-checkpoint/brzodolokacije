@@ -24,6 +24,11 @@ class Requests {
     fun register(email:String, username:String, password:String, passwordConfirm:String, context : Context){
 
         if(password != passwordConfirm){
+            Toast.makeText(
+                context,
+                "Passwords don't match!",
+                Toast.LENGTH_LONG
+            ).show();
             return ;
         }
 
@@ -57,7 +62,7 @@ class Requests {
         })
     }
 
-    fun login(username:String,password:String){
+    fun login(username:String,password:String, context: Context){
         //Log.d("sss", username+" "+password);
 
         val retrofit = Retrofit.Builder()
@@ -76,10 +81,21 @@ class Requests {
                 //Log.d("REQUESTS LOGIN" , "User logged in success");
                 token = response.body()!!;
                 Log.d("LOGIN CREDS", "token "+ token!!.access_token+" refresh "+ token!!.refresh_token);
+
+                Toast.makeText(
+                    context,
+                    "Login successfull",
+                    Toast.LENGTH_SHORT
+                ).show();
             }
             override fun onFailure(call: Call<Tokens>, t: Throwable) {
                 Log.d("REQUESTS LOGIN" , "User login error!");
                 Log.d("RE", t.toString());
+                Toast.makeText(
+                    context,
+                    "Wrong credentials!",
+                    Toast.LENGTH_SHORT
+                ).show();
             }
         })
     }

@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -117,6 +118,14 @@ fun goToLogIn(context : Context) {
 
 fun registerUser(context : Context,
                 mail: String, username : String, password: String, passwordConfirm : String) {
+    if(mail.trim()=="" || username.trim()=="" || password.trim()=="" || passwordConfirm.trim()==""){
+        Toast.makeText(
+            context,
+            "You must fill all fields",
+            Toast.LENGTH_LONG
+        ).show();
+        return;
+    }
     val registerRequest = Requests();
-    registerRequest.register(mail, username, password, passwordConfirm, context);
+    registerRequest.register(mail.trim(), username.trim(), password.trim(), passwordConfirm.trim(), context);
 }
