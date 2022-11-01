@@ -33,6 +33,9 @@
         <activity
             android:name=".activities.RegisterActivity">
         </activity>
+        <activity
+            android:name=".activities.SearchLocationActivity">
+        </activity>
     </application>
 
 </manifest>
