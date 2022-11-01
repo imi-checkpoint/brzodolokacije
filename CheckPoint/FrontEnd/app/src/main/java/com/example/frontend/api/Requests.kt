@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.frontend.Constants
 import com.example.frontend.activities.LoginActivity
+import com.example.frontend.activities.SearchLocationActivity
 import com.example.frontend.models.LocationDTO
 import com.example.frontend.models.LoginDTO
 import com.example.frontend.models.RegisterDTO
@@ -84,6 +85,10 @@ class Requests {
                 //Log.d("REQUESTS LOGIN" , "User logged in success");
                 token = response.body()!!;
                 Log.d("LOGIN CREDS", "token "+ token!!.access_token+" refresh "+ token!!.refresh_token);
+
+                //predji na search
+                val intent = Intent(context, SearchLocationActivity::class.java);
+                context.startActivity(intent);
 
                 Toast.makeText(
                     context,
