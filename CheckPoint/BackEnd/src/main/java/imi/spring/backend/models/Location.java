@@ -34,4 +34,9 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
 
+    public Location(String name,Double coordinateX,Double coordinateY){
+        this.name = name;
+        this.coordinateX = coordinateX;
+        this.coordinateY = coordinateY;
+    }
 }

@@ -16,6 +16,7 @@ interface RequestsInterface {
     @POST("api/login")
     fun login(@Field("username") username:String, @Field("password") password:String):Call<Tokens>
 
-    @GET("api/Location/keyword/{name}")
+    @Headers("Content-Type: application/json")
+    @GET("api/location/keyword/{name}")
     fun searchLocation(@Path("name") name:String):Call<List<LocationDTO>>
 }

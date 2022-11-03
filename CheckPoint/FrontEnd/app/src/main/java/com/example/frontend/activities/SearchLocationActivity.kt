@@ -20,11 +20,13 @@ import com.example.frontend.models.LocationDTO
 class SearchLocationActivity:AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
+        val Lista:List<LocationDTO> = Requests.search("E");
         setContent {
-                search();
+                lista(Lista);
         }
     }
 }
+
 @Composable
 fun lista(Lista:List<LocationDTO>){
     LazyColumn{
@@ -34,7 +36,7 @@ fun lista(Lista:List<LocationDTO>){
     }
 }
 
-@Preview
+
 @Composable
 fun search() {
     var searchText by remember{ mutableStateOf("")}
