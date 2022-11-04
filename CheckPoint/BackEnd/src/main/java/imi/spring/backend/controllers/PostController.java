@@ -1,15 +1,13 @@
 package imi.spring.backend.controllers;
 
-import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.services.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -26,4 +24,12 @@ public class PostController {
     @GetMapping("/{id}")
     @ResponseBody
     public Post getPostById(@PathVariable Long id) { return postService.getPostById(id); }
+
+    @PostMapping("/save")
+    @ResponseBody
+    public String savePost(HttpServletRequest request, @RequestBody Post post) throws ServletException { return postService.savePost(request, post); }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public String deletePostById(@PathVariable Long id) { return postService.deletePost(id); }
 }
