@@ -1,12 +1,7 @@
 package com.example.frontend.activities
 
 import android.content.Context
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
@@ -15,30 +10,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.frontend.R
+import com.example.frontend.Screen
 import com.example.frontend.api.Requests
 
-class RegisterActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState);
-        setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background,
-            ) {
-                Register(this);
-            }
-        }
-    }
-}
 
 @Composable
-fun Register(context : Context){
+fun RegisterScreen(navController : NavController){
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current;
 
     Column(
         Modifier
@@ -84,7 +70,7 @@ fun Register(context : Context){
 
         Button(
             onClick = {
-                registerUser(context, mailValue, usernameValue, passwordValue, passwordConfirmValue);
+                registerUser(context, navController,mailValue, usernameValue, passwordValue, passwordConfirmValue);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -103,7 +89,7 @@ fun Register(context : Context){
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account?", color = Color.Black)
             TextButton(onClick = {
-                goToLogIn(context)
+                navController.navigate(Screen.LoginScreen.route);
             }) {
                 Text("LOGIN");
             }
@@ -111,12 +97,7 @@ fun Register(context : Context){
     }
 }
 
-fun goToLogIn(context : Context) {
-    val intent = Intent(context,LoginActivity::class.java);
-    context.startActivity(intent)
-}
-
-fun registerUser(context : Context,
+fun registerUser(context : Context, navController: NavController,
                 mail: String, username : String, password: String, passwordConfirm : String) {
     if(mail.trim()=="" || username.trim()=="" || password.trim()=="" || passwordConfirm.trim()==""){
         Toast.makeText(
@@ -126,6 +107,6 @@ fun registerUser(context : Context,
         ).show();
         return;
     }
-    val registerRequest = Requests();
-    Requests.register(mail.trim(), username.trim(), password.trim(), passwordConfirm.trim(), context);
+
+    Requests.register(mail.trim(), username.trim(), password.trim(), passwordConfirm.trim(), navController, context);
 }

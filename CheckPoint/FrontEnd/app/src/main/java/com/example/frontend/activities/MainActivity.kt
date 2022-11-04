@@ -1,11 +1,8 @@
 package com.example.frontend.activities
 
-
-import android.content.Context
-import android.content.Intent
+import Navigation
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -15,24 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.frontend.R
+
+import com.example.frontend.Screen
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background,
-            ) {
-                LandingPage(this)
-            }
+            Navigation()
         }
     }
 }
 
 @Composable
-fun LandingPage(context: Context) {
+fun MainScreen(navController: NavController) {
     Column(
         Modifier
             .navigationBarsPadding()
@@ -49,7 +44,7 @@ fun LandingPage(context: Context) {
 
         Button(
             onClick = {
-                      goToLoginPage(context)
+                      navController.navigate(Screen.LoginScreen.route);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -60,11 +55,5 @@ fun LandingPage(context: Context) {
             Text("LOGIN", Modifier.padding(8.dp))
         }
     }
-}
-
-fun goToLoginPage(context : Context) {
-    Log.d("GO TO LOGIN PAGE", "Go to login user page");
-    val intent = Intent(context,LoginActivity::class.java);
-    context.startActivity(intent)
 }
 

@@ -1,10 +1,6 @@
 package com.example.frontend.activities
 
 import android.content.Context
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,33 +16,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.frontend.R
+import com.example.frontend.Screen
 import com.example.frontend.api.Requests
 
-class LoginActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState);
-        setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background,
-            ) {
-                Login(this);
-            }
-        }
-    }
-}
 
 @Composable
-fun Login(context : Context){
+fun LoginScreen(navController : NavController){
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
-    val username : String = "";
-    val password : String = "";
+    val context = LocalContext.current
 
     Column(
         Modifier
@@ -78,7 +63,7 @@ fun Login(context : Context){
         )
         Button(
             onClick = {
-                signInUser(context, usernameValue, passwordValue);
+                signInUser( usernameValue, passwordValue, navController, context);
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -97,7 +82,7 @@ fun Login(context : Context){
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Don't have an account?", color = Color.Black)
             TextButton(onClick = {
-                goToRegister(context)
+                navController.navigate(Screen.RegisterScreen.route);
             }) {
                 Text("SIGN UP");
             }
@@ -105,15 +90,8 @@ fun Login(context : Context){
     }
 }
 
-
-fun goToRegister(context : Context) {
-    val intent = Intent(context,RegisterActivity::class.java);
-    context.startActivity(intent)
-}
-
-fun signInUser(context: Context, name : String, password : String) {
-    val loginRequest = Requests();
-    Requests.login(name.trim(), password.trim(),context);
+fun signInUser( name : String, password : String, navController : NavController, context : Context) {
+    Requests.login(name.trim(), password.trim(), navController, context);
 }
 
 sealed class InputType(val label:String,

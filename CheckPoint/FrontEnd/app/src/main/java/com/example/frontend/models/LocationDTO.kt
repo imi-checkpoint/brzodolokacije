@@ -1,8 +1,10 @@
 package com.example.frontend.models
 
+import com.squareup.moshi.Json
+
 data class LocationDTO(
-    val id:Long,
-    val name:String,
-    val coordinateX:Double,
-    val coordinateY: Double
+    @field:Json(name = "id") val id:Long,
+    @field:Json(name = "name") val name:String,
+    @field:Json(name = "coordinateX") val coordinateX:Double,
+    @field:Json(name = "coordinateY") val coordinateY: Double
 )
