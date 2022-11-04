@@ -4,7 +4,6 @@ import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.LocationSearch;
 import imi.spring.backend.repositories.LocationSearchRepository;
-import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import imi.spring.backend.services.LocationSearchService;
 import imi.spring.backend.services.LocationService;
@@ -23,7 +22,6 @@ public class LocationSearchServiceImpl implements LocationSearchService {
 
     private final LocationSearchRepository locationSearchRepository;
     private final LocationService locationService;
-    private final AppUserService appUserService;
     private final JWTService jwtService;
 
     @Override

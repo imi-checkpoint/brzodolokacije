@@ -27,6 +27,9 @@ public class AppUser {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PostLike> postLikeList = new ArrayList<>();
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
