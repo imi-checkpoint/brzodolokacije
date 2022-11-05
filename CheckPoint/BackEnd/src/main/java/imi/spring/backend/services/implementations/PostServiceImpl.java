@@ -1,5 +1,6 @@
 package imi.spring.backend.services.implementations;
 
+import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.repositories.PostRepository;
 import imi.spring.backend.services.JWTService;
@@ -53,4 +54,14 @@ public class PostServiceImpl implements PostService {
         return "Post with that id does not exist!";
     }
 
+    @Override
+    public Long getNumberOfPostsInTotal() {
+        return postRepository.count();
+    }
+
+    @Override
+    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        return postRepository.countAllByUser(user);
+    }
 }

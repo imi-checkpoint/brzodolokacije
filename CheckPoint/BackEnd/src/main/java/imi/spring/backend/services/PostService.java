@@ -14,4 +14,8 @@ public interface PostService {
     String savePost(HttpServletRequest request, Post post) throws ServletException;
 
     String deletePost(Long id);
+
+    Long getNumberOfPostsInTotal();
+
+    Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException;
 }
