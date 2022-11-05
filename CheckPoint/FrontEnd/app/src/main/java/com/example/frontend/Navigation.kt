@@ -22,6 +22,9 @@ fun Navigation()
         composable(route = Screen.MainSearchScreen.route){
             MainSearchScreen(navController = navController)
         }
+        composable(route = Screen.ProfileScreen.route){
+            ProfilePage(navController = navController)
+        }
     }
 }
 

@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.frontend.Screen
 import com.example.frontend.api.CustomCallback
 import com.example.frontend.api.Requests
 import com.example.frontend.models.LocationDTO
@@ -22,8 +25,6 @@ import com.example.frontend.models.LocationDTO
 @Composable
 fun MainSearchScreen(navController: NavController)
 {
-    //profile page bar
-
     LocationScreen(navController = navController)
 }
 
@@ -33,14 +34,47 @@ fun LocationScreen(navController: NavController)
 //    Text("Hello world");
     var mList: List<LocationDTO> by remember {  mutableStateOf (listOf()) }
 
+    LaunchedEffect(Unit){
+        Requests.getAll(object : CustomCallback {
+            override fun onSucess(locList: List<LocationDTO>) {
+                Log.d("CALLBACK", locList.toString());
+
+//            locationList = locList;
+                mList = locList;
+            }
+            override fun onFailure() {}
+        })
+    }
+
+
     Column(
         modifier = Modifier
             .navigationBarsPadding()
             .fillMaxSize()
             .padding(20.dp),
-//        verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Top),
-//        horizontalAlignment = Alignment.CenterHorizontally
     ){
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.End
+        )
+        {
+            Button(
+                onClick = {
+                    navController.navigate(Screen.ProfileScreen.route);
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.DarkGray,
+                    contentColor = Color.White
+                )
+            ){
+                Text("Profile page", Modifier.padding(8.dp))
+            }
+        }
+
         search(mList = mList);
 
         Divider(
@@ -52,15 +86,6 @@ fun LocationScreen(navController: NavController)
         lista(mList = mList);
     }
 
-    Requests.getAll(object : CustomCallback {
-        override fun onSucess(locList: List<LocationDTO>) {
-            Log.d("CALLBACK", locList.toString());
-
-//            locationList = locList;
-            mList = locList;
-        }
-        override fun onFailure() {}
-    })
 }
 
 @Composable
@@ -112,9 +137,20 @@ fun search(
     }
 
     var searchText by remember{ mutableStateOf("")}
-//    val focusManager = LocalFocusManager.current
-//    var locationList:List<LocationDTO> = emptyList()
 
+    val trailingIconView = @Composable {
+        IconButton(
+            onClick = {
+                searchText = ""
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "",
+                tint = Color.Black
+            )
+        }
+    }
 
     OutlinedTextField(
         value = searchText,
@@ -126,11 +162,15 @@ fun search(
                 Requests.search( it , object : CustomCallback {
                     override fun onSucess(locList: List<LocationDTO>) {
                         list = locList;
+                        Log.d("LIST SEARCH", "List is changed!");
                     }
 
                     override fun onFailure() {}
                 })
             },
+        trailingIcon = {
+            if (searchText.isNotBlank()) trailingIconView else null
+        },
         modifier = Modifier.fillMaxWidth(),
     )
 }

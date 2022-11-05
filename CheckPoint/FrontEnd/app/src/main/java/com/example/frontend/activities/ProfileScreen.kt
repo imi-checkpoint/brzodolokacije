@@ -20,10 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.frontend.R
 
 @Composable
-fun ProfileScreen()
+fun ProfilePage(navController : NavController)
 {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -32,7 +33,6 @@ fun ProfileScreen()
         TopBar(name = "Tijana")
 
         Spacer(modifier = Modifier.height(4.dp))
-
 
     }
 
@@ -56,7 +56,7 @@ fun TopBar(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
             tint = Color.Black,
-            modifier = modifier.size(24.dp)
+            modifier = modifier.size(24.dp),
         )
 
         Text(
