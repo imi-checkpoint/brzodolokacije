@@ -8,11 +8,13 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.frontend.api.CustomCallback
@@ -30,18 +32,45 @@ fun MainSearchScreen(navController: NavController)
 @Composable
 fun LocationScreen(navController: NavController)
 {
-//    Text("Hello world");
     var mList: List<LocationDTO> by remember {  mutableStateOf (listOf()) }
-
+    var searchText by remember{ mutableStateOf("")}
     Column(
         modifier = Modifier
             .navigationBarsPadding()
             .fillMaxSize()
             .padding(20.dp),
-//        verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Top),
-//        horizontalAlignment = Alignment.CenterHorizontally
     ){
-        search(mList = mList);
+        val trailingIconView = @Composable {
+            IconButton(
+                onClick = {
+                    searchText = ""
+                },
+            ) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+            }
+        }
+        OutlinedTextField(
+            value = searchText,
+            leadingIcon = {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search Icon")
+            },
+            trailingIcon = if (searchText.isNotBlank()) trailingIconView else null ,
+            onValueChange = {
+                searchText = it
+                Requests.search( it , object : CustomCallback {
+                    override fun onSucess(locList: List<LocationDTO>) {
+                        mList = locList;
+                    }
+                    override fun onFailure() {
+                    }
+                })
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Divider(
             color = Color.DarkGray,
@@ -49,14 +78,15 @@ fun LocationScreen(navController: NavController)
             modifier = Modifier.padding(vertical = 30.dp)
         )
 
+        Text(text = if(mList.isEmpty())"No locations found!" else "",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+                .wrapContentHeight())
         lista(mList = mList);
     }
-
+    if(mList.isEmpty() && searchText.equals(""))
     Requests.getAll(object : CustomCallback {
         override fun onSucess(locList: List<LocationDTO>) {
-            Log.d("CALLBACK", locList.toString());
-
-//            locationList = locList;
             mList = locList;
         }
         override fun onFailure() {}
@@ -100,37 +130,4 @@ fun locationCard(location : LocationDTO)
             }
         }
     }
-}
-
-
-@Composable
-fun search(
-    mList : List<LocationDTO>
-) {
-    var list by remember {
-        mutableStateOf(mList);
-    }
-
-    var searchText by remember{ mutableStateOf("")}
-//    val focusManager = LocalFocusManager.current
-//    var locationList:List<LocationDTO> = emptyList()
-
-
-    OutlinedTextField(
-        value = searchText,
-        leadingIcon = {
-                      Icon(imageVector = Icons.Filled.Search, contentDescription = "Search Icon")
-        },
-        onValueChange = {
-                searchText = it
-                Requests.search( it , object : CustomCallback {
-                    override fun onSucess(locList: List<LocationDTO>) {
-                        list = locList;
-                    }
-
-                    override fun onFailure() {}
-                })
-            },
-        modifier = Modifier.fillMaxWidth(),
-    )
 }
