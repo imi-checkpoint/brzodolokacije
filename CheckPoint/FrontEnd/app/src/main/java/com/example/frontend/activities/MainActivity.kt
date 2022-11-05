@@ -21,13 +21,39 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
         setContent {
-            Navigation()
+            if(supportActionBar!=null){
+                supportActionBar!!.hide()
+            }
+//            Text("Hello");
+//            Navigation()
+
+            MyTopBar();
+
+        }
+    }
+}
+
+@Composable
+fun MyTopBar()
+{
+    Column() {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = 8.dp
+        )
+        {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Navigation();
+            }
         }
     }
 }
 
 @Composable
 fun MainScreen(navController: NavController) {
+
     Column(
         Modifier
             .navigationBarsPadding()

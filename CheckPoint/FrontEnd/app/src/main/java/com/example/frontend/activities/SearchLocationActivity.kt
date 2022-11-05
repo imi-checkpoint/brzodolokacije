@@ -19,17 +19,27 @@ import com.example.frontend.api.CustomCallback
 import com.example.frontend.api.Requests
 import com.example.frontend.models.LocationDTO
 
+@Composable
+fun MainSearchScreen(navController: NavController)
+{
+    //profile page bar
+
+    LocationScreen(navController = navController)
+}
 
 @Composable
 fun LocationScreen(navController: NavController)
 {
+//    Text("Hello world");
     var mList: List<LocationDTO> by remember {  mutableStateOf (listOf()) }
 
     Column(
         modifier = Modifier
             .navigationBarsPadding()
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(20.dp),
+//        verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Top),
+//        horizontalAlignment = Alignment.CenterHorizontally
     ){
         search(mList = mList);
 

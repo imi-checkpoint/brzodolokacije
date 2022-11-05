@@ -107,7 +107,7 @@ class Requests {
                     );
 
                     //predji na search
-                    navController.navigate(Screen.SearchLocationScreen.route);
+                    navController.navigate(Screen.MainSearchScreen.route);
 
                     Toast.makeText(
                         context,
