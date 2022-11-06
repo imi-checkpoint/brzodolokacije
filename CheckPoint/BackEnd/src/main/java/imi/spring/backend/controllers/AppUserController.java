@@ -66,7 +66,7 @@ public class AppUserController {
 
     @PostMapping("/register")
     @ResponseBody
-    public String registerProces(@RequestBody AppUser appUser, @RequestParam(name = "profile_image", required = false) MultipartFile profileImage) throws IOException {
+    public String registerProcess(@RequestBody AppUser appUser, @RequestParam(name = "profile_image", required = false) MultipartFile profileImage) throws IOException {
 
         if(profileImage!=null && !profileImage.isEmpty()){
             appUser.setImage(profileImage.getBytes());
