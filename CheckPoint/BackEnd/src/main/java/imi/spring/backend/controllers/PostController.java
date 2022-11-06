@@ -25,9 +25,11 @@ public class PostController {
     @ResponseBody
     public Post getPostById(@PathVariable Long id) { return postService.getPostById(id); }
 
-    @PostMapping("/save")
+    @PostMapping("/save/location/{locationId}")
     @ResponseBody
-    public String savePost(HttpServletRequest request, @RequestBody Post post) throws ServletException { return postService.savePost(request, post); }
+    public String savePost(HttpServletRequest request, @RequestBody Post post, @PathVariable Long locationId) throws ServletException {
+        return postService.savePost(request, post, locationId);
+    }
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
@@ -40,4 +42,8 @@ public class PostController {
     @GetMapping("/count")
     @ResponseBody
     public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException { return postService.getNumberOfPostsPerUser(request); }
+
+    @GetMapping("/location/{locationId}")
+    @ResponseBody
+    public List<Post> getPostsByLocationId(@PathVariable Long locationId) { return postService.getPostsByLocationId(locationId); }
 }
