@@ -1,4 +1,4 @@
-package com.example.frontend.activities
+package com.example.frontend.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,12 +7,12 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,8 +30,18 @@ fun MainSearchScreen(navController: NavController)
 @Composable
 fun LocationScreen(navController: NavController)
 {
+    val context = LocalContext.current
     var mList: List<LocationDTO> by remember {  mutableStateOf (listOf()) }
     var searchText by remember{ mutableStateOf("")}
+
+    if(mList.isEmpty() && searchText.equals(""))
+        Requests.getAll(object : CustomCallback {
+            override fun onSucess(locList: List<LocationDTO>) {
+                mList = locList;
+            }
+            override fun onFailure() {}
+        }, context)
+
     Column(
         modifier = Modifier
             .navigationBarsPadding()
@@ -47,23 +57,39 @@ fun LocationScreen(navController: NavController)
             horizontalAlignment = Alignment.End
         )
         {
-            Button(
-                onClick = {
+            Row(){
+                IconButton(onClick = {
                     navController.navigate(Screen.ProfileScreen.route);
-                },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.DarkGray,
-                    contentColor = Color.White
-                )
-            ){
-                Text("Profile page", Modifier.padding(8.dp))
+                }) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "",
+                        tint = Color.Black
+                    )
+                }
+
+                IconButton(onClick = {
+                    /* go to my messages */
+                }) {
+                    Icon(
+                        Icons.Default.Send,
+                        contentDescription = "",
+                        tint = Color.Black
+                    )
+                }
             }
         }
 
         val trailingIconView = @Composable {
             IconButton(
                 onClick = {
-                    searchText = ""
+                    searchText = "";
+                    Requests.getAll(object : CustomCallback {
+                        override fun onSucess(locList: List<LocationDTO>) {
+                            mList = locList;
+                        }
+                        override fun onFailure() {}
+                    }, context)
                 },
             ) {
                 Icon(
@@ -87,31 +113,31 @@ fun LocationScreen(navController: NavController)
                     }
                     override fun onFailure() {
                     }
-                })
+                }, context)
             },
             modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(
+                    text = "Search locations"
+                )
+            }
         )
 
-        Divider(
-            color = Color.DarkGray,
-            thickness = 2.dp,
-            modifier = Modifier.padding(vertical = 30.dp)
-        )
+//        Divider(
+//            color = Color.DarkGray,
+//            thickness = 2.dp,
+//            modifier = Modifier.padding(vertical = 30.dp)
+//        )
 
         Text(text = if(mList.isEmpty())"No locations found!" else "",
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .wrapContentHeight())
         lista(mList = mList);
     }
 
-    if(mList.isEmpty() && searchText.equals(""))
-        Requests.getAll(object : CustomCallback {
-            override fun onSucess(locList: List<LocationDTO>) {
-                mList = locList;
-            }
-            override fun onFailure() {}
-        })
+
 }
 
 @Composable
