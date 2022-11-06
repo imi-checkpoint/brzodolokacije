@@ -1,5 +1,7 @@
 package com.example.frontend.screens
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +26,7 @@ import com.example.frontend.models.LocationDTO
 @Composable
 fun MainSearchScreen(navController: NavController)
 {
+
     LocationScreen(navController = navController)
 }
 
@@ -134,7 +137,7 @@ fun LocationScreen(navController: NavController)
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight())
-        lista(mList = mList);
+        lista(mList = mList,navController);
     }
 
 
@@ -142,19 +145,20 @@ fun LocationScreen(navController: NavController)
 
 @Composable
 fun lista(
-    mList : List<LocationDTO>
+    mList : List<LocationDTO>,navController: NavController
 ){
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ){
         items(mList){
-                each -> locationCard(location = each)
+                each -> locationCard(location = each,navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun locationCard(location : LocationDTO)
+fun locationCard(location : LocationDTO,navController: NavController)
 {
     Card(
         modifier = Modifier
@@ -162,7 +166,10 @@ fun locationCard(location : LocationDTO)
             .fillMaxWidth(),
         elevation = 2.dp,
         backgroundColor = Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp))
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        onClick = {
+            navController.navigate(Screen.ProfileScreen.route);
+        }
     ){
         Row {
             Column (
