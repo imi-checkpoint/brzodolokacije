@@ -34,10 +34,11 @@ fun ProfilePage(navController : NavController)
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(10.dp)
     )
     {
         TopBar(
-            name = "Tijana",
+            name = "Ime korisnika",
             modifier = Modifier.padding(10.dp),
             navController = navController
         )
