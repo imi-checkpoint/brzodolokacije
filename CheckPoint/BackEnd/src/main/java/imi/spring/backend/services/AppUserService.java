@@ -9,4 +9,5 @@ public interface AppUserService extends UserDetailsService {
     AppUser saveUser(AppUser user);
     AppUser getUserByUsername(String username);
     List<AppUser> getAllUsers();
+    AppUser updateUser(AppUser user);
 }

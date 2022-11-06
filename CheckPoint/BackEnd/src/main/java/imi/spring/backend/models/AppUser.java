@@ -1,16 +1,16 @@
 package imi.spring.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppUser {
@@ -30,6 +30,17 @@ public class AppUser {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PostLike> postLikeList = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "userfollow",
+            joinColumns = {@JoinColumn(name = "user1_id", referencedColumnName = "id", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name="user2_id", referencedColumnName = "id", nullable = false)})
+    private List<AppUser> followingList = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "followingList")
+    private List<AppUser> followersList = new ArrayList<>();
 
     @Lob
     @Basic(fetch = FetchType.LAZY)

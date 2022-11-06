@@ -58,6 +58,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public AppUser updateUser(AppUser user) {
+        return appUserRepository.save(user);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = appUserRepository.findByUsername(username);
 
