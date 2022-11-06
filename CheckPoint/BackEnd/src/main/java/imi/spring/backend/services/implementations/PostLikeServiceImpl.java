@@ -45,7 +45,7 @@ public class PostLikeServiceImpl implements PostLikeService {
             return "Post with that id does not exist!";
         PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, user.getId());
         if (postLike == null){ //like
-            postLikeRepository.save(new PostLike(null, LocalDateTime.now(), post, user));
+            postLikeRepository.save(new PostLike(post, user, LocalDateTime.now()));
             return "Liked";
         }
         postLikeRepository.delete(postLike); //unlike

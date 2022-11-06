@@ -1,5 +1,6 @@
 package imi.spring.backend.models;
 
+import imi.spring.backend.models.composite_pk_classes.PostLikeId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,18 +12,17 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@IdClass(PostLikeId.class)
 public class PostLike {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private LocalDateTime time;
-
     @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
-    Post post;
+    private Post post;
+    @Id
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    AppUser user;
+    private AppUser user;
+
+    private LocalDateTime time;
 }

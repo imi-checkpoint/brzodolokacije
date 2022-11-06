@@ -32,4 +32,12 @@ public class PostController {
     @DeleteMapping("/delete/{id}")
     @ResponseBody
     public String deletePostById(@PathVariable Long id) { return postService.deletePost(id); }
+
+    @GetMapping("/count/all")
+    @ResponseBody
+    public Long getNumberOfPostsInTotal() { return postService.getNumberOfPostsInTotal(); }
+
+    @GetMapping("/count")
+    @ResponseBody
+    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException { return postService.getNumberOfPostsPerUser(request); }
 }

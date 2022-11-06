@@ -16,6 +16,7 @@ public class LocationSearch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime time;
 
     @ManyToOne()
