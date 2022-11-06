@@ -1,6 +1,7 @@
 package imi.spring.backend.services.implementations;
 
 import imi.spring.backend.models.AppUser;
+import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.repositories.PostRepository;
 import imi.spring.backend.services.JWTService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -35,10 +37,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public String savePost(HttpServletRequest request, Post post) throws ServletException {
-        if (locationService.getLocationById(post.getLocation().getId()) != null) {
+    public String savePost(HttpServletRequest request, Post post, Long locationId) throws ServletException {
+        Location location = locationService.getLocationById(locationId);
+        if (location != null) {
             post.setTime(LocalDateTime.now());
             post.setUser(jwtService.getAppUserFromJWT(request));
+            post.setLocation(location);
             postRepository.save(post);
             return "Saved";
         }
@@ -63,5 +67,13 @@ public class PostServiceImpl implements PostService {
     public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         return postRepository.countAllByUser(user);
+    }
+
+    @Override
+    public List<Post> getPostsByLocationId(Long locationId) {
+        Location location = locationService.getLocationById(locationId);
+        if (location != null)
+            return postRepository.findAllByLocation(location);
+        return Collections.emptyList();
     }
 }

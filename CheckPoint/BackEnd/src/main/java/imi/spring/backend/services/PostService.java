@@ -11,11 +11,13 @@ public interface PostService {
 
     Post getPostById(Long id);
 
-    String savePost(HttpServletRequest request, Post post) throws ServletException;
+    String savePost(HttpServletRequest request, Post post, Long locationId) throws ServletException;
 
     String deletePost(Long id);
 
     Long getNumberOfPostsInTotal();
 
     Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException;
+
+    List<Post> getPostsByLocationId(Long locationId);
 }
