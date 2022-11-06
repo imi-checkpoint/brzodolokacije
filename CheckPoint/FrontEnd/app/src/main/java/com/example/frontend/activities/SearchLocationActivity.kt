@@ -1,5 +1,7 @@
 package com.example.frontend.activities
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,6 +27,7 @@ import com.example.frontend.models.LocationDTO
 @Composable
 fun MainSearchScreen(navController: NavController)
 {
+
     LocationScreen(navController = navController)
 }
 
@@ -32,6 +36,7 @@ fun LocationScreen(navController: NavController)
 {
     var mList: List<LocationDTO> by remember {  mutableStateOf (listOf()) }
     var searchText by remember{ mutableStateOf("")}
+
     Column(
         modifier = Modifier
             .navigationBarsPadding()
@@ -102,7 +107,7 @@ fun LocationScreen(navController: NavController)
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
                 .wrapContentHeight())
-        lista(mList = mList);
+        lista(mList = mList,navController);
     }
 
     if(mList.isEmpty() && searchText.equals(""))
@@ -116,19 +121,20 @@ fun LocationScreen(navController: NavController)
 
 @Composable
 fun lista(
-    mList : List<LocationDTO>
+    mList : List<LocationDTO>,navController: NavController
 ){
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ){
         items(mList){
-                each -> locationCard(location = each)
+                each -> locationCard(location = each,navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun locationCard(location : LocationDTO)
+fun locationCard(location : LocationDTO,navController: NavController)
 {
     Card(
         modifier = Modifier
@@ -136,7 +142,10 @@ fun locationCard(location : LocationDTO)
             .fillMaxWidth(),
         elevation = 2.dp,
         backgroundColor = Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp))
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        onClick = {
+            navController.navigate(Screen.ProfileScreen.route);
+        }
     ){
         Row {
             Column (
