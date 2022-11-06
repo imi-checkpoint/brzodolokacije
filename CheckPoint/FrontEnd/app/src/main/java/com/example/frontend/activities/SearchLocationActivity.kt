@@ -104,13 +104,14 @@ fun LocationScreen(navController: NavController)
                 .wrapContentHeight())
         lista(mList = mList);
     }
+
     if(mList.isEmpty() && searchText.equals(""))
-    Requests.getAll(object : CustomCallback {
-        override fun onSucess(locList: List<LocationDTO>) {
-            mList = locList;
-        }
-        override fun onFailure() {}
-    })
+        Requests.getAll(object : CustomCallback {
+            override fun onSucess(locList: List<LocationDTO>) {
+                mList = locList;
+            }
+            override fun onFailure() {}
+        })
 }
 
 @Composable
