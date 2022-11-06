@@ -3,7 +3,11 @@ package com.example.frontend.api
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material.Text
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import com.example.frontend.Constants
 import com.example.frontend.Screen
@@ -12,6 +16,10 @@ import com.example.frontend.models.RegisterDTO
 import com.example.frontend.models.Tokens
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -26,6 +34,7 @@ class Requests {
     companion object {
 
         var token: Tokens? = null;
+        var requestsInterface: RequestsInterface = RetrofitInstance.api;
 
         fun register(
             email: String,
@@ -45,14 +54,6 @@ class Requests {
                 return;
             }
 
-            val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            var requestsInterface: RequestsInterface =
-                retrofit.create(RequestsInterface::class.java)
 
             var call: Call<String> =
                 requestsInterface.register(RegisterDTO(email, username, password));
@@ -83,16 +84,6 @@ class Requests {
             navController: NavController,
             context: Context
         ) {
-            //Log.d("sss", username+" "+password);
-
-            val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            var requestsInterface: RequestsInterface =
-                retrofit.create(RequestsInterface::class.java)
 
             var call: Call<Tokens> = requestsInterface.login(username, password);
 
@@ -101,6 +92,14 @@ class Requests {
                 override fun onResponse(call: Call<Tokens>, response: Response<Tokens>) {
                     //Log.d("REQUESTS LOGIN" , "User logged in success");
                     token = response.body()!!;
+
+                    //sacuvaj token
+                    GlobalScope.launch(Dispatchers.IO) {
+                        DataStoreManager.saveValue(context, "access_token", token!!.access_token);
+                        DataStoreManager.saveValue(context, "refresh_token", token!!.refresh_token);
+                    }
+
+
                     Log.d(
                         "LOGIN CREDS",
                         "token " + token!!.access_token + " refresh " + token!!.refresh_token
@@ -128,77 +127,79 @@ class Requests {
             })
         }
 
-        fun search(searchText: String, customCallback: CustomCallback){
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build();
-            val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-//                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
+        fun search(searchText: String, customCallback: CustomCallback, context: Context){
 
-            var requestsInterface: RequestsInterface =
-                retrofit.create(RequestsInterface::class.java)
+            var access_token : String = "";
+            var refresh_token : String = "";
+            //sacuvaj token
+            GlobalScope.launch(Dispatchers.IO) {
+                access_token =  DataStoreManager.getStringValue(context, "access_token");
+                refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+                Log.d("GOT CREDS", "${access_token}, ${refresh_token}")
 
-            val call: Call<List<LocationDTO>> =
-                requestsInterface.searchLocation("Bearer " + token!!.access_token, searchText);
+                val call: Call<List<LocationDTO>> =
+                    requestsInterface.searchLocation("Bearer " + access_token, searchText);
 
 
-            call.enqueue(object : Callback<List<LocationDTO>> {
-                override fun onResponse(
-                    call: Call<List<LocationDTO>>,
-                    response: Response<List<LocationDTO>>
-                ) {
+                call.enqueue(object : Callback<List<LocationDTO>> {
+                    override fun onResponse(
+                        call: Call<List<LocationDTO>>,
+                        response: Response<List<LocationDTO>>
+                    ) {
 //                    val lista = mutableListOf<LocationDTO>()
-                    var lista : List<LocationDTO>  = emptyList();
+                        var lista : List<LocationDTO>  = emptyList();
 //                    var lista : MutableList<LocationDTO>  = MutableList<LocationDTO>(0);
 
-                    response.body()?.forEach { loc ->
-                        lista += loc;
+                        response.body()?.forEach { loc ->
+                            lista += loc;
+                        }
+                        Log.d("LOCATION SEARCH", "Lista je ${lista}");
+                        customCallback.onSucess(lista);
                     }
-                    Log.d("LOCATION SEARCH", "Lista je ${lista}");
-                    customCallback.onSucess(lista);
-                }
 
-                override fun onFailure(call: Call<List<LocationDTO>>, t: Throwable) {
-                    println(t.message)
-                }
-            })
+                    override fun onFailure(call: Call<List<LocationDTO>>, t: Throwable) {
+                        println(t.message)
+                    }
+                })
+            }
+
         }
 
-        fun getAll(customCallback: CustomCallback){
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build();
-            val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-//                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
+        fun getAll(customCallback: CustomCallback, context: Context){
 
-            var requestsInterface: RequestsInterface =
-                retrofit.create(RequestsInterface::class.java)
+            var access_token : String = "";
+            var refresh_token : String = "";
+            //sacuvaj token
+            GlobalScope.launch(Dispatchers.IO) {
+                access_token =  DataStoreManager.getStringValue(context, "access_token");
+                refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+                Log.d("GOT CREDS", "${access_token}, ${refresh_token}")
 
-            val call: Call<List<LocationDTO>> =
-                requestsInterface.getAll("Bearer " + token!!.access_token);
+                val call: Call<List<LocationDTO>> =
+                    requestsInterface.getAll("Bearer " + access_token);
 
 
-            call.enqueue(object : Callback<List<LocationDTO>> {
-                override fun onResponse(
-                    call: Call<List<LocationDTO>>,
-                    response: Response<List<LocationDTO>>
-                ) {
+                call.enqueue(object : Callback<List<LocationDTO>> {
+                    override fun onResponse(
+                        call: Call<List<LocationDTO>>,
+                        response: Response<List<LocationDTO>>
+                    ) {
 //                    val lista = mutableListOf<LocationDTO>()
-                    var lista : List<LocationDTO>  = emptyList();
+                        var lista : List<LocationDTO>  = emptyList();
 //                    var lista : MutableList<LocationDTO>  = MutableList<LocationDTO>(0);
 
-                    response.body()?.forEach { loc ->
-                        lista += loc;
+                        response.body()?.forEach { loc ->
+                            lista += loc;
+                        }
+                        customCallback.onSucess(lista);
                     }
-                    customCallback.onSucess(lista);
-                }
 
-                override fun onFailure(call: Call<List<LocationDTO>>, t: Throwable) {
-                    println(t.message)
-                }
-            })
+                    override fun onFailure(call: Call<List<LocationDTO>>, t: Throwable) {
+                        println(t.message)
+                    }
+                })
+            }
+
         }
     }
 }

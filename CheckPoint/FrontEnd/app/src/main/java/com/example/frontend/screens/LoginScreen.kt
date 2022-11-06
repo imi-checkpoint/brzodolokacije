@@ -1,4 +1,4 @@
-package com.example.frontend.activities
+package com.example.frontend.screens
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
@@ -41,7 +41,7 @@ fun LoginScreen(navController : NavController){
         verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Bottom),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Icon(painter = painterResource(id = R.drawable.logo),
+        Icon(painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,
             Modifier.size(80.dp),
             tint = Color.Black
