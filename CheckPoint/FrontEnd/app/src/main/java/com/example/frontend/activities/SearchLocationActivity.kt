@@ -1,6 +1,5 @@
 package com.example.frontend.activities
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.frontend.Screen
 import com.example.frontend.api.CustomCallback
 import com.example.frontend.api.Requests
 import com.example.frontend.models.LocationDTO
@@ -24,8 +24,6 @@ import com.example.frontend.models.LocationDTO
 @Composable
 fun MainSearchScreen(navController: NavController)
 {
-    //profile page bar
-
     LocationScreen(navController = navController)
 }
 
@@ -40,6 +38,28 @@ fun LocationScreen(navController: NavController)
             .fillMaxSize()
             .padding(20.dp),
     ){
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.End
+        )
+        {
+            Button(
+                onClick = {
+                    navController.navigate(Screen.ProfileScreen.route);
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.DarkGray,
+                    contentColor = Color.White
+                )
+            ){
+                Text("Profile page", Modifier.padding(8.dp))
+            }
+        }
+
         val trailingIconView = @Composable {
             IconButton(
                 onClick = {
@@ -84,13 +104,14 @@ fun LocationScreen(navController: NavController)
                 .wrapContentHeight())
         lista(mList = mList);
     }
+
     if(mList.isEmpty() && searchText.equals(""))
-    Requests.getAll(object : CustomCallback {
-        override fun onSucess(locList: List<LocationDTO>) {
-            mList = locList;
-        }
-        override fun onFailure() {}
-    })
+        Requests.getAll(object : CustomCallback {
+            override fun onSucess(locList: List<LocationDTO>) {
+                mList = locList;
+            }
+            override fun onFailure() {}
+        })
 }
 
 @Composable

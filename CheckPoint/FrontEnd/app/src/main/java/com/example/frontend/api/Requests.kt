@@ -155,6 +155,7 @@ class Requests {
                     response.body()?.forEach { loc ->
                         lista += loc;
                     }
+                    Log.d("LOCATION SEARCH", "Lista je ${lista}");
                     customCallback.onSucess(lista);
                 }
 
