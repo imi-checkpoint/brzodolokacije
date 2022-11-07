@@ -61,7 +61,7 @@ class Requests {
             val nes = this
             call.enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
-                    //Log.d("REQUESTS REGISTER" , "User registered success");
+                    Log.d("REQUESTS REGISTER" , "User registered success");
                     navController.navigate(Screen.LoginScreen.route);
 
                     Toast.makeText(
