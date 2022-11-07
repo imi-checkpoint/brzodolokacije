@@ -1,6 +1,8 @@
 package imi.spring.backend.controllers;
 
+import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Post;
+import imi.spring.backend.services.JWTService;
 import imi.spring.backend.services.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final JWTService jwtService;
 
     @GetMapping("/all")
     @ResponseBody
@@ -28,7 +31,10 @@ public class PostController {
     @PostMapping("/save/location/{locationId}")
     @ResponseBody
     public String savePost(HttpServletRequest request, @RequestBody Post post, @PathVariable Long locationId) throws ServletException {
-        return postService.savePost(request, post, locationId);
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.savePost(post, user.getId(), locationId);
+        return "Invalid user!";
     }
 
     @DeleteMapping("/delete/{id}")

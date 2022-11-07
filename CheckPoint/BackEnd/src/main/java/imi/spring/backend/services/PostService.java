@@ -11,7 +11,7 @@ public interface PostService {
 
     Post getPostById(Long id);
 
-    String savePost(HttpServletRequest request, Post post, Long locationId) throws ServletException;
+    String savePost(Post post, Long userId, Long locationId);
 
     String deletePost(Long id);
 

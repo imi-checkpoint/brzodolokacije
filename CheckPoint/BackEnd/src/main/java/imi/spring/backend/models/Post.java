@@ -21,7 +21,6 @@ public class Post {
     private String description;
     private LocalDateTime time;
 
-
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
@@ -34,4 +33,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostLike> postLikeList = new ArrayList<>();
 
+    public Post(String description) {
+        this.description = description;
+    }
 }
