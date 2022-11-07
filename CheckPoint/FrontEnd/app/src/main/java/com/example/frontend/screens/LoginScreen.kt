@@ -43,7 +43,7 @@ fun LoginScreen(navController : NavController){
     ){
         Icon(painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,
-            Modifier.size(80.dp),
+            Modifier.size(150.dp),
             tint = Color.Black
         )
 

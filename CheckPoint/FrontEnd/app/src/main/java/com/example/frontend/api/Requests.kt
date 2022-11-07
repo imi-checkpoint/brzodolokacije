@@ -61,7 +61,7 @@ class Requests {
             val nes = this
             call.enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
-                    //Log.d("REQUESTS REGISTER" , "User registered success");
+                    Log.d("REQUESTS REGISTER" , "User registered success");
                     navController.navigate(Screen.LoginScreen.route);
 
                     Toast.makeText(
@@ -74,6 +74,12 @@ class Requests {
                 override fun onFailure(call: Call<String>, t: Throwable) {
                     Log.d("REQUESTS REGISTER", "User register error!");
                     Log.d("RE", t.toString());
+
+                    Toast.makeText(
+                        context,
+                        "Error! Try again!",
+                        Toast.LENGTH_SHORT
+                    ).show();
                 }
             })
         }

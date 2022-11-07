@@ -22,7 +22,9 @@ import com.example.frontend.api.Requests
 
 @Composable
 fun RegisterScreen(navController : NavController){
+    var emailFocusRequester = FocusRequester()
     var passwordFocusRequester = FocusRequester()
+    var passwordRepeatFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current;
 
@@ -36,14 +38,14 @@ fun RegisterScreen(navController : NavController){
     ){
         Icon(painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,
-            Modifier.size(80.dp),
+            Modifier.size(150.dp),
             tint = Color.Black
         )
 
         var usernameValue = "";
         TextInput(InputType.Name,
             keyboardActions = KeyboardActions(onNext = {
-                passwordFocusRequester.requestFocus()
+                emailFocusRequester.requestFocus()
             }),
             valuePar = usernameValue, onChange = {usernameValue = it})
 
@@ -51,13 +53,13 @@ fun RegisterScreen(navController : NavController){
         TextInput(InputType.Mail,
             keyboardActions = KeyboardActions(onNext = {
                 passwordFocusRequester.requestFocus()
-            }),
+            }), focusRequester = emailFocusRequester,
             valuePar = mailValue, onChange = {mailValue = it})
 
         var passwordValue = "";
         TextInput(InputType.Password,
             keyboardActions = KeyboardActions(onDone = {
-                focusManager.clearFocus()
+                passwordRepeatFocusRequester.requestFocus()
             }), focusRequester = passwordFocusRequester,
             valuePar = passwordValue, onChange = {passwordValue = it})
 
@@ -65,7 +67,7 @@ fun RegisterScreen(navController : NavController){
         TextInput(InputType.PasswordConfirm,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-            }), focusRequester = passwordFocusRequester,
+            }), focusRequester = passwordRepeatFocusRequester,
             valuePar = passwordConfirmValue, onChange = {passwordConfirmValue = it})
 
         Button(
