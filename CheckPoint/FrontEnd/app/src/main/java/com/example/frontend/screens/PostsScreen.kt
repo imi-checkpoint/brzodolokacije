@@ -43,7 +43,6 @@ fun PostsScreen(navController: NavController,location:Long){
             .fillMaxSize()
             .padding(20.dp),
     ){
-            Text("test")
             IconButton(onClick = { navController.navigate(Screen.MainSearchScreen.route) }) {
                 Icon(Icons.Default.ArrowBack,
                     contentDescription = "",
