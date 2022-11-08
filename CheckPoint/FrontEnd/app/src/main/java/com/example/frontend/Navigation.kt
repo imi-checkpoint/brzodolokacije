@@ -3,6 +3,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.frontend.Screen
+import com.example.frontend.models.LocationDTO
+import com.example.frontend.models.PostDTO
 import com.example.frontend.screens.*
 
 @Composable
@@ -21,6 +23,13 @@ fun Navigation()
         }
         composable(route = Screen.ProfileScreen.route){
             ProfilePage(navController = navController)
+        }
+        composable(route = Screen.PostsScreen.route,){
+            val locationId:Long = navController
+                .previousBackStackEntry
+                ?.arguments
+                ?.getLong("location")!!
+            MainPostsScreen(navController = navController,locationId)
         }
     }
 }

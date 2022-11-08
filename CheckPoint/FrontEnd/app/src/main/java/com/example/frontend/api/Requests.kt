@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.example.frontend.Constants
 import com.example.frontend.Screen
 import com.example.frontend.models.LocationDTO
+import com.example.frontend.models.PostDTO
 import com.example.frontend.models.RegisterDTO
 import com.example.frontend.models.Tokens
 import com.squareup.moshi.Moshi
@@ -25,8 +26,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-interface CustomCallback {
-    fun onSucess(value: List<LocationDTO>)
+interface CustomCallback<T> {
+    fun onSucess(value: T)
     fun onFailure()
 }
 
@@ -133,7 +134,7 @@ class Requests {
             })
         }
 
-        fun search(searchText: String, customCallback: CustomCallback, context: Context){
+        fun search(searchText: String, customCallback: CustomCallback<List<LocationDTO>>, context: Context){
 
             var access_token : String = "";
             var refresh_token : String = "";
@@ -171,7 +172,7 @@ class Requests {
 
         }
 
-        fun getAll(customCallback: CustomCallback, context: Context){
+        fun getAll(customCallback: CustomCallback<List<LocationDTO>>, context: Context){
 
             var access_token : String = "";
             var refresh_token : String = "";
@@ -207,5 +208,39 @@ class Requests {
             }
 
         }
+        fun getPostsFromLocation(customCallback: CustomCallback<List<PostDTO>>,context: Context,locationId:Long){
+            var access_token : String = "";
+            var refresh_token : String = "";
+            //sacuvaj token
+            GlobalScope.launch(Dispatchers.IO) {
+                access_token =  DataStoreManager.getStringValue(context, "access_token");
+                refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+                Log.d("GOT CREDS", "${access_token}, ${refresh_token}")
+
+                val call: Call<List<PostDTO>> =
+                    requestsInterface.getPostsFromLocation("Bearer " + access_token,locationId);
+
+
+                call.enqueue(object : Callback<List<PostDTO>> {
+                    override fun onResponse(
+                        call: Call<List<PostDTO>>,
+                        response: Response<List<PostDTO>>
+                    ) {
+                        var lista : List<PostDTO>  = emptyList();
+
+                        response.body()?.forEach { loc ->
+                            lista += loc
+                        }
+                        customCallback.onSucess(lista);
+                    }
+
+                    override fun onFailure(call: Call<List<PostDTO>>, t: Throwable) {
+                        println(t.message)
+                    }
+                })
+            }
+        }
+
+
     }
 }

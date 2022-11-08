@@ -1,6 +1,7 @@
 package com.example.frontend.api
 
 import com.example.frontend.models.LocationDTO
+import com.example.frontend.models.PostDTO
 import com.example.frontend.models.RegisterDTO
 import com.example.frontend.models.Tokens
 import retrofit2.Call
@@ -23,4 +24,8 @@ interface RequestsInterface {
     @Headers("Content-Type: application/json")
     @GET("location/all")
     fun getAll(@Header("Authorization") token : String):Call<List<LocationDTO>>
+
+    @Headers("Content-Type: application/json")
+    @GET("post/location/{locationId}")
+    fun getPostsFromLocation(@Header("Authorization") token : String,@Path("locationId") locationId:Long):Call<List<PostDTO>>
 }

@@ -1,7 +1,6 @@
 package com.example.frontend.screens
 
-import android.content.Context
-import android.content.Intent
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,7 +37,7 @@ fun LocationScreen(navController: NavController)
     var searchText by remember{ mutableStateOf("")}
 
     if(mList.isEmpty() && searchText.equals(""))
-        Requests.getAll(object : CustomCallback {
+        Requests.getAll(object : CustomCallback<List<LocationDTO>> {
             override fun onSucess(locList: List<LocationDTO>) {
                 mList = locList;
             }
@@ -87,7 +86,7 @@ fun LocationScreen(navController: NavController)
             IconButton(
                 onClick = {
                     searchText = "";
-                    Requests.getAll(object : CustomCallback {
+                    Requests.getAll(object : CustomCallback<List<LocationDTO>> {
                         override fun onSucess(locList: List<LocationDTO>) {
                             mList = locList;
                         }
@@ -110,7 +109,7 @@ fun LocationScreen(navController: NavController)
             trailingIcon = if (searchText.isNotBlank()) trailingIconView else null ,
             onValueChange = {
                 searchText = it
-                Requests.search( it , object : CustomCallback {
+                Requests.search( it , object : CustomCallback<List<LocationDTO>> {
                     override fun onSucess(locList: List<LocationDTO>) {
                         mList = locList;
                     }
@@ -168,7 +167,8 @@ fun locationCard(location : LocationDTO,navController: NavController)
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick = {
-            navController.navigate(Screen.ProfileScreen.route);
+            navController.currentBackStackEntry?.arguments?.putLong("location",location.id)
+            navController.navigate(Screen.PostsScreen.route);
         }
     ){
         Row {

@@ -5,6 +5,7 @@ import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.LocationService;
+import imi.spring.backend.services.PostService;
 
 import imi.spring.backend.services.PostService;
 import org.springframework.boot.CommandLineRunner;

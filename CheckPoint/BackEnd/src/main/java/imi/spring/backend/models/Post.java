@@ -19,6 +19,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
+    @JsonIgnore
     private LocalDateTime time;
 
     @ManyToOne()
