@@ -87,7 +87,7 @@ app.delete("/logout", (req, res) => {
 })
 
 app.get("/download", checkAuthenticated, (req, res) =>{
-    res.download("./apk/checkpoint.mp4")
+    res.download("./apk/checkpoint.apk")
 })
 
 function checkNotAuthenticated(req, res, next){
