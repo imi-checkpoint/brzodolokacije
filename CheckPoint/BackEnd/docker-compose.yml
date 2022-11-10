@@ -4,7 +4,7 @@ services:
     build: .
     restart: always
     ports:
-      - 8080:8080
+      - 10060:8080
     depends_on:
       - mysqldb
       - mongodb
@@ -12,13 +12,11 @@ services:
     image: "mysql:5.7"
     restart: always
     ports:
-      - 3306:3306
+      - 10068:3306
     environment:
-      MYSQL_DATABASE: checkpoint
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: rootpwd
   mongodb:
-    image: mongo:latest
+    image: "mongo:latest"
     container_name: "mongodb"
     ports:
-      - 27017:27017
+      - 10067:27017
