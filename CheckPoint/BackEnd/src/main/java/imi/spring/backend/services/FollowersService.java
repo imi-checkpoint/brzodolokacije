@@ -14,4 +14,8 @@ public interface FollowersService {
     Integer countAllFollowingByUser(Long userId);
 
     Integer countAllFollowersPerUser(Long userId);
+
+    List<AppUser> getFollowingByUsername(Long userId, String username);
+
+    List<AppUser> getFollowersByUsername(Long userId, String username);
 }
