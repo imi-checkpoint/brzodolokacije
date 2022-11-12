@@ -1,6 +1,8 @@
 package com.example.frontend.di
 
 import Constants.Companion.BASE_URL
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.repository.CheckpointRepositoryImpl
 import com.example.frontend.domain.repository.CheckpointRepository
@@ -9,6 +11,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -38,4 +41,5 @@ object AppModule {
     fun provideCheckpointRepository(api : CheckpointApi) : CheckpointRepository {
         return CheckpointRepositoryImpl(api)
     }
+
 }

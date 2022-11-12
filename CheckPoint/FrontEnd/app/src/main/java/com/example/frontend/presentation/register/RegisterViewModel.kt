@@ -4,7 +4,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.frontend.common.Resource
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.use_case.register_user.RegisterUseCase
 import com.example.frontend.presentation.register.components.RegisterState
@@ -27,7 +29,7 @@ class RegisterViewModel @Inject constructor(
     val state : State<RegisterState> = _state
 
 
-    fun register(mail:String , username:String, password:String, passwordRepeat:String)
+    fun register(mail:String , username:String, password:String, passwordRepeat:String, navController: NavController)
     {
         if(password !== passwordRepeat){
             _state.value = RegisterState(error = "Passwords dont't match!");
@@ -38,6 +40,10 @@ class RegisterViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _state.value = RegisterState(message = result.data ?: "")
+                        navController.navigate(Screen.LoginScreen.route){
+                            popUpTo(Screen.RegisterScreen.route)
+                        }
+
                     }
                     is Resource.Error -> {
                         _state.value = RegisterState(error = result.message ?:

@@ -37,7 +37,6 @@ fun LoginScreen(
 
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
 
     Column(
         Modifier
@@ -80,7 +79,7 @@ fun LoginScreen(
         
         
         Button(onClick = {
-            viewModel.login(usernameValue, passwordValue,context, navController);
+            viewModel.login(usernameValue, passwordValue, navController);
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(

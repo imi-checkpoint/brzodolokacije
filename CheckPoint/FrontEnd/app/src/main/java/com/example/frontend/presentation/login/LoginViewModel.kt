@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.login
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
@@ -24,23 +25,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private var application: Application
 ) : ViewModel() {
 
     private val _state = mutableStateOf(LoginState())
     val state : State<LoginState> = _state
-
-    init{
-        once();
-    }
-
-    private fun once()
-    {
-        Log.d("LOGIN", "INIT LOGIN CALL");
-    }
+    val context = application.baseContext
 
 
-    fun login(username:String, password:String, context: Context, navController: NavController)
+    fun login(username:String, password:String, navController: NavController)
     {
         loginUseCase(username, password).onEach { result ->
             when(result){

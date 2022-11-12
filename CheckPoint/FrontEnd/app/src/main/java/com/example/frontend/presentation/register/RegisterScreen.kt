@@ -39,7 +39,6 @@ fun RegisterScreen(
     var passwordFocusRequester = FocusRequester()
     var passwordRepeatFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
 
     Column(
         Modifier
@@ -106,7 +105,7 @@ fun RegisterScreen(
 
 
         Button(onClick = {
-            viewModel.register(mailValue , usernameValue, passwordValue, passwordRepeatValue)
+            viewModel.register(mailValue , usernameValue, passwordValue, passwordRepeatValue, navController)
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(

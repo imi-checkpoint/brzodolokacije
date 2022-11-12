@@ -37,27 +37,7 @@ fun MainLocationScreen(
 )
 {
     val state = viewModel.state.value
-    val context = LocalContext.current
-
-//    if(!locationsLoaded)
-//    {
-//        Log.d("BOOLEAN", locationsLoaded.toString())
-//        viewModel.getAllLocations(context)
-//        locationsLoaded = true;
-//    }
-
-
-    var allLocations by remember{ mutableStateOf(state.locations) }
     var searchText by remember{ mutableStateOf("") }
-
-//
-//    if(searchText == ""){
-//        viewModel.getAllLocations(context)
-//    Log.d("STATE LOCATIONS", state.locations.toString())
-//    }
-//    else{
-//        viewModel.searchLocations(context, searchText);
-//    }
 
 
     Column(
@@ -68,25 +48,22 @@ fun MainLocationScreen(
     {
         ProfileTopBar(navController)
 
-        Button(onClick = {
-            viewModel.getAllLocations(context)
-            Log.d("LOCATIONS", state.locations.toString())
-        },
-            modifier =Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.DarkGray,
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "Get all locations" , Modifier.padding(8.dp))
-        }
+        LocationSearchBar(searchText, onChange = {
+            Log.d("SEARCH", "Search text changed to ${it}")
+            searchText = it
+            if(searchText == ""){
+                viewModel.getAllLocations();
+            }
+            else{
+                viewModel.searchLocations(searchText)
+            }
+        })
 
-        LocationSearchBar(searchText, onChange = {searchText = it})
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
-            LocationList(locationList = allLocations, navController = navController)
+            LocationList(locationList = state.locations, navController = navController)
         }
     }
 }
@@ -141,7 +118,8 @@ fun LocationList(
     navController: NavController
 )
 {
-    
+    Log.d("ALL", locationList.toString())
+
     if(locationList == null || locationList.isEmpty()){
         Text(
             text = "No locations found!",
