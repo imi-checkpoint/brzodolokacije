@@ -7,9 +7,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -33,39 +38,18 @@ fun MainLocationScreen(
 {
     val state = viewModel.state.value
     val context = LocalContext.current
-    viewModel.getAllLocations(context)
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(state.locations) { location ->
-                LocationItem(
-                    location = location,
-                    onItemClick = {
-                        navController.navigate(Screen.PostsScreen.route + "/${location.id}")
-                    }
-                )
-            }
-        }
-        if(state.error.isNotBlank()) {
-            Text(
-                text = state.error,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .align(Alignment.Center)
-            )
-        }
-        if(state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    }
+//    if(!locationsLoaded)
+//    {
+//        Log.d("BOOLEAN", locationsLoaded.toString())
+//        viewModel.getAllLocations(context)
+//        locationsLoaded = true;
+//    }
 
-//    val state = viewModel.state.value
-//    var allLocations = state.locations
-//    var searchText by remember{ mutableStateOf("") }
-//    val context = LocalContext.current
+
+    var allLocations by remember{ mutableStateOf(state.locations) }
+    var searchText by remember{ mutableStateOf("") }
+
 //
 //    if(searchText == ""){
 //        viewModel.getAllLocations(context)
@@ -74,44 +58,81 @@ fun MainLocationScreen(
 //    else{
 //        viewModel.searchLocations(context, searchText);
 //    }
-//
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(20.dp)
-//    )
-//    {
-//        ProfileTopBar()
-//        LocationSearchBar(searchText, onChange = {searchText = it})
-//        if(state.isLoading){
-//            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-//        }
-//        else{
-//            LocationList(locationList = allLocations, navController = navController)
-//        }
-//    }
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    )
+    {
+        ProfileTopBar(navController)
+
+        Button(onClick = {
+            viewModel.getAllLocations(context)
+            Log.d("LOCATIONS", state.locations.toString())
+        },
+            modifier =Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.DarkGray,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Get all locations" , Modifier.padding(8.dp))
+        }
+
+        LocationSearchBar(searchText, onChange = {searchText = it})
+        if(state.isLoading){
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
+        else{
+            LocationList(locationList = allLocations, navController = navController)
+        }
+    }
 }
 
 
 @Composable
-fun LocationItem(
-    location : Location,
-    onItemClick: (Location) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onItemClick(location) }
-            .padding(20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "${location.id}. ${location.name} (${location.coordinateX})",
-            style = MaterialTheme.typography.bodyMedium,
-            overflow = TextOverflow.Ellipsis
-        )
+fun LocationSearchBar(
+    searchText : String,
+    onChange: (String) -> Unit = {}
+)
+{
+    var searchTextChange by remember {
+        mutableStateOf(searchText)
     }
+
+    val trailingIconView = @Composable {
+        IconButton(onClick = {
+            onChange("") //isprazni search text
+        }) {
+            Icon(
+                Icons.Default.Clear,
+                contentDescription ="",
+                tint = Color.Black
+            )
+        }
+    }
+
+    TextField(
+        value = searchText,
+        trailingIcon = if(searchText.isNotBlank()) trailingIconView else null,
+        onValueChange = {
+            onChange(it)
+        },
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null)},
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = {
+            Text("Search locations")
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.LightGray,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+
+        )
 }
 
 @Composable
@@ -120,6 +141,7 @@ fun LocationList(
     navController: NavController
 )
 {
+    
     if(locationList == null || locationList.isEmpty()){
         Text(
             text = "No locations found!",
@@ -129,6 +151,7 @@ fun LocationList(
                 .wrapContentHeight()
         )
     }
+
     else{
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -168,6 +191,42 @@ fun LocationCard(
                 Text(location.name)
                 Text(location.coordinateX.toString())
                 Text(location.coordinateY.toString())
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileTopBar(
+    navController: NavController
+)
+{
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.End
+    ) {
+        Row(){
+            IconButton(onClick = {
+                navController.navigate(Screen.ProfileScreen.route);
+            }) {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+            }
+
+            IconButton(onClick = {
+//                go to messages
+            }) {
+                Icon(
+                    Icons.Default.Send,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
             }
         }
     }

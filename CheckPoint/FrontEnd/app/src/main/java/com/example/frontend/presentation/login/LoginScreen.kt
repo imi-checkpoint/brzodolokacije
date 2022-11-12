@@ -80,7 +80,7 @@ fun LoginScreen(
         
         
         Button(onClick = {
-            viewModel.login(usernameValue, passwordValue,context);
+            viewModel.login(usernameValue, passwordValue,context, navController);
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -116,14 +116,6 @@ fun LoginScreen(
 
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
-
-        if(state.token != null){
-            navController.navigate(Screen.MainLocationScreen.route){
-                popUpTo(Screen.MainLocationScreen.route){
-                    inclusive = false;
-                }
-            }
         }
     }
 }

@@ -7,10 +7,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.frontend.presentation.TestScreen
 import com.example.frontend.presentation.login.LoginScreen
 import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
 import com.example.frontend.presentation.posts.PostsScreen
+import com.example.frontend.presentation.profile.ProfileScreen
 
 @Composable
 fun Navigation()
@@ -26,9 +28,12 @@ fun Navigation()
         composable(route = Screen.MainLocationScreen.route){
             MainLocationScreen(navController = navController)
         }
-//        composable(route = Screen.ProfileScreen.route){
-//            ProfilePage(navController = navController)
-//        }
+        composable(route = Screen.ProfileScreen.route){
+            ProfileScreen(navController = navController)
+        }
+        composable(route = Screen.TestScreen.route){
+            TestScreen(navController = navController)
+        }
         composable(
             route = Screen.PostsScreen.route + "/{location}",
             arguments = listOf(

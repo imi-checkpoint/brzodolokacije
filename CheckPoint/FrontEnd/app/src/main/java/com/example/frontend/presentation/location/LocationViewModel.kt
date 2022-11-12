@@ -21,24 +21,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val allLocationsUseCase: GetAllLocationsUseCase,
-    private val searchLocationsUseCase: GetLocationsKeywordUseCase
+    private val allLocationsUseCase: GetAllLocationsUseCase
 ) : ViewModel(){
 
     private val _state = mutableStateOf(LocationState())
     val state : State<LocationState> = _state
 
-    init {
-        only()
-    }
-
-    private fun only(){
-        Log.d("ONCE", "THIS HAPPENS ONLY ONCE");
-    }
-
 
     fun getAllLocations(context : Context)
     {
+        Log.d("Locations", "Get all locations called");
         GlobalScope.launch(Dispatchers.IO) {
 
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
@@ -61,29 +53,29 @@ class LocationViewModel @Inject constructor(
         }
     }
 
-    fun searchLocations(context : Context, keyword : String)
-    {
-        GlobalScope.launch(Dispatchers.IO) {
-
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            searchLocationsUseCase("Bearer " + access_token, keyword).onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        _state.value = LocationState(locations = result.data ?: emptyList())
-                    }
-                    is Resource.Error -> {
-                        _state.value = LocationState(
-                            error = result.message ?: "An unexpected error occured"
-                        )
-                    }
-                    is Resource.Loading -> {
-                        _state.value = LocationState(isLoading = true)
-                    }
-                }
-            }
-        }
-    }
+//    fun searchLocations(context : Context, keyword : String)
+//    {
+//        GlobalScope.launch(Dispatchers.IO) {
+//
+//            var access_token =  DataStoreManager.getStringValue(context, "access_token");
+//            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+//            searchLocationsUseCase("Bearer " + access_token, keyword).onEach { result ->
+//                when (result) {
+//                    is Resource.Success -> {
+//                        _state.value = LocationState(locations = result.data ?: emptyList())
+//                    }
+//                    is Resource.Error -> {
+//                        _state.value = LocationState(
+//                            error = result.message ?: "An unexpected error occured"
+//                        )
+//                    }
+//                    is Resource.Loading -> {
+//                        _state.value = LocationState(isLoading = true)
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
 }

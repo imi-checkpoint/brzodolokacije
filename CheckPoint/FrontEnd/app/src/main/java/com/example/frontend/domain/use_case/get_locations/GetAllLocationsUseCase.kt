@@ -1,6 +1,5 @@
 package com.example.frontend.domain.use_case.get_locations
 
-import android.util.Log
 import com.example.frontend.common.Resource
 import com.example.frontend.data.remote.dto.toLocation
 import com.example.frontend.domain.model.Location
