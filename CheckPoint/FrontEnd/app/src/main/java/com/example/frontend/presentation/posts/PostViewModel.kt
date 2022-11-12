@@ -1,11 +1,15 @@
 package com.example.frontend.presentation.posts
 
+import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
+import Constants.Companion.LOCATION_ID
+import android.util.Log
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.location_posts.GetAllPostsForLocationUseCase
 import com.example.frontend.presentation.posts.components.PostState
@@ -19,13 +23,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val getAllPostsForLocationUseCase : GetAllPostsForLocationUseCase
+    private val getAllPostsForLocationUseCase : GetAllPostsForLocationUseCase,
+    savedStateHandle: SavedStateHandle,
+    application: Application
 ) : ViewModel(){
 
     private val _state = mutableStateOf(PostState())
     val state : State<PostState> = _state
+    val context = application.baseContext
 
-    fun getAllPostsForLocation(context : Context, locationId : Long)
+    init {
+        savedStateHandle.get<Long>(LOCATION_ID)?.let { locationId ->
+            Log.d("Location id", locationId.toString())
+            getAllPostsForLocation(locationId)
+        }
+    }
+
+    fun getAllPostsForLocation(locationId : Long)
     {
         GlobalScope.launch(Dispatchers.IO){
             var access_token =  DataStoreManager.getStringValue(context, "access_token");

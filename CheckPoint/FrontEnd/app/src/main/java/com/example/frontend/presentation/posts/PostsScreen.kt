@@ -29,12 +29,10 @@ import com.example.frontend.domain.model.Post
 @Composable
 fun PostsScreen(
     navController: NavController,
-    locationId : Long,
     viewModel : PostViewModel = hiltViewModel()
 )
 {
-    val context = LocalContext.current
-    viewModel.getAllPostsForLocation(context, locationId);
+
     val state = viewModel.state.value
     
     Column(

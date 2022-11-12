@@ -38,7 +38,6 @@ class LocationViewModel @Inject constructor(
 
     fun getAllLocations()
     {
-        Log.d("Locations", "Get all locations called");
         GlobalScope.launch(Dispatchers.IO) {
 
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
@@ -63,7 +62,6 @@ class LocationViewModel @Inject constructor(
 
     fun searchLocations(keyword : String)
     {
-        Log.d("Locations", "Search locations by ${keyword}");
         GlobalScope.launch(Dispatchers.IO) {
 
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
@@ -72,20 +70,17 @@ class LocationViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         _state.value = LocationState(locations = result.data ?: emptyList())
-                        Log.d("Search back", result.data.toString())
                     }
                     is Resource.Error -> {
                         _state.value = LocationState(
                             error = result.message ?: "An unexpected error occured"
                         )
-                        Log.d("Search back", "Error")
                     }
                     is Resource.Loading -> {
                         _state.value = LocationState(isLoading = true)
-                        Log.d("Search back", "Loading")
                     }
                 }
-            }
+            }.launchIn(viewModelScope)
         }
     }
 

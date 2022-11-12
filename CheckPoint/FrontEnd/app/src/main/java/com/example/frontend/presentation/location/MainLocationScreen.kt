@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
@@ -49,7 +50,6 @@ fun MainLocationScreen(
         ProfileTopBar(navController)
 
         LocationSearchBar(searchText, onChange = {
-            Log.d("SEARCH", "Search text changed to ${it}")
             searchText = it
             if(searchText == ""){
                 viewModel.getAllLocations();

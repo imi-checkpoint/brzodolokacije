@@ -35,9 +35,9 @@ fun Navigation()
             TestScreen(navController = navController)
         }
         composable(
-            route = Screen.PostsScreen.route + "/{location}",
+            route = Screen.PostsScreen.route + "/{locationId}",
             arguments = listOf(
-                navArgument("location"){
+                navArgument("locationId"){
                     type = NavType.LongType
                     defaultValue = 0
                     nullable = false
@@ -45,7 +45,7 @@ fun Navigation()
             )
         ){
                 entry ->
-            PostsScreen(navController = navController, locationId = entry.arguments!!.getLong("location"))
+            PostsScreen(navController = navController)
         }
     }
 }
