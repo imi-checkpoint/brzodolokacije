@@ -1,0 +1,54 @@
+package com.example.frontend.presentation.login
+
+import android.content.Context
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.frontend.common.Resource
+import com.example.frontend.domain.DataStoreManager
+import com.example.frontend.domain.use_case.login_user.LoginUseCase
+import com.example.frontend.presentation.login.components.LoginState
+import dagger.assisted.Assisted
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase
+) : ViewModel() {
+
+
+    private val _state = mutableStateOf(LoginState())
+    val state : State<LoginState> = _state
+
+    fun login(username:String, password:String, context: Context)
+    {
+        loginUseCase(username, password).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _state.value = LoginState(token = result.data ?: null)
+                    //sacuvaj token
+                    GlobalScope.launch(Dispatchers.IO) {
+                        DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
+                        DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
+                    }
+                }
+                is Resource.Error -> {
+                    _state.value = LoginState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = LoginState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+}
