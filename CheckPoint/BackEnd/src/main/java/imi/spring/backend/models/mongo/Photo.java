@@ -11,6 +11,7 @@ import javax.persistence.Id;
 public class Photo {
     @Id
     private String id;
+    private Integer order;
     private Long postId;
     private Binary photo;
 }

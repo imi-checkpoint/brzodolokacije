@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface VideoService {
-    String addVideo(Long postId, MultipartFile file) throws IOException;
-    List<Video> getVideos(Long postId) throws IllegalStateException, IOException;
+    String addVideo(Long postId, Integer order, MultipartFile file) throws IOException;
+    List<Video> getVideosByPostId(Long postId) throws IllegalStateException, IOException;
+    Video getVideoByPostIdAndOrder(Long postId, Integer order) throws IOException;
 }

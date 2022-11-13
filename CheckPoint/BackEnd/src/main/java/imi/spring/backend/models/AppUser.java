@@ -41,6 +41,7 @@ public class AppUser {
     @JsonIgnore
     @ManyToMany(mappedBy = "followingList")
     private List<AppUser> followersList = new ArrayList<>();
+
     @JsonIgnore
     @Lob
     @Basic(fetch = FetchType.LAZY)

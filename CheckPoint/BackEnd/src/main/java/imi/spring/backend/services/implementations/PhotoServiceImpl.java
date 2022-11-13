@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +22,10 @@ public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
 
     @Override
-    public String addPhoto(Long postId, MultipartFile file) throws IOException {
+    public String addPhoto(Long postId, Integer order, MultipartFile file) throws IOException {
         Photo photo = new Photo();
         photo.setPostId(postId);
+        photo.setOrder(order);
         photo.setPhoto(
                 new Binary(BsonBinarySubType.BINARY, file.getBytes())
         );
@@ -32,17 +34,17 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public List<Photo> getPhotos(Long postId) {
+    public List<Photo> getPhotosByPostId(Long postId) {
         List<Photo> photos = photoRepository.getPhotosByPostId(postId);
         if(photos!=null && photos.size()>0){
-            return photoRepository.getPhotosByPostId(postId);
+            return photos;
         }
         return null;
     }
 
     @Override
     public List<String> getEncodedPhotos(Long postId) {
-        List<Photo> photos = getPhotos(postId);
+        List<Photo> photos = getPhotosByPostId(postId);
         List<String> encodedPhotos = new ArrayList<>();
 
         for(Photo photo : photos){
@@ -50,5 +52,24 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         return encodedPhotos;
+    }
+
+    @Override
+    public Photo getPhotoByPostIdAndOrder(Long postId, Integer order) throws IOException {
+        List<Photo> photos = getPhotosByPostId(postId);
+        Photo actualPhoto = null;
+
+        for(Photo photo : photos){
+            if(Objects.equals(photo.getOrder(), order)){
+                actualPhoto = photo;
+                break;
+            }
+        }
+
+        if(actualPhoto == null){
+            throw new IOException("No photo with that order.");
+        }
+
+        return actualPhoto;
     }
 }

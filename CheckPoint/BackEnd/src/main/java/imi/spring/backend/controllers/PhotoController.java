@@ -1,5 +1,6 @@
 package imi.spring.backend.controllers;
 
+import imi.spring.backend.models.mongo.Photo;
 import imi.spring.backend.services.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,8 @@ public class PhotoController {
     }
 
     @PostMapping("/add")
-    public String addPhoto(@RequestParam("postId") Long postId, @RequestParam("photo") MultipartFile image) throws IOException {
-        String id = photoService.addPhoto(postId, image);
+    public String addPhoto(@RequestParam("postId") Long postId, @RequestParam("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
+        String id = photoService.addPhoto(postId, order, image);
         log.info("Added image to MongoDB with id {}", id);
         return "redirect:/photos/" + postId;
     }
@@ -38,5 +39,11 @@ public class PhotoController {
         model.addAttribute("photos", encodedPhotos);
 
         return "photos";
+    }
+
+    @GetMapping("/photoByPostIdAndOrder")
+    @ResponseBody
+    public Photo getPhotoByPostIdAndOrder(@RequestParam("postId") Long postId, @RequestParam("order") Integer order) throws IOException {
+        return photoService.getPhotoByPostIdAndOrder(postId, order);
     }
 }

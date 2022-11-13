@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -23,7 +24,6 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 
 @Controller
 @RequiredArgsConstructor
@@ -84,5 +84,15 @@ public class AppUserController {
         }
 
         return "Successfully registered.";
+    }
+
+    @GetMapping("/getProfilePicture")
+    @ResponseBody
+    public byte[] getProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        try{
+            return jwtService.getAppUserFromJWT(request).getImage();
+        } catch (ServletException e) {
+            throw new ServletException(e);
+        }
     }
 }

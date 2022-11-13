@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -26,10 +27,12 @@ public class VideoServiceImpl implements VideoService {
     private final GridFsOperations operations;
 
     @Override
-    public String addVideo(Long postId, MultipartFile file) throws IOException {
+    public String addVideo(Long postId, Integer order, MultipartFile file) throws IOException {
         DBObject metaData = new BasicDBObject();
         metaData.put("type", "video");
         metaData.put("postId", postId);
+        metaData.put("order", order);
+
         ObjectId id = gridFsTemplate.store(
                 file.getInputStream(), file.getName(), file.getContentType(), metaData
         );
@@ -37,7 +40,7 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public List<Video> getVideos(Long postId) throws IllegalStateException, IOException {
+    public List<Video> getVideosByPostId(Long postId) throws IllegalStateException, IOException {
 
         List<GridFSFile> gridFSFiles = new ArrayList<>();
         gridFsTemplate.find(new Query(Criteria.where("metadata.postId").is(postId))).into(gridFSFiles);
@@ -48,9 +51,33 @@ public class VideoServiceImpl implements VideoService {
             Video video = new Video();
             video.setPostId(postId);
             video.setInputStream(operations.getResource(file).getInputStream());
+
+            if(file.getMetadata() != null){
+                video.setOrder(Integer.parseInt(file.getMetadata().get("order").toString()));
+            }
+
             videos.add(video);
         }
 
         return videos;
+    }
+
+    @Override
+    public Video getVideoByPostIdAndOrder(Long postId, Integer order) throws IOException {
+        List<Video> videos = getVideosByPostId(postId);
+        Video actualVideo = null;
+
+        for(Video video : videos){
+            if(Objects.equals(video.getOrder(), order)){
+                actualVideo = video;
+                break;
+            }
+        }
+
+        if(actualVideo == null){
+            throw new IOException("No video with that order.");
+        }
+
+        return actualVideo;
     }
 }

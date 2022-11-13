@@ -37,10 +37,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests().antMatchers("/photos/add", "/photos", "/photos/**").permitAll();
-        http.authorizeRequests().antMatchers("/videos/add", "/videos", "/videos/**", "/videos/watchVideo**").permitAll();
+        http.authorizeRequests().antMatchers("/videos/add", "/videos", "/videos/watchVideo**", "/videos/**").permitAll();
 
         http.authorizeRequests().antMatchers("/api/token/refresh/**").permitAll();
-        http.authorizeRequests().antMatchers("/api/login",  "/api/login/**","/api/login**").permitAll();
+        http.authorizeRequests().antMatchers("/api/login", "/api/login/**", "/api/login**").permitAll();
         http.authorizeRequests().antMatchers("/api/user/save").permitAll();
         http.authorizeRequests().antMatchers("/api/register").permitAll();
         http.authorizeRequests().anyRequest().authenticated().and().formLogin();

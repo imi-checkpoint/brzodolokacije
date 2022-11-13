@@ -10,5 +10,6 @@ import java.io.InputStream;
 @Document(collection = "videos")
 public class Video {
     private Long postId;
+    private Integer order;
     private InputStream inputStream;
 }
