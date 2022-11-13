@@ -45,6 +45,14 @@ public class PostController {
     @ResponseBody
     public String deletePostById(@PathVariable Long id) { return postService.deletePost(id); }
 
+    @GetMapping("/user/{userId}")
+    @ResponseBody
+    public List<Post> getPostsByUserId(@PathVariable Long userId) { return postService.getPostsByUserId(userId); }
+
+    @GetMapping("/location/{locationId}")
+    @ResponseBody
+    public List<Post> getPostsByLocationId(@PathVariable Long locationId) { return postService.getPostsByLocationId(locationId); }
+
     @GetMapping("/count/all")
     @ResponseBody
     public Long getNumberOfPostsInTotal() { return postService.getNumberOfPostsInTotal(); }
@@ -53,7 +61,4 @@ public class PostController {
     @ResponseBody
     public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException { return postService.getNumberOfPostsPerUser(request); }
 
-    @GetMapping("/location/{locationId}")
-    @ResponseBody
-    public List<Post> getPostsByLocationId(@PathVariable Long locationId) { return postService.getPostsByLocationId(locationId); }
 }
