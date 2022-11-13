@@ -10,35 +10,33 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+    Komentare je moguce dodati u dva nivoa (dubine) - komentar i odgovor na komentar.
+    Svaki odgovor na odgovor na komentar sa fronta ce se tretirati samo kao odgovor na komentar na beku i u bazi.
+*/
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String description;
-    @JsonIgnore
-    private LocalDateTime time;
 
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
     @ManyToOne()
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
-    private Location location;
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostLike> postLikeList = new ArrayList<>();
+    @ManyToOne()
+    private Comment parentComment;
     @JsonIgnore
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> commentList = new ArrayList<>();
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    private List<Comment> subCommentList = new ArrayList<>();
 
-    //dodatno: slike i videi, ocene
-
-    public Post(String description) {
-        this.description = description;
-    }
+    private String text;
+    private LocalDateTime time;
 }

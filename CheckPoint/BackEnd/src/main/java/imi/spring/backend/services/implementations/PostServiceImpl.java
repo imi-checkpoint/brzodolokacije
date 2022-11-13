@@ -22,11 +22,8 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-
     private final JWTService jwtService;
-
     private final LocationService locationService;
-
     private final AppUserService appUserService;
 
     @Override
@@ -37,6 +34,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Integer countCommentsByPostId(Long id) {
+        Post post = getPostById(id);
+        if (post != null)
+            return post.getCommentList().size();
+        return 0;
     }
 
     @Override
@@ -62,14 +67,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Long getNumberOfPostsInTotal() {
-        return postRepository.count();
-    }
-
-    @Override
-    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
-        AppUser user = jwtService.getAppUserFromJWT(request);
-        return postRepository.countAllByUser(user);
+    public List<Post> getPostsByUserId(Long userId) {
+        AppUser user = appUserService.getUserById(userId);
+        if (user != null)
+            return user.getPostList();
+        return Collections.emptyList();
     }
 
     @Override
@@ -78,5 +80,16 @@ public class PostServiceImpl implements PostService {
         if (location != null)
             return postRepository.findAllByLocation(location);
         return Collections.emptyList();
+    }
+
+    @Override
+    public Long getNumberOfPostsInTotal() {
+        return postRepository.count();
+    }
+
+    @Override
+    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        return postRepository.countAllByUser(user);
     }
 }

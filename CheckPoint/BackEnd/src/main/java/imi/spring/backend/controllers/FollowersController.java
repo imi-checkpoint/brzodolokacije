@@ -21,14 +21,14 @@ public class FollowersController {
     private final JWTService jwtService;
 
     /* Koga sve dati korisnik prati? */
-    @GetMapping("/following/{userId}")
+    @GetMapping("/{userId}/following")
     @ResponseBody
     public List<AppUser> getAllFollowingByUser(@PathVariable Long userId) {
         return followersService.getAllFollowingByUser(userId);
     }
 
     /* Ko sve prati datog korisnika? */
-    @GetMapping("/followers/{userId}")
+    @GetMapping("/{userId}/followers")
     @ResponseBody
     public List<AppUser> getAllFollowersPerUser(@PathVariable Long userId) {
         return followersService.getAllFollowersPerUser(userId);
@@ -43,15 +43,23 @@ public class FollowersController {
         return "Invalid user!";
     }
 
-    @GetMapping("/following/count/{userId}")
+    @GetMapping("/{userId}/following/count")
     @ResponseBody
     public Integer countAllFollowingByUser(@PathVariable Long userId) {
         return followersService.countAllFollowingByUser(userId);
     }
 
-    @GetMapping("/followers/count/{userId}")
+    @GetMapping("/{userId}/followers/count")
     @ResponseBody
     public Integer countAllFollowersPerUser(@PathVariable Long userId) {
         return followersService.countAllFollowersPerUser(userId);
     }
+
+    @GetMapping("/{userId}/following/keyword/{username}")
+    @ResponseBody
+    public List<AppUser> getFollowingByUsername(@PathVariable Long userId, @PathVariable String username) { return followersService.getFollowingByUsername(userId, username); }
+
+    @GetMapping("/{userId}/followers/keyword/{username}")
+    @ResponseBody
+    public List<AppUser> getFollowersByUsername(@PathVariable Long userId, @PathVariable String username) { return followersService.getFollowersByUsername(userId, username); }
 }
