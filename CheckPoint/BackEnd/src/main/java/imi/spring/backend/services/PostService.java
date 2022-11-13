@@ -20,4 +20,6 @@ public interface PostService {
     Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException;
 
     List<Post> getPostsByLocationId(Long locationId);
+
+    Integer countCommentsByPostId(Long id);
 }

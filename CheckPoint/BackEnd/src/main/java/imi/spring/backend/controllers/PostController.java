@@ -28,6 +28,10 @@ public class PostController {
     @ResponseBody
     public Post getPostById(@PathVariable Long id) { return postService.getPostById(id); }
 
+    @GetMapping("/{id}/comments/count")
+    @ResponseBody
+    public Integer countCommentsByPostId(@PathVariable Long id) { return postService.countCommentsByPostId(id); }
+
     @PostMapping("/save/location/{locationId}")
     @ResponseBody
     public String savePost(HttpServletRequest request, @RequestBody Post post, @PathVariable Long locationId) throws ServletException {

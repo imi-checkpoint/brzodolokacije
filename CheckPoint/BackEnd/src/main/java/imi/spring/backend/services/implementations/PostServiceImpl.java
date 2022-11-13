@@ -79,4 +79,12 @@ public class PostServiceImpl implements PostService {
             return postRepository.findAllByLocation(location);
         return Collections.emptyList();
     }
+
+    @Override
+    public Integer countCommentsByPostId(Long id) {
+        Post post = getPostById(id);
+        if (post != null)
+            return post.getCommentList().size();
+        return 0;
+    }
 }

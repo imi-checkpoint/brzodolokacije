@@ -1,7 +1,6 @@
 package imi.spring.backend.services.implementations;
 
 import imi.spring.backend.models.Comment;
-import imi.spring.backend.models.Post;
 import imi.spring.backend.repositories.CommentRepository;
 import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.CommentService;
@@ -52,12 +51,13 @@ public class CommentServiceImpl implements CommentService {
         comment.setTime(LocalDateTime.now());
         comment.setUser(appUserService.getUserById(userId));
         comment.setPost(postService.getPostById(postId));
-        log.info("Parrent comment id {} u servisu", parentCommentId);
         if (parentCommentId == 0) // PARENTCOMMENTID = 0 KADA NEMA PARENTCOMMENT !!!
             comment.setParentComment(null);
         else {
-            log.info("USAO U ELSE, IMA PARRENTCOMMENTID");
-            comment.setParentComment(getCommentById(parentCommentId));
+            Comment parentComment = getCommentById(parentCommentId);
+            if (parentComment == null)
+                return "Parent comment with that id does not exist!";
+            comment.setParentComment(parentComment);
         }
         commentRepository.save(comment);
         return "Saved";
