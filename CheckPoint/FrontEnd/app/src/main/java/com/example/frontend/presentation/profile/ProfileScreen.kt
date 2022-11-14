@@ -41,7 +41,7 @@ fun ProfileScreen(
     ) {
         TopBar(
             name = "Ime korisnika",
-//            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             navController = navController
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -190,7 +190,7 @@ fun ButtonSection(
     modifier: Modifier = Modifier
 ){
     val minWidth = 120.dp
-    val height = 30.dp
+    val height = 35.dp
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,

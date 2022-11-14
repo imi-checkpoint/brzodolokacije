@@ -1,19 +1,30 @@
 package com.example.frontend.data.remote.dto
 
+import com.example.frontend.domain.model.Location
+import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.domain.model.Video
 
 data class PostDTO(
-    val id:Long,
+    val appUserId:Long,
+    val appUserUsername:String,
+    val postId:Long,
+    val location:LocationDTO,
     val description:String,
-    val user:UserDTO,
-    val location:LocationDTO
+    val numberOfLikes:Int
+    //val photos:List<Photo>,
+    //val videos:List<Video>
 )
 
 fun PostDTO.toPost() : Post{
     return Post(
-        id = id,
+        postId = postId,
         description = description,
-        user = user.toUser(),
+        appUserId = appUserId,
+        appUserUsername = appUserUsername,
+        numberOfLikes = numberOfLikes,
+        //photos = photos,
+        //videos = videos,
         location = location.toLocation()
     )
 }
