@@ -16,6 +16,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".presentation.ui.MainActivity"
             android:exported="true"
             android:theme="@style/splashScreenTheme">
