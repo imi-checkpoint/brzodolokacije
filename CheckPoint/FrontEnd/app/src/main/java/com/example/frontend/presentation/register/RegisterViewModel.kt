@@ -41,7 +41,9 @@ class RegisterViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.value = RegisterState(message = result.data ?: "")
                         navController.navigate(Screen.LoginScreen.route){
-                            popUpTo(Screen.RegisterScreen.route)
+                            popUpTo(Screen.RegisterScreen.route){
+                                inclusive = true;
+                            }
                         }
 
                     }

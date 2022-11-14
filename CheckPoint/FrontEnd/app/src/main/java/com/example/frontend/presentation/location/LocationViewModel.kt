@@ -31,57 +31,56 @@ class LocationViewModel @Inject constructor(
     private val _state = mutableStateOf(LocationState())
     val state : State<LocationState> = _state
     val context = application.baseContext
+    var access_token  = "";
+    var refresh_token = "";
 
     init {
-        getAllLocations()
+        GlobalScope.launch(Dispatchers.IO){
+            access_token =  DataStoreManager.getStringValue(context, "access_token");
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+
+            getAllLocations()
+        }
     }
 
     fun getAllLocations()
     {
-        GlobalScope.launch(Dispatchers.IO) {
-
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            allLocationsUseCase("Bearer " + access_token).onEach { result ->
-                when(result){
-                    is Resource.Success -> {
-                        _state.value = LocationState(locations = result.data ?: emptyList())
-                    }
-                    is Resource.Error -> {
-                        _state.value = LocationState(error = result.message ?:
-                        "An unexpected error occured")
-                    }
-                    is Resource.Loading -> {
-                        _state.value = LocationState(isLoading = true)
-                    }
+        Log.d("ALL", "get all locations")
+        allLocationsUseCase("Bearer " + access_token).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    Log.d("ALL", "All locations fetched ${result.data.toString()}")
+                    _state.value = LocationState(locations = result.data ?: emptyList())
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Error -> {
+                    _state.value = LocationState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = LocationState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun searchLocations(keyword : String)
     {
-        GlobalScope.launch(Dispatchers.IO) {
-
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            getLocationsKeywordUseCase("Bearer " + access_token, keyword).onEach { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        _state.value = LocationState(locations = result.data ?: emptyList())
-                    }
-                    is Resource.Error -> {
-                        _state.value = LocationState(
-                            error = result.message ?: "An unexpected error occured"
-                        )
-                    }
-                    is Resource.Loading -> {
-                        _state.value = LocationState(isLoading = true)
-                    }
+        Log.d("SEARCH", "Searching locations");
+        getLocationsKeywordUseCase("Bearer " + access_token, keyword).onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    _state.value = LocationState(locations = result.data ?: emptyList())
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Error -> {
+                    _state.value = LocationState(
+                        error = result.message ?: "An unexpected error occured"
+                    )
+                }
+                is Resource.Loading -> {
+                    _state.value = LocationState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
 

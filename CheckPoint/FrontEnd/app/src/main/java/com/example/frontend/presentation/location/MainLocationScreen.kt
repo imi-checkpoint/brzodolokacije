@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
@@ -47,7 +48,7 @@ fun MainLocationScreen(
             .padding(20.dp)
     )
     {
-        ProfileTopBar(navController)
+        ProfileTopBar(navController, viewModel)
 
         LocationSearchBar(searchText, onChange = {
             searchText = it
@@ -176,7 +177,8 @@ fun LocationCard(
 
 @Composable
 fun ProfileTopBar(
-    navController: NavController
+    navController: NavController,
+    viewModel: LocationViewModel
 )
 {
     Column(
@@ -188,6 +190,7 @@ fun ProfileTopBar(
     ) {
         Row(){
             IconButton(onClick = {
+                viewModel.getAllLocations()
                 navController.navigate(Screen.ProfileScreen.route);
             }) {
                 Icon(
