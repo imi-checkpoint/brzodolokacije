@@ -1,8 +1,12 @@
 package com.example.frontend.domain.model
 
 data class Post(
-    val id:Long,
+    val postId:Long,
     val description:String,
-    val user:User,
-    val location: Location
+    val appUserId:Long,
+    val appUserUsername:String,
+    val location: Location,
+    val numberOfLikes:Int
+    //val photos:List<Photo>,
+    //val videos:List<Video>
 )

@@ -98,7 +98,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO convertPostToPostDTO(Post post) throws IOException {
         PostDTO postDTO = new PostDTO();
-
+        postDTO.setPostId(post.getId());
         postDTO.setAppUserId(post.getUser().getId());
         postDTO.setAppUserUsername(post.getUser().getUsername());
         postDTO.setLocation(post.getLocation());
