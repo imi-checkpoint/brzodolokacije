@@ -88,4 +88,24 @@ public class FollowersServiceImpl implements FollowersService {
             return Collections.emptyList();
         return appUserRepository.findFollowersUsernameLike(user, username);
     }
+
+    @Override
+    public List<AppUser> getMyFollowing(AppUser user) {
+        return user.getFollowingList();
+    }
+
+    @Override
+    public List<AppUser> getMyFollowers(AppUser user) {
+        return user.getFollowersList();
+    }
+
+    @Override
+    public Integer countMyFollowing(AppUser user) {
+        return user.getFollowingList().size();
+    }
+
+    @Override
+    public Integer countMyFollowers(AppUser user) {
+        return user.getFollowersList().size();
+    }
 }
