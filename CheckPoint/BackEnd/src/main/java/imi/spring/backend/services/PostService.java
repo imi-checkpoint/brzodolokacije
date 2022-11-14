@@ -1,9 +1,11 @@
 package imi.spring.backend.services;
 
 import imi.spring.backend.models.Post;
+import imi.spring.backend.models.PostDTO;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 public interface PostService {
@@ -16,4 +18,6 @@ public interface PostService {
     List<Post> getPostsByLocationId(Long locationId);
     Long getNumberOfPostsInTotal();
     Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException;
+    PostDTO convertPostToPostDTO(Post post) throws IOException;
+    List<PostDTO> convertListOfPostsToPostDTOs(List<Post> posts) throws IOException;
 }

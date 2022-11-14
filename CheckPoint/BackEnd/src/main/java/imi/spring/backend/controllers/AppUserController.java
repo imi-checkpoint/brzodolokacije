@@ -5,6 +5,7 @@ import imi.spring.backend.models.UserDTO;
 import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -86,13 +88,44 @@ public class AppUserController {
         return "Successfully registered.";
     }
 
-    @GetMapping("/getProfilePicture")
+    @GetMapping("/getMyProfilePicture")
     @ResponseBody
-    public byte[] getProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    public byte[] getMyProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try{
             return jwtService.getAppUserFromJWT(request).getImage();
         } catch (ServletException e) {
             throw new ServletException(e);
+        }
+    }
+
+    @GetMapping("/getProfilePictureByUserId/{userId}")
+    @ResponseBody
+    public byte[] getProfilePictureByUserId(@PathVariable("userId") Long userId) throws IOException {
+        AppUser user = appUserService.getUserById(userId);
+
+        if(user != null && user.getImage()!=null){
+            log.info("Getting picture for user with id {}", userId);
+            return  user.getImage();
+        }
+        else{
+            throw new IOException("Error getting image for that user.");
+        }
+    }
+
+    @GetMapping("/changeProfilePicture")
+    @ResponseBody
+    public String changeProfilePicture(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "profile_image") MultipartFile profileImage) throws Exception {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            if (appUser != null && profileImage != null && !profileImage.isEmpty()) {
+                appUser.setImage(profileImage.getBytes());
+            }
+            appUserService.updateUser(appUser);
+            log.info("Successfully changed profile picture for user [{}]", appUser.getUsername());
+            return "Success";
+        } catch (ServletException | IOException e) {
+            log.error("Error changing profile picture, received message [{}]", e.getMessage());
+            throw new Exception(e.getMessage());
         }
     }
 }

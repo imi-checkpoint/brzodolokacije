@@ -3,17 +3,17 @@ package imi.spring.backend.services.implementations;
 import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
+import imi.spring.backend.models.PostDTO;
 import imi.spring.backend.repositories.PostRepository;
-import imi.spring.backend.services.AppUserService;
-import imi.spring.backend.services.JWTService;
-import imi.spring.backend.services.LocationService;
-import imi.spring.backend.services.PostService;
+import imi.spring.backend.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,6 +25,8 @@ public class PostServiceImpl implements PostService {
     private final JWTService jwtService;
     private final LocationService locationService;
     private final AppUserService appUserService;
+    private final PhotoService photoService;
+    private final VideoService videoService;
 
     @Override
     public List<Post> getAllPosts() {
@@ -91,5 +93,32 @@ public class PostServiceImpl implements PostService {
     public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         return postRepository.countAllByUser(user);
+    }
+
+    @Override
+    public PostDTO convertPostToPostDTO(Post post) throws IOException {
+        PostDTO postDTO = new PostDTO();
+
+        postDTO.setAppUserId(post.getUser().getId());
+        postDTO.setAppUserUsername(post.getUser().getUsername());
+        postDTO.setLocation(post.getLocation());
+        postDTO.setDescription(post.getDescription());
+        postDTO.setNumberOfLikes(post.getPostLikeList().size());
+
+        postDTO.setPhotos(photoService.getPhotosByPostId(post.getId()));
+        postDTO.setVideos(videoService.getVideosByPostId(post.getId()));
+
+        return  postDTO;
+    }
+
+    @Override
+    public List<PostDTO> convertListOfPostsToPostDTOs(List<Post> posts) throws IOException {
+        List<PostDTO> postDTOs = new ArrayList<>();
+
+        for(Post post : posts){
+            postDTOs.add(convertPostToPostDTO(post));
+        }
+
+        return  postDTOs;
     }
 }

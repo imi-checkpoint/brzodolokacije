@@ -2,6 +2,7 @@ package imi.spring.backend.controllers;
 
 import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Post;
+import imi.spring.backend.models.PostDTO;
 import imi.spring.backend.services.JWTService;
 import imi.spring.backend.services.PostService;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -22,11 +24,15 @@ public class PostController {
 
     @GetMapping("/all")
     @ResponseBody
-    public List<Post> getAllPosts() { return postService.getAllPosts(); }
+    public List<PostDTO> getAllPosts() throws IOException {
+        return postService.convertListOfPostsToPostDTOs(postService.getAllPosts());
+    }
 
     @GetMapping("/{id}")
     @ResponseBody
-    public Post getPostById(@PathVariable Long id) { return postService.getPostById(id); }
+    public PostDTO getPostById(@PathVariable Long id) throws IOException {
+        return postService.convertPostToPostDTO(postService.getPostById(id));
+    }
 
     @GetMapping("/{id}/comments/count")
     @ResponseBody
@@ -47,11 +53,15 @@ public class PostController {
 
     @GetMapping("/user/{userId}")
     @ResponseBody
-    public List<Post> getPostsByUserId(@PathVariable Long userId) { return postService.getPostsByUserId(userId); }
+    public List<PostDTO> getPostsByUserId(@PathVariable Long userId) throws IOException {
+        return postService.convertListOfPostsToPostDTOs(postService.getPostsByUserId(userId));
+    }
 
     @GetMapping("/location/{locationId}")
     @ResponseBody
-    public List<Post> getPostsByLocationId(@PathVariable Long locationId) { return postService.getPostsByLocationId(locationId); }
+    public List<PostDTO> getPostsByLocationId(@PathVariable Long locationId) throws IOException {
+        return postService.convertListOfPostsToPostDTOs(postService.getPostsByLocationId(locationId));
+    }
 
     @GetMapping("/count/all")
     @ResponseBody
@@ -60,5 +70,4 @@ public class PostController {
     @GetMapping("/count")
     @ResponseBody
     public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException { return postService.getNumberOfPostsPerUser(request); }
-
 }
