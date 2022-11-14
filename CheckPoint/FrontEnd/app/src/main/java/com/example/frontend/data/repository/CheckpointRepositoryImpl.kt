@@ -4,6 +4,7 @@ import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.LocationDTO
 import com.example.frontend.data.remote.dto.LoginDTO
 import com.example.frontend.data.remote.dto.PostDTO
+import com.example.frontend.data.remote.dto.UserDTO
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
 
@@ -29,6 +30,26 @@ class CheckpointRepositoryImpl(
 
     override suspend fun getPostsFromLocation(token: String, locationId: Long): List<PostDTO> {
         return api.getPostsFromLocation(token, locationId)
+    }
+
+    override suspend fun getMyFollowers(token: String): List<UserDTO> {
+        return api.getMyFollowers(token)
+    }
+
+    override suspend fun getMyFollowing(token: String): List<UserDTO> {
+        return api.getMyFollowing(token)
+    }
+
+    override suspend fun getMyFollowersCount(token: String): Int {
+        return api.getMyFollowersCount(token)
+    }
+
+    override suspend fun getMyFollowingCount(token: String): Int {
+        return api.getMyFollowingCount(token)
+    }
+
+    override suspend fun getMyPostsCount(token: String): Int {
+        return api.getMyPostsCount(token)
     }
 
 }
