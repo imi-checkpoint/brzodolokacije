@@ -4,6 +4,8 @@ import lombok.Data;
 import org.bson.types.Binary;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Id;
 
 @Data
@@ -13,5 +15,6 @@ public class Photo {
     private String id;
     private Integer order;
     private Long postId;
+    @JsonIgnore
     private Binary photo;
 }

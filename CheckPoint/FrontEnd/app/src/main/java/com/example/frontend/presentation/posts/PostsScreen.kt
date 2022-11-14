@@ -110,7 +110,7 @@ fun PostCard(
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
-                Text(post.user.username)
+                Text(post.appUserUsername)
                 Text(post.description)
             }
         }
