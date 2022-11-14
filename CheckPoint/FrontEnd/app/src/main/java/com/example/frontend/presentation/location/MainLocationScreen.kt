@@ -1,6 +1,7 @@
 package com.example.frontend.presentation.location
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
 
@@ -99,7 +103,8 @@ fun LocationSearchBar(
             onChange(it)
         },
         leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null)},
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         placeholder = {
             Text("Search locations")
         },
@@ -109,6 +114,7 @@ fun LocationSearchBar(
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
+        shape = RoundedCornerShape(20.dp)
 
         )
 }
@@ -119,7 +125,6 @@ fun LocationList(
     navController: NavController
 )
 {
-    Log.d("ALL", locationList.toString())
 
     if(locationList == null || locationList.isEmpty()){
         Text(
@@ -133,7 +138,8 @@ fun LocationList(
 
     else{
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
         ){
             items(locationList){
                     location -> LocationCard(location = location, navController = navController)
@@ -149,28 +155,33 @@ fun LocationCard(
     navController: NavController
 )
 {
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        elevation =2.dp,
-        backgroundColor =Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        onClick = {
-            navController.navigate(Screen.PostsScreen.withArgs(location.id));
+    val painter = rememberImagePainter(
+        data = "https://www.moneycrashers.com/wp-content/uploads/2018/01/thailand-trip-travel-budget.jpg",
+        builder = {
+
         }
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
-        Row {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(location.name)
-                Text(location.coordinateX.toString())
-                Text(location.coordinateY.toString())
-            }
+        Image(painter = painter,
+            contentDescription = "Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable{
+                    navController.navigate(Screen.PostsScreen.withArgs(location.id));
+                }
+                .height(200.dp)
+                .fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        Row(){
+            Text(text = location.name)
         }
     }
 }

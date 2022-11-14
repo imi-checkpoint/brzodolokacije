@@ -38,11 +38,10 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
     ) {
         TopBar(
             name = "Ime korisnika",
-            modifier = Modifier.padding(20.dp),
+//            modifier = Modifier.padding(20.dp),
             navController = navController
         )
         Spacer(modifier = Modifier.height(4.dp))
