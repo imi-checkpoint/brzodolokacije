@@ -40,7 +40,9 @@ fun PostsScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        IconButton(onClick = { navController.navigate(Screen.MainLocationScreen.route) }) {
+        IconButton(onClick = {
+            navController.popBackStack()
+        }) {
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "",

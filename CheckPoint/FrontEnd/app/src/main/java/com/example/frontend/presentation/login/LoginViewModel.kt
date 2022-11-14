@@ -46,7 +46,9 @@ class LoginViewModel @Inject constructor(
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
                     }
                     navController.navigate(Screen.MainLocationScreen.route){
-                        popUpTo(Screen.LoginScreen.route)
+                        popUpTo(Screen.LoginScreen.route){
+                            inclusive = true;
+                        }
                     };
                 }
                 is Resource.Error -> {
