@@ -90,9 +90,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException {
+    public Long getNumberOfMyPosts(HttpServletRequest request) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         return postRepository.countAllByUser(user);
+    }
+
+    @Override
+    public Long getNumberOfPostsByUserId(Long userId) {
+        AppUser user = appUserService.getUserById(userId);
+        if (user != null)
+            return postRepository.countAllByUser(user);
+        return 0L;
     }
 
     @Override

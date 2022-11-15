@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -62,4 +63,43 @@ public class FollowersController {
     @GetMapping("/{userId}/followers/keyword/{username}")
     @ResponseBody
     public List<AppUser> getFollowersByUsername(@PathVariable Long userId, @PathVariable String username) { return followersService.getFollowersByUsername(userId, username); }
+
+    /* Koga sve ja kao korisnik pratim? */
+    @GetMapping("/my/following")
+    @ResponseBody
+    public List<AppUser> getMyFollowing(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.getMyFollowing(user);
+        return Collections.emptyList();
+    }
+
+    /* Koga sve mene prati? */
+    @GetMapping("/my/followers")
+    @ResponseBody
+    public List<AppUser> getMyFollowers(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.getMyFollowers(user);
+        return Collections.emptyList();
+    }
+
+    @GetMapping("/my/following/count")
+    @ResponseBody
+    public Integer countMyFollowing(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.countMyFollowing(user);
+        return 0;
+    }
+
+    @GetMapping("/my/followers/count")
+    @ResponseBody
+    public Integer countMyFollowers(HttpServletRequest request) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.countMyFollowers(user);
+        return 0;
+    }
+
 }

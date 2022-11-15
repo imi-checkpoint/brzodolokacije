@@ -17,7 +17,8 @@ public interface PostService {
     List<Post> getPostsByUserId(Long userId);
     List<Post> getPostsByLocationId(Long locationId);
     Long getNumberOfPostsInTotal();
-    Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException;
+    Long getNumberOfMyPosts(HttpServletRequest request) throws ServletException;
+    Long getNumberOfPostsByUserId(Long userId);
     PostDTO convertPostToPostDTO(Post post) throws IOException;
     List<PostDTO> convertListOfPostsToPostDTOs(List<Post> posts) throws IOException;
 }

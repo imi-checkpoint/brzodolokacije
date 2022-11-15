@@ -67,7 +67,11 @@ public class PostController {
     @ResponseBody
     public Long getNumberOfPostsInTotal() { return postService.getNumberOfPostsInTotal(); }
 
-    @GetMapping("/count")
+    @GetMapping("/my/count")
     @ResponseBody
-    public Long getNumberOfPostsPerUser(HttpServletRequest request) throws ServletException { return postService.getNumberOfPostsPerUser(request); }
+    public Long getNumberOfMyPosts(HttpServletRequest request) throws ServletException { return postService.getNumberOfMyPosts(request); }
+
+    @GetMapping("/user/{userId}/count")
+    @ResponseBody
+    public Long getNumberOfPostsByUserId(@PathVariable Long userId) { return postService.getNumberOfPostsByUserId(userId); }
 }
