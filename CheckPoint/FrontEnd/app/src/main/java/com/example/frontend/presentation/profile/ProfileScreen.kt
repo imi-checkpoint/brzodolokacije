@@ -1,10 +1,12 @@
 package com.example.frontend.presentation.profile
 
+import android.provider.ContactsContract.Profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -13,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,15 +28,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.R
+import com.example.frontend.presentation.profile.components.ProfileDataState
 
 @Composable
 fun ProfileScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: ProfileViewModel = hiltViewModel()
 )
 {
-    val context = LocalContext.current
+    val state = viewModel.state.value
 
     Column(
         modifier = Modifier
@@ -46,7 +52,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        ProfileSection();
+        ProfileSection(state);
         Spacer(modifier = Modifier.height(25.dp))
 
         ButtonSection(modifier = Modifier.fillMaxWidth());
@@ -97,7 +103,8 @@ fun TopBar(
 
 @Composable
 fun ProfileSection(
-    modifier: Modifier = Modifier
+    state : ProfileDataState,
+    modifier: Modifier = Modifier,
 )
 {
     Column(
@@ -119,7 +126,7 @@ fun ProfileSection(
             
             Spacer(modifier = Modifier.width(16.dp))
 
-            StatSection(modifier.weight(7f))
+            StatSection(state, modifier.weight(7f))
 
         }
     }
@@ -148,6 +155,7 @@ fun RoundImage(
 
 @Composable
 fun StatSection(
+    state : ProfileDataState,
     modifier: Modifier = Modifier
 ){
     Row (
@@ -155,9 +163,18 @@ fun StatSection(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = modifier
     ){
-        ProfileStat(numberText = "601", text = "Posts")
-        ProfileStat(numberText = "99.1K", text = "Followers")
-        ProfileStat(numberText = "790", text = "Following")
+        if(state.error.isNotBlank()){
+            Text("Error!");
+        }
+
+        if(state.isLoading){
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
+        }
+        else if(state.profileData != null){
+            ProfileStat(numberText = state.profileData.postCount.toString(), text = "Posts")
+            ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers")
+            ProfileStat(numberText = state.profileData.followingCount.toString(), text = "Following")
+        }
     }
 }
 

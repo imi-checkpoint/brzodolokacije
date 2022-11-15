@@ -49,7 +49,6 @@ class LocationViewModel @Inject constructor(
         allLocationsUseCase("Bearer " + access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
-                    Log.d("ALL", "All locations fetched ${result.data.toString()}")
                     _state.value = LocationState(locations = result.data ?: emptyList())
                 }
                 is Resource.Error -> {
