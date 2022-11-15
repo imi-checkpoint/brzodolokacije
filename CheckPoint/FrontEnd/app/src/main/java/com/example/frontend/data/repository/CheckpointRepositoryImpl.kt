@@ -52,4 +52,32 @@ class CheckpointRepositoryImpl(
         return api.getMyPostsCount(token)
     }
 
+    override suspend fun getAllFollowingByUser(userId: Long): List<UserDTO> {
+        return api.getAllFollowingByUser(userId)
+    }
+
+    override suspend fun getAllFollowersPerUser(userId: Long): List<UserDTO> {
+        return api.getAllFollowersPerUser(userId)
+    }
+
+    override suspend fun followOrUnfollowUser(token: String, userId: Long): String {
+        return api.followOrUnfollowUser(token, userId)
+    }
+
+    override suspend fun countAllFollowingByUser(userId: Long): Int {
+        return api.countAllFollowingByUser(userId)
+    }
+
+    override suspend fun countAllFollowersPerUser(userId: Long): Int {
+        return api.countAllFollowersPerUser(userId)
+    }
+
+    override suspend fun getFollowingByUsername(userId: Long, username: String): List<UserDTO> {
+        return api.getFollowingByUsername(userId, username)
+    }
+
+    override suspend fun getFollowersByUsername(userId: Long, username: String): List<UserDTO> {
+        return api.getFollowingByUsername(userId, username)
+    }
+
 }

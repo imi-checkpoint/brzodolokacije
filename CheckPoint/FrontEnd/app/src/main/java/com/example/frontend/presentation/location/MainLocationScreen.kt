@@ -148,7 +148,7 @@ fun LocationList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun LocationCard(
     location : Location,

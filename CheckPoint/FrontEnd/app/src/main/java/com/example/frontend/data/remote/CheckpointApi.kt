@@ -70,4 +70,49 @@ interface CheckpointApi {
         @Header("Authorization") token : String
     ) : Int
 
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/following")
+    suspend fun getAllFollowingByUser(
+        @Path("userId") userId:Long
+    ) : List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/followers")
+    suspend fun getAllFollowersPerUser(
+        @Path("userId") userId:Long
+    ) : List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/follow_or_unfollow/{userId}")
+    suspend fun followOrUnfollowUser(
+        @Header("Authorization") token : String,
+        @Path("userId") userId:Long
+    ) : String
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/following/count")
+    suspend fun countAllFollowingByUser(
+        @Path("userId") userId:Long
+    ) : Int
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/followers/count")
+    suspend fun countAllFollowersPerUser(
+        @Path("userId") userId:Long
+    ) : Int
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/following/count")
+    suspend fun getFollowingByUsername(
+        @Path("userId") userId:Long,
+        @Path("username") username : String
+    ) : List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/{userId}/followers/count")
+    suspend fun getFollowersByUsername(
+        @Path("userId") userId:Long,
+        @Path("username") username : String
+    ) : List<UserDTO>
+
 }

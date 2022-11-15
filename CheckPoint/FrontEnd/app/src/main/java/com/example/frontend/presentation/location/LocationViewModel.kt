@@ -39,13 +39,15 @@ class LocationViewModel @Inject constructor(
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
+            Log.d("ACCESS TOKEN", access_token);
+
             getAllLocations()
         }
     }
 
     fun getAllLocations()
     {
-        Log.d("ALL", "get all locations")
+        Log.d("ALL", "get all locations with token ${access_token}");
         allLocationsUseCase("Bearer " + access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {

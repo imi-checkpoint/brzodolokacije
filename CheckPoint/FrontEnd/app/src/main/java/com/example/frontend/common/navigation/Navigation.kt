@@ -13,6 +13,7 @@ import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
 import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
+import com.example.frontend.presentation.user_list.UserListScreen
 
 @Composable
 fun Navigation()
@@ -31,9 +32,6 @@ fun Navigation()
         composable(route = Screen.ProfileScreen.route){
             ProfileScreen(navController = navController)
         }
-        composable(route = Screen.TestScreen.route){
-            TestScreen(navController = navController)
-        }
         composable(
             route = Screen.PostsScreen.route + "/{locationId}",
             arguments = listOf(
@@ -46,6 +44,19 @@ fun Navigation()
         ){
                 entry ->
             PostsScreen(navController = navController)
+        }
+        composable(
+            route = Screen.UserListScreen.route + "/{userTypeList}",
+            arguments = listOf(
+                navArgument("userTypeList"){
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            )
+        ){
+            entry ->
+                UserListScreen(navController = navController)
         }
     }
 }

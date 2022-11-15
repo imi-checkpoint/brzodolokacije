@@ -26,4 +26,20 @@ interface CheckpointRepository {
     suspend fun getMyFollowingCount(token: String): Int
 
     suspend fun getMyPostsCount(token: String): Int
+
+    suspend fun getAllFollowingByUser(userId : Long): List<UserDTO>
+
+    suspend fun getAllFollowersPerUser(userId : Long): List<UserDTO>
+
+    suspend fun followOrUnfollowUser(token: String, userId: Long): String
+
+    suspend fun countAllFollowingByUser(userId : Long): Int
+
+    suspend fun countAllFollowersPerUser(userId : Long): Int
+
+    suspend fun getFollowingByUsername(userId: Long, username: String): List<UserDTO>
+
+    suspend fun getFollowersByUsername(userId: Long, username: String): List<UserDTO>
+
+
 }
