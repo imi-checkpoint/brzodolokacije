@@ -15,6 +15,6 @@ public class Photo {
     private String id;
     private Integer order;
     private Long postId;
-    @JsonIgnore
+//    @JsonIgnore
     private Binary photo;
 }

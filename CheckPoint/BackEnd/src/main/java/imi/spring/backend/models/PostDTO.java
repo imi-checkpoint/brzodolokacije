@@ -18,7 +18,7 @@ public class PostDTO {
     private Location location;
     private String description;
     private Integer numberOfLikes;
-    @JsonIgnore
+//    @JsonIgnore
     private List<Photo> photos;
     @JsonIgnore
     private List<Video> videos;

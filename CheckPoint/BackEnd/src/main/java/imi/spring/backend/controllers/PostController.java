@@ -6,6 +6,7 @@ import imi.spring.backend.models.PostDTO;
 import imi.spring.backend.services.JWTService;
 import imi.spring.backend.services.PostService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Controller
 @AllArgsConstructor
 @RequestMapping(path = "/post")
@@ -25,6 +27,7 @@ public class PostController {
     @GetMapping("/all")
     @ResponseBody
     public List<PostDTO> getAllPosts() throws IOException {
+        log.info("Getting all posts.");
         return postService.convertListOfPostsToPostDTOs(postService.getAllPosts());
     }
 
@@ -60,6 +63,7 @@ public class PostController {
     @GetMapping("/location/{locationId}")
     @ResponseBody
     public List<PostDTO> getPostsByLocationId(@PathVariable Long locationId) throws IOException {
+        log.info("Calling this one.");
         return postService.convertListOfPostsToPostDTOs(postService.getPostsByLocationId(locationId));
     }
 

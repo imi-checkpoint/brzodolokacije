@@ -11,8 +11,8 @@ data class PostDTO(
     val postId:Long,
     val location:LocationDTO,
     val description:String,
-    val numberOfLikes:Int
-    //val photos:List<Photo>,
+    val numberOfLikes:Int,
+    val photos:List<Photo>
     //val videos:List<Video>
 )
 
