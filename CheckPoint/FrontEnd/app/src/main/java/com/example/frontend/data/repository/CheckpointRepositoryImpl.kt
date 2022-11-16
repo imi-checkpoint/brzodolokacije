@@ -83,7 +83,21 @@ class CheckpointRepositoryImpl(
     }
 
     override suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDTO> {
-        return api.getFollowingByUsername(token,userId, username)
+        return api.getFollowersByUsername(token,userId, username)
+    }
+
+    override suspend fun getMyFollowersByUsername(
+        token: String,
+        username: String
+    ): List<UserDTO> {
+        return api.getMyFollowersByUsername(token, username);
+    }
+
+    override suspend fun getMyFollowingByUsername(
+        token: String,
+        username: String
+    ): List<UserDTO> {
+        return api.getMyFollowingByUsername(token, username);
     }
 
 }

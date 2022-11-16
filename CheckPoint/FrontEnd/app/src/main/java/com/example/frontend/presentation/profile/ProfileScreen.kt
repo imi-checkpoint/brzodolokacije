@@ -55,7 +55,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        ProfileSection(navController, state);
+        ProfileSection(navController, state, viewModel.savedUserId);
         Spacer(modifier = Modifier.height(25.dp))
 
         ButtonSection(modifier = Modifier.fillMaxWidth());
@@ -108,6 +108,7 @@ fun TopBar(
 fun ProfileSection(
     navController: NavController,
     state : ProfileDataState,
+    userId : Long,
     modifier: Modifier = Modifier,
 )
 {
@@ -130,7 +131,7 @@ fun ProfileSection(
             
             Spacer(modifier = Modifier.width(16.dp))
 
-            StatSection(navController, state, modifier.weight(7f))
+            StatSection(navController, state, userId, modifier.weight(7f))
 
         }
     }
@@ -161,6 +162,7 @@ fun RoundImage(
 fun StatSection(
     navController : NavController,
     state : ProfileDataState,
+    userId: Long,
     modifier: Modifier = Modifier
 ){
     Row (
@@ -180,12 +182,11 @@ fun StatSection(
             onClick = {})
             ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers",
             onClick = {
-                navController.navigate(Screen.UserListScreen.withArgs("followers"));
+                navController.navigate(Screen.UserListScreen.route + "/followers/${userId}");
             })
             ProfileStat(numberText = state.profileData.followingCount.toString(), text = "Following",
             onClick = {
-                navController.navigate(Screen.UserListScreen.withArgs("following"));
-
+                navController.navigate(Screen.UserListScreen.route + "/following/${userId}");
             })
         }
     }

@@ -2,6 +2,7 @@ package com.example.frontend.presentation.profile
 
 import Constants.Companion.USER_ID
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -31,6 +32,7 @@ class ProfileViewModel @Inject constructor(
     private val _state = mutableStateOf(ProfileDataState())
     val state : State<ProfileDataState> = _state
     val context = application.baseContext
+    var savedUserId = 0L;
 
     var access_token  = "";
     var refresh_token = "";
@@ -47,10 +49,12 @@ class ProfileViewModel @Inject constructor(
     fun getProfileData()
     {
         savedStateHandle.get<Long>(USER_ID)?.let { userId ->
+            Log.d("User id", userId.toString());
             if(userId == 0L) {
                 getMyProfileData();
             }
             else {
+                savedUserId = userId;
                 getUserProfileData(userId)
             }
         }

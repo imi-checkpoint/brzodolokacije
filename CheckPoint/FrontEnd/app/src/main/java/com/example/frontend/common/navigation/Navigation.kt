@@ -35,7 +35,7 @@ fun Navigation()
                 navArgument("userId"){
                     type = NavType.LongType
                     defaultValue = 0
-                    nullable = true
+                    nullable = false
                 }
             )
         ){
@@ -56,11 +56,16 @@ fun Navigation()
             PostsScreen(navController = navController)
         }
         composable(
-            route = Screen.UserListScreen.route + "/{userTypeList}",
+            route = Screen.UserListScreen.route + "/{userTypeList}/{userId}",
             arguments = listOf(
                 navArgument("userTypeList"){
                     type = NavType.StringType
                     defaultValue = ""
+                    nullable = false
+                },
+                navArgument("userId"){
+                    type = NavType.LongType
+                    defaultValue = 0
                     nullable = false
                 }
             )

@@ -14,10 +14,10 @@ import javax.inject.Inject
 class SearchMyFollowersUseCase @Inject constructor(
     private val repository: CheckpointRepository
 ){
-    operator fun invoke(token : String) : Flow<Resource<List<User>>> = flow {
+    operator fun invoke(token : String, keyword: String) : Flow<Resource<List<User>>> = flow {
         try{
             emit(Resource.Loading())
-            val userList = repository.getMyFollowing(token).map{
+            val userList = repository.getMyFollowersByUsername(token, keyword).map{
                 it.toUser()
             }
             emit(Resource.Success(userList))

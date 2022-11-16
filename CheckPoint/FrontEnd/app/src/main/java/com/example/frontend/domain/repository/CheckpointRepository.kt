@@ -43,5 +43,8 @@ interface CheckpointRepository {
 
     suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDTO>
 
+    suspend fun getMyFollowersByUsername(token: String, username: String): List<UserDTO>
+
+    suspend fun getMyFollowingByUsername(token: String, username: String): List<UserDTO>
 
 }

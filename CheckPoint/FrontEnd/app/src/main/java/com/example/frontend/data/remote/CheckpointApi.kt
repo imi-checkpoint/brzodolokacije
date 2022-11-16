@@ -87,7 +87,7 @@ interface CheckpointApi {
     ) : List<UserDTO>
 
     @Headers("Content-Type: application/json")
-    @GET("follow_list/follow_or_unfollow/{userId}")
+    @POST("follow_list/follow_or_unfollow/{userId}")
     suspend fun followOrUnfollowUser(
         @Header("Authorization") token : String,
         @Path("userId") userId:Long
@@ -127,6 +127,20 @@ interface CheckpointApi {
     suspend fun getFollowersByUsername(
         @Header("Authorization") token : String,
         @Path("userId") userId:Long,
+        @Path("username") username : String
+    ) : List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/my/followers/keyword/{username}")
+    suspend fun getMyFollowingByUsername(
+        @Header("Authorization") token : String,
+        @Path("username") username : String
+    ) : List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @GET("follow_list/my/followers/keyword/{username}")
+    suspend fun getMyFollowersByUsername(
+        @Header("Authorization") token : String,
         @Path("username") username : String
     ) : List<UserDTO>
 
