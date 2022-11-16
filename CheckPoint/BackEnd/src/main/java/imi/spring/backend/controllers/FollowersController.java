@@ -102,4 +102,22 @@ public class FollowersController {
         return 0;
     }
 
+    @GetMapping("/my/following/keyword/{username}")
+    @ResponseBody
+    public List<AppUser> getMyFollowingByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.getMyFollowingByUsername(user, username);
+        return Collections.emptyList();
+    }
+
+    @GetMapping("/my/followers/keyword/{username}")
+    @ResponseBody
+    public List<AppUser> getMyFollowersByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return followersService.getMyFollowersByUsername(user, username);
+        return Collections.emptyList();
+    }
+
 }
