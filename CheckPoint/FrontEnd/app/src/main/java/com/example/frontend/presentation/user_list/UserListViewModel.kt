@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.user_list
 
+import Constants.Companion.USER_ID
 import Constants.Companion.USER_LIST_TYPE
 import android.app.Application
 import android.util.Log
@@ -10,8 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
-import com.example.frontend.domain.use_case.get_profile_data.GetMyFollowersUseCase
-import com.example.frontend.domain.use_case.get_profile_data.GetMyFollowingUseCase
+import com.example.frontend.domain.use_case.get_profile_data.*
 import com.example.frontend.presentation.location.components.LocationState
 import com.example.frontend.presentation.user_list.components.UserListState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +26,12 @@ import javax.inject.Inject
 class UserListViewModel @Inject constructor(
     private val getMyFollowersUseCase: GetMyFollowersUseCase,
     private val getMyFollowingUseCase: GetMyFollowingUseCase,
+    private val getUserFollowersUseCase: GetUserFollowersUseCase,
+    private val getUserFollowingUseCase: GetUserFollowingUseCase,
+    private val searchMyFollowersUseCase: SearchMyFollowersUseCase,
+    private val searchMyFollowingUseCase: SearchMyFollowingUseCase,
+    private val searchUserFollowersUseCase: SearchUserFollowersUseCase,
+    private val searchUserFollowingUseCase: SearchUserFollowingUseCase,
     private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel(){
@@ -35,7 +41,9 @@ class UserListViewModel @Inject constructor(
     private val context = application.baseContext
     private var access_token = "";
     private var refresh_token = "";
-    var type = "";
+
+    var typeOfUsers = "";
+    var userId = 0L;
 
     init {
         Log.d("INIT", "Initialize");
@@ -43,31 +51,68 @@ class UserListViewModel @Inject constructor(
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
-            getUsers();
-        }
-    }
-
-    fun getUsers(){
-        savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
-            if(userTypeList == "following") {
-                type = "Following"
-                getAllFollowingForUser(access_token)
+            savedStateHandle.get<Long>(USER_ID)?.let { id ->
+                userId = userId
             }
-            else if(userTypeList == "followers") {
-                type = "Followers"
-                getAllFollowersForUser(access_token)
+
+            savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
+                if(userTypeList == "following") {
+                    typeOfUsers = "Following"
+                }
+                else if(userTypeList == "followers") {
+                    typeOfUsers = "Followers"
+                }
+            }
+
+            getAllUsers()
+        }
+    }
+
+
+    fun getAllUsers()
+    {
+        if(typeOfUsers == "Following"){
+            if(userId == 0L){
+                getAllMyFollowing(access_token)
+            }
+            else{
+                getUsersFollowing(access_token, userId);
+            }
+        }
+        else if(typeOfUsers == "Followers"){
+            if(userId == 0L){
+                getAllMyFollowers(access_token)
+            }
+            else{
+                getUsersFollowers(access_token, userId);
             }
         }
     }
 
-    fun getSearchUsers(keyword : String){
-        savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
-            if(userTypeList == "following") getAllFollowingForUser(access_token)
-            else if(userTypeList == "followers") getAllFollowersForUser(access_token)
+
+
+    fun searchUsers(keyword: String)
+    {
+        if(typeOfUsers == "Following"){
+            if(userId == 0L){
+                searchAllMyFollowing(access_token, keyword)
+            }
+            else{
+                searchUsersFollowing(access_token, userId, keyword);
+            }
+        }
+        else if(typeOfUsers == "Followers"){
+            if(userId == 0L){
+                searchAllMyFollowers(access_token, keyword)
+            }
+            else{
+                searchUsersFollowers(access_token, userId, keyword);
+            }
         }
     }
 
-    private fun getAllFollowersForUser(token : String)
+
+    private fun getAllMyFollowers(token : String)
     {
         getMyFollowersUseCase("Bearer "+token).onEach { result ->
             when(result){
@@ -85,7 +130,7 @@ class UserListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getAllFollowingForUser(token : String)
+    private fun getAllMyFollowing(token : String)
     {
         getMyFollowingUseCase("Bearer "+token).onEach { result ->
             when(result){
@@ -103,4 +148,80 @@ class UserListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private fun getUsersFollowers(token: String, userId : Long){
+        getUserFollowersUseCase("Bearer "+token, userId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _state.value = UserListState(users = result.data ?: emptyList())
+                }
+                is Resource.Error -> {
+                    _state.value = UserListState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = UserListState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getUsersFollowing(token: String, userId : Long){
+        getUserFollowingUseCase("Bearer "+token, userId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _state.value = UserListState(users = result.data ?: emptyList())
+                }
+                is Resource.Error -> {
+                    _state.value = UserListState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = UserListState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun searchAllMyFollowing(token : String, keyword: String)
+    {
+
+    }
+
+    private fun searchAllMyFollowers(token : String, keyword: String){
+
+    }
+
+    private fun searchUsersFollowing(token : String, userId : Long, keyword: String){
+        searchUserFollowingUseCase("Bearer "+token, userId, keyword).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _state.value = UserListState(users = result.data ?: emptyList())
+                }
+                is Resource.Error -> {
+                    _state.value = UserListState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = UserListState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun searchUsersFollowers(token : String, userId : Long, keyword: String){
+        searchUserFollowingUseCase("Bearer "+token, userId, keyword).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _state.value = UserListState(users = result.data ?: emptyList())
+                }
+                is Resource.Error -> {
+                    _state.value = UserListState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _state.value = UserListState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 }

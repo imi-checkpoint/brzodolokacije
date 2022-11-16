@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
 
 @Composable
@@ -40,13 +41,13 @@ fun UserListScreen(
             .fillMaxSize()
             .padding(10.dp)
     ){
-        UserListTopBar(modifier = Modifier.padding(20.dp), viewModel.type);
+        UserListTopBar(modifier = Modifier.padding(20.dp), viewModel.typeOfUsers);
         Spacer(modifier = Modifier.height(5.dp))
 
         UserListSearchBar(searchText, onChange = {
             searchText = it
-            if(searchText == "") viewModel.getUsers();
-            else viewModel.getSearchUsers(searchText);
+            if(searchText == "") viewModel.getAllUsers();
+            else viewModel.searchUsers(searchText);
         });
         Spacer(modifier = Modifier.height(5.dp))
 
@@ -164,8 +165,9 @@ fun OneUser(
         modifier = Modifier
             .fillMaxWidth()
             .clickable{
-                      Log.d("ID", user.id.toString()) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
-            },
+                        Log.d("ID", user.id.toString()) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
+                        navController.navigate(Screen.ProfileScreen.withArgs(user.id))
+                      },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ){

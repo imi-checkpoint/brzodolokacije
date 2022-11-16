@@ -29,8 +29,18 @@ fun Navigation()
         composable(route = Screen.MainLocationScreen.route){
             MainLocationScreen(navController = navController)
         }
-        composable(route = Screen.ProfileScreen.route){
-            ProfileScreen(navController = navController)
+        composable(
+            route = Screen.ProfileScreen.route + "/{userId}",
+            arguments = listOf(
+                navArgument("userId"){
+                    type = NavType.LongType
+                    defaultValue = 0
+                    nullable = true
+                }
+            )
+        ){
+            entry ->
+                ProfileScreen(navController = navController)
         }
         composable(
             route = Screen.PostsScreen.route + "/{locationId}",

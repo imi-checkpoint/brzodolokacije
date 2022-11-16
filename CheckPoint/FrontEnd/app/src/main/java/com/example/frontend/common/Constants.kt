@@ -5,5 +5,7 @@ public class Constants{
         const val LOCATION_ID = "locationId"
 
         const val USER_LIST_TYPE = "userTypeList"
+
+        const val USER_ID = "userId"
     }
 }
