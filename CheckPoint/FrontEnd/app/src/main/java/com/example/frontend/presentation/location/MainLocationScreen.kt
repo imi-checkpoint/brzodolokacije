@@ -201,6 +201,17 @@ fun ProfileTopBar(
     ) {
         Row(){
             IconButton(onClick = {
+//                viewModel.getAllLocations()
+//                navController.navigate(Screen.ProfileScreen.route); //navigate to new post
+            }) {
+                Icon(
+                    Icons.Default.AddCircle,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+            }
+
+            IconButton(onClick = {
                 viewModel.getAllLocations()
                 navController.navigate(Screen.ProfileScreen.route);
             }) {
@@ -212,7 +223,8 @@ fun ProfileTopBar(
             }
 
             IconButton(onClick = {
-//                go to messages
+//                viewModel.getAllLocations()
+//                navController.navigate(Screen.ProfileScreen.route); //navigate to messages
             }) {
                 Icon(
                     Icons.Default.Send,

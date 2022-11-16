@@ -26,15 +26,16 @@ import javax.inject.Inject
 class UserListViewModel @Inject constructor(
     private val getMyFollowersUseCase: GetMyFollowersUseCase,
     private val getMyFollowingUseCase: GetMyFollowingUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel(){
 
     private val _state = mutableStateOf(UserListState())
     val state : State<UserListState> = _state
-    val context = application.baseContext
-    var access_token = "";
-    var refresh_token = "";
+    private val context = application.baseContext
+    private var access_token = "";
+    private var refresh_token = "";
+    var type = "";
 
     init {
         Log.d("INIT", "Initialize");
@@ -42,20 +43,31 @@ class UserListViewModel @Inject constructor(
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
-            Log.d("TOKEN", access_token);
+            getUsers();
+        }
+    }
 
-            //
-            Log.d("Get type", "get type of user list");
-            savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
-                Log.d("USER TYPE", userTypeList);
-
-                if(userTypeList == "following") getAllFollowingForUser(access_token)
-                else if(userTypeList == "followers") getAllFollowersForUser(access_token)
+    fun getUsers(){
+        savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
+            if(userTypeList == "following") {
+                type = "Following"
+                getAllFollowingForUser(access_token)
+            }
+            else if(userTypeList == "followers") {
+                type = "Followers"
+                getAllFollowersForUser(access_token)
             }
         }
     }
 
-    fun getAllFollowersForUser(token : String)
+    fun getSearchUsers(keyword : String){
+        savedStateHandle.get<String>(USER_LIST_TYPE)?.let { userTypeList ->
+            if(userTypeList == "following") getAllFollowingForUser(access_token)
+            else if(userTypeList == "followers") getAllFollowersForUser(access_token)
+        }
+    }
+
+    private fun getAllFollowersForUser(token : String)
     {
         getMyFollowersUseCase("Bearer "+token).onEach { result ->
             when(result){
@@ -73,7 +85,7 @@ class UserListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAllFollowingForUser(token : String)
+    private fun getAllFollowingForUser(token : String)
     {
         getMyFollowingUseCase("Bearer "+token).onEach { result ->
             when(result){
