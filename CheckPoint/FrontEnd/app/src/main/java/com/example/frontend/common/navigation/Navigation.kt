@@ -13,6 +13,7 @@ import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
 import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
+import com.example.frontend.presentation.user_list.UserListScreen
 
 @Composable
 fun Navigation()
@@ -28,11 +29,18 @@ fun Navigation()
         composable(route = Screen.MainLocationScreen.route){
             MainLocationScreen(navController = navController)
         }
-        composable(route = Screen.ProfileScreen.route){
-            ProfileScreen(navController = navController)
-        }
-        composable(route = Screen.TestScreen.route){
-            TestScreen(navController = navController)
+        composable(
+            route = Screen.ProfileScreen.route + "/{userId}",
+            arguments = listOf(
+                navArgument("userId"){
+                    type = NavType.LongType
+                    defaultValue = 0
+                    nullable = false
+                }
+            )
+        ){
+            entry ->
+                ProfileScreen(navController = navController)
         }
         composable(
             route = Screen.PostsScreen.route + "/{locationId}",
@@ -46,6 +54,24 @@ fun Navigation()
         ){
                 entry ->
             PostsScreen(navController = navController)
+        }
+        composable(
+            route = Screen.UserListScreen.route + "/{userTypeList}/{userId}",
+            arguments = listOf(
+                navArgument("userTypeList"){
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument("userId"){
+                    type = NavType.LongType
+                    defaultValue = 0
+                    nullable = false
+                }
+            )
+        ){
+            entry ->
+                UserListScreen(navController = navController)
         }
     }
 }

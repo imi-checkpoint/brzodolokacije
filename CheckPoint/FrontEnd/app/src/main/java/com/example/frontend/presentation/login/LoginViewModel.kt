@@ -45,11 +45,13 @@ class LoginViewModel @Inject constructor(
                         DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
                     }
+
                     navController.navigate(Screen.MainLocationScreen.route){
                         popUpTo(Screen.LoginScreen.route){
                             inclusive = true;
                         }
                     };
+
                 }
                 is Resource.Error -> {
                     _state.value = LoginState(error = result.message ?:

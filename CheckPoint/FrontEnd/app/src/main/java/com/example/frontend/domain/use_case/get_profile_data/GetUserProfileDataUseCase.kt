@@ -1,7 +1,6 @@
 package com.example.frontend.domain.use_case.get_profile_data
 
 import com.example.frontend.common.Resource
-import com.example.frontend.data.remote.dto.toUser
 import com.example.frontend.domain.model.ProfileData
 import com.example.frontend.domain.repository.CheckpointRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,15 +9,15 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class GetMyProfileDataUseCase @Inject constructor(
+class GetUserProfileDataUseCase @Inject constructor(
     private val repository: CheckpointRepository
 ){
-    operator fun invoke(token:String) : Flow<Resource<ProfileData>> = flow{
+    operator fun invoke(token:String, userId : Long) : Flow<Resource<ProfileData>> = flow{
         try{
             emit(Resource.Loading())
-            val followersCount = repository.getMyFollowersCount(token)
-            val followingCount = repository.getMyFollowingCount(token)
-            val postCount = repository.getMyPostsCount(token)
+            val followersCount = repository.countAllFollowersPerUser(token, userId)
+            val followingCount = repository.countAllFollowingByUser(token, userId)
+            val postCount = repository.getUserPostsCount(token, userId)
 
             val profileData = ProfileData(followersCount, followingCount, postCount)
             emit(Resource.Success(profileData));

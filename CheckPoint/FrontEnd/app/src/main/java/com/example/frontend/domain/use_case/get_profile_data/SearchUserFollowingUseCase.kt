@@ -2,7 +2,7 @@ package com.example.frontend.domain.use_case.get_profile_data
 
 import com.example.frontend.common.Resource
 import com.example.frontend.data.remote.dto.toUser
-import com.example.frontend.domain.model.ProfileData
+import com.example.frontend.domain.model.User
 import com.example.frontend.domain.repository.CheckpointRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -10,18 +10,16 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class GetMyProfileDataUseCase @Inject constructor(
+class SearchUserFollowingUseCase @Inject constructor(
     private val repository: CheckpointRepository
 ){
-    operator fun invoke(token:String) : Flow<Resource<ProfileData>> = flow{
+    operator fun invoke(token : String,userId: Long, username: String) : Flow<Resource<List<User>>> = flow {
         try{
             emit(Resource.Loading())
-            val followersCount = repository.getMyFollowersCount(token)
-            val followingCount = repository.getMyFollowingCount(token)
-            val postCount = repository.getMyPostsCount(token)
-
-            val profileData = ProfileData(followersCount, followingCount, postCount)
-            emit(Resource.Success(profileData));
+            val userList = repository.getFollowingByUsername(token, userId, username).map{
+                it.toUser()
+            }
+            emit(Resource.Success(userList))
         }catch (e : HttpException){
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))
         }catch (e : IOException){

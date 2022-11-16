@@ -1,8 +1,10 @@
 package com.example.frontend.presentation.profile
 
 import android.provider.ContactsContract.Profile
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.R
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.profile.components.ProfileDataState
 
 @Composable
@@ -52,7 +55,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        ProfileSection(state);
+        ProfileSection(navController, state, viewModel.savedUserId);
         Spacer(modifier = Modifier.height(25.dp))
 
         ButtonSection(modifier = Modifier.fillMaxWidth());
@@ -103,7 +106,9 @@ fun TopBar(
 
 @Composable
 fun ProfileSection(
+    navController: NavController,
     state : ProfileDataState,
+    userId : Long,
     modifier: Modifier = Modifier,
 )
 {
@@ -126,7 +131,7 @@ fun ProfileSection(
             
             Spacer(modifier = Modifier.width(16.dp))
 
-            StatSection(state, modifier.weight(7f))
+            StatSection(navController, state, userId, modifier.weight(7f))
 
         }
     }
@@ -155,7 +160,9 @@ fun RoundImage(
 
 @Composable
 fun StatSection(
+    navController : NavController,
     state : ProfileDataState,
+    userId: Long,
     modifier: Modifier = Modifier
 ){
     Row (
@@ -171,9 +178,16 @@ fun StatSection(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
         }
         else if(state.profileData != null){
-            ProfileStat(numberText = state.profileData.postCount.toString(), text = "Posts")
-            ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers")
-            ProfileStat(numberText = state.profileData.followingCount.toString(), text = "Following")
+            ProfileStat(numberText = state.profileData.postCount.toString(), text = "Posts",
+            onClick = {})
+            ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers",
+            onClick = {
+                navController.navigate(Screen.UserListScreen.route + "/followers/${userId}");
+            })
+            ProfileStat(numberText = state.profileData.followingCount.toString(), text = "Following",
+            onClick = {
+                navController.navigate(Screen.UserListScreen.route + "/following/${userId}");
+            })
         }
     }
 }
@@ -182,13 +196,17 @@ fun StatSection(
 fun ProfileStat(
     numberText : String,
     text : String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick : () -> Unit = {}
 )
 {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .clickable{
+                onClick()
+            }
     )    {
         Text(
             text = numberText,

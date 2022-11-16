@@ -43,6 +43,9 @@ public class BackendApplication {
 			locationService.saveLocation(new Location("Eiffel Tower", 0.0, 0.0));
 			locationService.saveLocation(new Location("Stonehenge", 0.0, 0.0));
 			locationService.saveLocation(new Location("Leaning Tower of Pisa", 0.0, 0.0));
+			locationService.saveLocation(new Location("Machu Picchu", 0.0, 0.0));
+			locationService.saveLocation(new Location("The Grand Canyon", 0.0, 0.0));
+			locationService.saveLocation(new Location("Golden Gate Bridge", 0.0, 0.0));
 
 			postService.savePost(new Post("The repainting campaign is an important event in the life of the monument and takes on a truly mythical nature."),
 					1L, 1L);
