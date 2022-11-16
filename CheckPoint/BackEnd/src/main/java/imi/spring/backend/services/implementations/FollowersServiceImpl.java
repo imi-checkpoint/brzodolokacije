@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class FollowersServiceImpl implements FollowersService {
         return Collections.emptyList();
     }
 
+    @Transactional
     @Override
     public String followOrUnfollowUser(Long user1id, Long user2id) {
         AppUser user1 = appUserRepository.findById(user1id).orElse(null);
@@ -107,5 +109,15 @@ public class FollowersServiceImpl implements FollowersService {
     @Override
     public Integer countMyFollowers(AppUser user) {
         return user.getFollowersList().size();
+    }
+
+    @Override
+    public List<AppUser> getMyFollowingByUsername(AppUser user, String username) {
+        return appUserRepository.findFollowingUsernameLike(user, username);
+    }
+
+    @Override
+    public List<AppUser> getMyFollowersByUsername(AppUser user, String username) {
+        return appUserRepository.findFollowersUsernameLike(user, username);
     }
 }

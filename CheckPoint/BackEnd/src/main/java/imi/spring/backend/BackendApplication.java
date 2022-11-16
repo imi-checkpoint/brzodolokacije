@@ -4,6 +4,7 @@ import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.services.AppUserService;
+import imi.spring.backend.services.FollowersService;
 import imi.spring.backend.services.LocationService;
 import imi.spring.backend.services.PostService;
 
@@ -32,7 +33,7 @@ public class BackendApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService){
+	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService, FollowersService followersService){
 		return args -> {
 			appUserService.saveUser(new AppUser("user1@gmail.com", "user1", "user1"));
 			appUserService.saveUser(new AppUser("user2@gmail.com", "user2", "user2"));
@@ -58,6 +59,16 @@ public class BackendApplication {
 					1L, 3L);
 			postService.savePost(new Post("One of Italy's signature sights, leaning a startling 3.9 degrees off the vertical. The 58m-high tower, officially the Duomo's campanile (bell tower), took almost 200 years to build, but was already listing when it was unveiled in 1372."),
 					3L, 3L);
+
+			followersService.followOrUnfollowUser(1L, 2L);
+			followersService.followOrUnfollowUser(1L, 3L);
+			followersService.followOrUnfollowUser(1L, 4L);
+			followersService.followOrUnfollowUser(2L, 3L);
+			followersService.followOrUnfollowUser(2L, 4L);
+			followersService.followOrUnfollowUser(3L, 1L);
+			followersService.followOrUnfollowUser(3L, 4L);
+			followersService.followOrUnfollowUser(4L, 2L);
+			followersService.followOrUnfollowUser(4L, 3L);
 		};
 	}
 
