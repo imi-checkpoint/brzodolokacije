@@ -49,7 +49,6 @@ class ProfileViewModel @Inject constructor(
     fun getProfileData()
     {
         savedStateHandle.get<Long>(USER_ID)?.let { userId ->
-            Log.d("User id", userId.toString());
             if(userId == 0L) {
                 getMyProfileData();
             }

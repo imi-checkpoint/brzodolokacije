@@ -131,7 +131,7 @@ interface CheckpointApi {
     ) : List<UserDTO>
 
     @Headers("Content-Type: application/json")
-    @GET("follow_list/my/followers/keyword/{username}")
+    @GET("follow_list/my/following/keyword/{username}")
     suspend fun getMyFollowingByUsername(
         @Header("Authorization") token : String,
         @Path("username") username : String

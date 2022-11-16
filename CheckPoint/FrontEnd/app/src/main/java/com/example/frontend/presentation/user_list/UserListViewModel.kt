@@ -46,13 +46,11 @@ class UserListViewModel @Inject constructor(
     var savedUserId : Long = 0L;
 
     init {
-        Log.d("INIT", "Initialize");
         GlobalScope.launch(Dispatchers.IO){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
             savedStateHandle.get<Long>(USER_ID)?.let { userId ->
-                Log.d("SAVED ID", userId.toString())
                 savedUserId = userId
             }
 
@@ -72,15 +70,11 @@ class UserListViewModel @Inject constructor(
 
     fun getAllUsers()
     {
-        Log.d("LIST","get all " )
-        Log.d("TYPE", typeOfUsers)
-        Log.d("User id", savedUserId.toString());
         if(typeOfUsers == "Following"){
             if(savedUserId == 0L){
                 getAllMyFollowing(access_token)
             }
             else{
-                Log.d("USER FOLLOWING", savedUserId.toString())
                 getUsersFollowing(access_token, savedUserId);
             }
         }
@@ -89,7 +83,6 @@ class UserListViewModel @Inject constructor(
                 getAllMyFollowers(access_token)
             }
             else{
-                Log.d("USER FOLLOWERS", savedUserId.toString())
                 getUsersFollowers(access_token, savedUserId);
             }
         }
@@ -99,19 +92,24 @@ class UserListViewModel @Inject constructor(
 
     fun searchUsers(keyword: String)
     {
+        Log.d("SEARCH", keyword);
         if(typeOfUsers == "Following"){
             if(savedUserId == 0L){
+                Log.d("SEARCH", "my following")
                 searchAllMyFollowing(access_token, keyword)
             }
             else{
+                Log.d("SEARCH", "user ${savedUserId} following")
                 searchUsersFollowing(access_token, savedUserId, keyword);
             }
         }
         else if(typeOfUsers == "Followers"){
             if(savedUserId == 0L){
+                Log.d("SEARCH", "my followers")
                 searchAllMyFollowers(access_token, keyword)
             }
             else{
+                Log.d("SEARCH", "user ${savedUserId} followers")
                 searchUsersFollowers(access_token, savedUserId, keyword);
             }
         }
