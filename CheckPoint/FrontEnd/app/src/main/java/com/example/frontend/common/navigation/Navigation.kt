@@ -14,6 +14,7 @@ import com.example.frontend.presentation.location.MainLocationScreen
 import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.user_list.UserListScreen
+import com.example.frontend.presentation.newpost.NovPostScreen
 
 @Composable
 fun Navigation()
@@ -28,6 +29,9 @@ fun Navigation()
         }
         composable(route = Screen.MainLocationScreen.route){
             MainLocationScreen(navController = navController)
+        }
+        composable(route = Screen.NovPostScreen.route){
+            NovPostScreen(navController = navController)
         }
         composable(
             route = Screen.ProfileScreen.route + "/{userId}",
@@ -73,6 +77,7 @@ fun Navigation()
             entry ->
                 UserListScreen(navController = navController)
         }
+
     }
 }
 

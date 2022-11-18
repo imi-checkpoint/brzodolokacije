@@ -6,8 +6,8 @@ sealed class Screen(val route : String) {
     object MainLocationScreen : Screen("mainLocation_screen");
     object ProfileScreen : Screen("profile_screen");
     object PostsScreen : Screen("posts_screen");
-    object UserListScreen : Screen("userList_screen")
-
+    object UserListScreen : Screen("userList_screen");
+    object NovPostScreen : Screen("newPost_screen");
     fun withArgs(vararg args : Long) : String {
         return buildString{
             append(route)
