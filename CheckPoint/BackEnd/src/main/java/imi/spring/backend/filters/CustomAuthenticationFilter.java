@@ -3,6 +3,7 @@ package imi.spring.backend.filters;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import imi.spring.backend.services.AppUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +50,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withExpiresAt(new Date(System.currentTimeMillis() + 15*60*1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("role", "user")
+                .withClaim("userId", 1L)
                 .sign(algorithm);
 
         String refreshToken = JWT.create()

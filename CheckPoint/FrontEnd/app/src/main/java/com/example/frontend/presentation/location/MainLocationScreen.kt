@@ -214,7 +214,7 @@ fun ProfileTopBar(
 
             IconButton(onClick = {
                 viewModel.getAllLocations()
-                navController.navigate(Screen.ProfileScreen.withArgs(0));
+                navController.navigate(Screen.ProfileScreen.withArgs(viewModel.loginUserId));
             }) {
                 Icon(
                     Icons.Default.Person,

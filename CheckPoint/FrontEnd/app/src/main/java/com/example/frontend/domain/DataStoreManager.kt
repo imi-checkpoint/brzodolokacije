@@ -50,6 +50,11 @@ object DataStoreManager {
         return valueFlow.first()
     }
 
+    suspend fun getLongValue(context: Context, key : String, default: Int = 0) : Long{
+        val intValue = getIntValue(context,key, default);
+        return intValue.toLong()
+    }
+
     fun decodeToken(jwt : String) : String
     {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)

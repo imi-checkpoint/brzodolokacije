@@ -39,8 +39,6 @@ class MapViewModel @Inject constructor(
         GlobalScope.launch(Dispatchers.IO){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            getAllPostLocations(1L);
         }
     }
 

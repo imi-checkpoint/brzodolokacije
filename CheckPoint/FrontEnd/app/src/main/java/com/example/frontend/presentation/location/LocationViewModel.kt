@@ -36,15 +36,15 @@ class LocationViewModel @Inject constructor(
     val context = application.baseContext
     var access_token  = "";
     var refresh_token = "";
+    var username = "";
+    var loginUserId = 0L;
 
     init {
         GlobalScope.launch(Dispatchers.IO){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            Log.d("DECODED", decodeToken(access_token));
-
-            Log.d("ACCESS TOKEN", access_token);
+            username = DataStoreManager.getStringValue(context, "username");
+            loginUserId = DataStoreManager.getLongValue(context, "userId");
 
             getAllLocations()
         }
@@ -52,7 +52,7 @@ class LocationViewModel @Inject constructor(
 
     fun getAllLocations()
     {
-        Log.d("ALL", "get all locations with token ${access_token}");
+//        Log.d("ALL", "get all locations with token ${access_token}");
         allLocationsUseCase("Bearer " + access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {

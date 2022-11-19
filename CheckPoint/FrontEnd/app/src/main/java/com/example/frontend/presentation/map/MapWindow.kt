@@ -11,9 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,7 +30,7 @@ import com.google.maps.android.compose.*
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MapWindow(
-//    userId : Long,
+    userId : Long,
     viewModel: MapViewModel = hiltViewModel()
 )
 {
@@ -37,8 +39,18 @@ fun MapWindow(
         MapUiSettings(zoomControlsEnabled = false)
     }
 
+    val camPosState = rememberCameraPositionState{
+    }
     val builder = LatLngBounds.Builder()
 
+    val localDensity = LocalDensity.current
+    var mapWidth by remember{
+        mutableStateOf(0)
+    }
+
+    var mapHeight by remember{
+        mutableStateOf(0)
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -56,14 +68,19 @@ fun MapWindow(
     ) {
         GoogleMap(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .onGloballyPositioned { coords ->
+                    mapWidth = with(localDensity){coords.size.width}
+                    mapHeight = with(localDensity){coords.size.height}
+                },
             properties = viewModel.state.value.properties,
             uiSettings = uiSettings,
             onMapLoaded = {
-                //load all locations for user!
-            }
+                viewModel.getAllPostLocations(userId);
+            },
+            cameraPositionState = camPosState
         ){
-            Log.d("MAP", viewModel.statePosts.value.toString());
+
             if(viewModel.statePosts.value.userPosts != null){
                 viewModel.statePosts.value.userPosts!!.forEach { post ->
 
@@ -81,9 +98,29 @@ fun MapWindow(
                         )
                     )
                 }
-            }
 
-            Log.d("BUILDER", builder.toString());
+                if(!viewModel.statePosts.value.userPosts!!.isEmpty())
+                {
+                    updateCamera(camPosState, builder, mapWidth, mapHeight)
+                }
+            }
         }
     }
+}
+
+fun updateCamera(
+    cameraPositionState: CameraPositionState,
+    builder : LatLngBounds.Builder,
+    width: Int,
+    height : Int
+){
+    val padding = (width * 0.20).toInt();
+    cameraPositionState.move(
+        update = CameraUpdateFactory.newLatLngBounds(
+            builder.build(),
+            width,
+            height,
+            padding
+        )
+    )
 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,6 +45,12 @@ class LoginViewModel @Inject constructor(
                     GlobalScope.launch(Dispatchers.IO) {
                         DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
+
+                        val jwtDecode = DataStoreManager.decodeToken(result.data!!.access_token);
+                        val userId = JSONObject(jwtDecode).getInt("userId");
+                        val username = JSONObject(jwtDecode).getString("sub")
+                        DataStoreManager.saveValue(context, "userId", userId)
+                        DataStoreManager.saveValue(context, "username", username)
                     }
 
                     navController.navigate(Screen.MainLocationScreen.route){

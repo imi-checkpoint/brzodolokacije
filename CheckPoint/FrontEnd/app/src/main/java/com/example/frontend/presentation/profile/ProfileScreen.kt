@@ -52,7 +52,7 @@ fun ProfileScreen(
             .fillMaxSize()
     ) {
         TopBar(
-            name = "Ime korisnika",
+            name = viewModel.username,
             modifier = Modifier.padding(20.dp),
             navController = navController
         )
@@ -65,7 +65,9 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(25.dp))
 
         //MAPA
-        MapSection()
+        if(viewModel.savedUserId != 0L){
+            MapSection(viewModel.savedUserId)
+        }
     }
 }
 
@@ -294,7 +296,7 @@ fun ActionButton(
 
 @Composable
 fun MapSection(
-
+    userId : Long
 )
 {
     Column(
@@ -309,6 +311,6 @@ fun MapSection(
                 shape = RoundedCornerShape(5.dp)
             )
     ) {
-        MapWindow()
+        MapWindow(userId)
     }
 }

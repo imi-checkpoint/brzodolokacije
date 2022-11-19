@@ -67,6 +67,7 @@ public class JWTServiceImpl implements JWTService {
                 .withExpiresAt(new Date(System.currentTimeMillis() + 10*60*1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("role", "user")
+                .withClaim("userId", appUserService.getUserByUsername(username).getId())
                 .sign(getAlgorithm());
     }
 
