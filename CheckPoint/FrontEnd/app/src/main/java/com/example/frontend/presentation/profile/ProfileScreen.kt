@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +65,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(25.dp))
 
         //MAPA
-        MapWindow()
+        MapSection()
     }
 }
 
@@ -287,5 +289,26 @@ fun ActionButton(
                 tint = Color.Black
             )
         }
+    }
+}
+
+@Composable
+fun MapSection(
+
+)
+{
+    Column(
+        modifier = Modifier
+            .padding(
+                horizontal = 20.dp,
+                vertical = 20.dp
+            )
+            .border(
+                width = Dp.Hairline,
+                color = Color.Transparent,
+                shape = RoundedCornerShape(5.dp)
+            )
+    ) {
+        MapWindow()
     }
 }

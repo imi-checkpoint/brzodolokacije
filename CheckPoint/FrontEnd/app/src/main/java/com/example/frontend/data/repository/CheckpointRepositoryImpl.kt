@@ -29,6 +29,10 @@ class CheckpointRepositoryImpl(
         return api.getPostsFromLocation(token, locationId)
     }
 
+    override suspend fun getPostsByUserId(token: String, userId: Long): List<PostDTO> {
+        return api.getPostsByUserId(token, userId)
+    }
+
     override suspend fun getMyFollowers(token: String): List<UserDTO> {
         return api.getMyFollowers(token)
     }

@@ -38,6 +38,13 @@ interface CheckpointApi {
     ): List<PostDTO>
 
     @Headers("Content-Type: application/json")
+    @GET("post/user/{userId}")
+    suspend fun getPostsByUserId(
+        @Header("Authorization") token : String,
+        @Path("userId") userId:Long
+    ): List<PostDTO>
+
+    @Headers("Content-Type: application/json")
     @GET("follow_list/my/following")
     suspend fun getMyFollowing(
         @Header("Authorization") token : String

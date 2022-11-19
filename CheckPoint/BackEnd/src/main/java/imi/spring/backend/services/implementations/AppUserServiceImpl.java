@@ -72,6 +72,8 @@ public class AppUserServiceImpl implements AppUserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = appUserRepository.findByUsername(username);
 
+        log.info("Username is {}", username);
+
         if(user==null){
             log.error("User {} not found in database", username);
             throw new UsernameNotFoundException("User not found.");

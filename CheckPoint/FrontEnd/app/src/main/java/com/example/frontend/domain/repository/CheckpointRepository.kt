@@ -14,6 +14,8 @@ interface CheckpointRepository {
 
     suspend fun getPostsFromLocation(token : String, locationId : Long) : List<PostDTO>
 
+    suspend fun getPostsByUserId(token : String, userId : Long) : List<PostDTO>
+
     suspend fun getMyFollowers(token: String): List<UserDTO>
 
     suspend fun getMyFollowing(token: String): List<UserDTO>
@@ -45,5 +47,6 @@ interface CheckpointRepository {
     suspend fun getMyFollowingByUsername(token: String, username: String): List<UserDTO>
 
     suspend fun getPhotoByPostIdAndOrder(token: String, postid: Long, order: Int): BinaryPhoto
+
 
 }
