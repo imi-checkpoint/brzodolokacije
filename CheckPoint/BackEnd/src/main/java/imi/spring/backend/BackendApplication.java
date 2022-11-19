@@ -47,6 +47,7 @@ public class BackendApplication {
 			locationService.saveLocation(new Location("The Grand Canyon", 0.0, 0.0));
 			locationService.saveLocation(new Location("Golden Gate Bridge", 0.0, 0.0));
 
+			/*
 			postService.savePost(new Post("The repainting campaign is an important event in the life of the monument and takes on a truly mythical nature."),
 					1L, 1L);
 			postService.savePost(new Post("The beams of light, directed from the bottom towards the top, illuminate the Eiffel Tower from the inside of its structure.t"),
@@ -58,6 +59,20 @@ public class BackendApplication {
 			postService.savePost(new Post("The Pisa tower is one of the four buildings that make up the cathedral complex in Pisa."),
 					1L, 3L);
 			postService.savePost(new Post("One of Italy's signature sights, leaning a startling 3.9 degrees off the vertical. The 58m-high tower, officially the Duomo's campanile (bell tower), took almost 200 years to build, but was already listing when it was unveiled in 1372."),
+					3L, 3L);
+			*/
+
+			postService.savePost("The repainting campaign is an important event in the life of the monument and takes on a truly mythical nature.",
+					1L, 1L);
+			postService.savePost("The beams of light, directed from the bottom towards the top, illuminate the Eiffel Tower from the inside of its structure.t",
+					2L, 1L);
+			postService.savePost("Experience the unforgettable atmosphere of the Stone Circle and follow in the footsteps of the prehistoric people who lived here 4,000 years ago as you walk among the Neolithic houses.",
+					1L, 2L);
+			postService.savePost("The Stone Circle is a masterpiece of engineering, and building it would have taken huge effort from hundreds of well-organised people using only simple tools and technologies. Visit Stonehenge to find out more about this iconic symbol of Britain.",
+					3L, 2L);
+			postService.savePost("The Pisa tower is one of the four buildings that make up the cathedral complex in Pisa.",
+					1L, 3L);
+			postService.savePost("One of Italy's signature sights, leaning a startling 3.9 degrees off the vertical. The 58m-high tower, officially the Duomo's campanile (bell tower), took almost 200 years to build, but was already listing when it was unveiled in 1372.",
 					3L, 3L);
 
 			followersService.followOrUnfollowUser(1L, 2L);

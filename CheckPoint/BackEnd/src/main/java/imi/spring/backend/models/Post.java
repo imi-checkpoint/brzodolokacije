@@ -19,6 +19,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
+
+
+
     @JsonIgnore
     private LocalDateTime time;
 
@@ -40,5 +43,12 @@ public class Post {
 
     public Post(String description) {
         this.description = description;
+    }
+
+    public Post(String description, LocalDateTime time, AppUser user, Location location) {
+        this(description);
+        this.time = time;
+        this.user = user;
+        this.location = location;
     }
 }

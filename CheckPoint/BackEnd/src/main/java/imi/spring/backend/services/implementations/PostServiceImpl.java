@@ -46,6 +46,7 @@ public class PostServiceImpl implements PostService {
         return 0;
     }
 
+    /*
     @Override
     public String savePost(Post post, Long userId, Long locationId) {
         Location location = locationService.getLocationById(locationId);
@@ -54,6 +55,16 @@ public class PostServiceImpl implements PostService {
             post.setUser(appUserService.getUserById(userId));
             post.setLocation(location);
             postRepository.save(post);
+            return "Saved";
+        }
+        return "Location with that id does not exist!";
+    }
+    */
+    @Override
+    public String savePost(String description, Long userId, Long locationId) {
+        Location location = locationService.getLocationById(locationId);
+        if (location != null) {
+            postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
             return "Saved";
         }
         return "Location with that id does not exist!";
