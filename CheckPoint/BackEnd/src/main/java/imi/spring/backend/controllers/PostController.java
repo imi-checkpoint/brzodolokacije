@@ -41,12 +41,22 @@ public class PostController {
     @ResponseBody
     public Integer countCommentsByPostId(@PathVariable Long id) { return postService.countCommentsByPostId(id); }
 
+    /*
     @PostMapping("/save/location/{locationId}")
     @ResponseBody
     public String savePost(HttpServletRequest request, @RequestBody Post post, @PathVariable Long locationId) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
             return postService.savePost(post, user.getId(), locationId);
+        return "Invalid user!";
+    }*/
+
+    @PostMapping("/save/location/{locationId}")
+    @ResponseBody
+    public String savePost(HttpServletRequest request, @RequestBody String description, @PathVariable Long locationId) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.savePost(description, user.getId(), locationId);
         return "Invalid user!";
     }
 

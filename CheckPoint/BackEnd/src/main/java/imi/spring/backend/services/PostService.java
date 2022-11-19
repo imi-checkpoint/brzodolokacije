@@ -12,7 +12,8 @@ public interface PostService {
     List<Post> getAllPosts();
     Post getPostById(Long id);
     Integer countCommentsByPostId(Long id);
-    String savePost(Post post, Long userId, Long locationId);
+    //String savePost(Post post, Long userId, Long locationId);
+    String savePost(String description, Long userId, Long locationId);
     String deletePost(Long id);
     List<Post> getPostsByUserId(Long userId);
     List<Post> getPostsByLocationId(Long locationId);
