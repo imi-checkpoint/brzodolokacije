@@ -201,6 +201,7 @@ fun ProfileTopBar(
     ) {
         Row(){
             IconButton(onClick = {
+                navController.navigate(Screen.NovPostScreen.route)
 //                viewModel.getAllLocations()
 //                navController.navigate(Screen.ProfileScreen.route); //navigate to new post
             }) {
