@@ -62,7 +62,12 @@ public class PostController {
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public String deletePostById(@PathVariable Long id) { return postService.deletePost(id); }
+    public String deletePostById(HttpServletRequest request, @PathVariable Long id) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.deletePost(user.getId(), id);
+        return "Invalid user!";
+    }
 
     @GetMapping("/user/{userId}")
     @ResponseBody
