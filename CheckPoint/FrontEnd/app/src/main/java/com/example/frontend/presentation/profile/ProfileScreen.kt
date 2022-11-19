@@ -34,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
+import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.ProfileDataState
 
 @Composable
@@ -60,6 +61,9 @@ fun ProfileScreen(
 
         ButtonSection(modifier = Modifier.fillMaxWidth());
         Spacer(modifier = Modifier.height(25.dp))
+
+        //MAPA
+        MapWindow()
     }
 }
 
