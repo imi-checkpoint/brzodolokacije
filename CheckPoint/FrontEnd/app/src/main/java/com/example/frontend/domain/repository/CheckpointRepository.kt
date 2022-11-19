@@ -1,9 +1,6 @@
 package com.example.frontend.domain.repository
 
-import com.example.frontend.data.remote.dto.LocationDTO
-import com.example.frontend.data.remote.dto.LoginDTO
-import com.example.frontend.data.remote.dto.PostDTO
-import com.example.frontend.data.remote.dto.UserDTO
+import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
 
 interface CheckpointRepository {
@@ -46,5 +43,7 @@ interface CheckpointRepository {
     suspend fun getMyFollowersByUsername(token: String, username: String): List<UserDTO>
 
     suspend fun getMyFollowingByUsername(token: String, username: String): List<UserDTO>
+
+    suspend fun getPhotoByPostIdAndOrder(token: String, postid: Long, order: Int): BinaryPhoto
 
 }

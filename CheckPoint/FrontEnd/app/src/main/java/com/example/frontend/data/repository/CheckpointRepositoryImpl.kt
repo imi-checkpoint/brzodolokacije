@@ -1,10 +1,7 @@
 package com.example.frontend.data.repository
 
 import com.example.frontend.data.remote.CheckpointApi
-import com.example.frontend.data.remote.dto.LocationDTO
-import com.example.frontend.data.remote.dto.LoginDTO
-import com.example.frontend.data.remote.dto.PostDTO
-import com.example.frontend.data.remote.dto.UserDTO
+import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
 
@@ -98,6 +95,14 @@ class CheckpointRepositoryImpl(
         username: String
     ): List<UserDTO> {
         return api.getMyFollowingByUsername(token, username);
+    }
+
+    override suspend fun getPhotoByPostIdAndOrder(
+        token: String,
+        postId: Long,
+        order: Int
+    ): BinaryPhoto {
+        return api.GetPhotoByPostIdAndOrder(token, postId, order)
     }
 
 }

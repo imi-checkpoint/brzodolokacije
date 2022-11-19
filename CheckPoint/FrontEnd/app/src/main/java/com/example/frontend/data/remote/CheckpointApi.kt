@@ -1,9 +1,6 @@
 package com.example.frontend.data.remote
 
-import com.example.frontend.data.remote.dto.LocationDTO
-import com.example.frontend.data.remote.dto.LoginDTO
-import com.example.frontend.data.remote.dto.PostDTO
-import com.example.frontend.data.remote.dto.UserDTO
+import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
 import retrofit2.http.*
 
@@ -144,5 +141,11 @@ interface CheckpointApi {
         @Path("username") username : String
     ) : List<UserDTO>
 
-
+    @Headers("Content-Type: application/octet-stream")
+    @GET("photos/photoByPostIdAndOrder/{postId}/{order}")
+    suspend fun GetPhotoByPostIdAndOrder(
+        @Header("Authorization") token : String,
+        @Path("postId") postId: Long,
+        @Path("order") order: Int
+    ) : BinaryPhoto
 }

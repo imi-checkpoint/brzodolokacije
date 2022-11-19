@@ -12,7 +12,7 @@ data class PostDTO(
     val location:LocationDTO,
     val description:String,
     val numberOfLikes:Int,
-    val photos:List<Photo>
+    val photos:List<Photo>,
     //val videos:List<Video>
 )
 
@@ -23,7 +23,7 @@ fun PostDTO.toPost() : Post{
         appUserId = appUserId,
         appUserUsername = appUserUsername,
         numberOfLikes = numberOfLikes,
-        //photos = photos,
+        photos = photos,
         //videos = videos,
         location = location.toLocation()
     )

@@ -4,6 +4,8 @@ import imi.spring.backend.models.mongo.Photo;
 import imi.spring.backend.services.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.bson.types.Binary;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,9 +43,9 @@ public class PhotoController {
         return "photos";
     }
 
-    @GetMapping("/photoByPostIdAndOrder")
+    @GetMapping("/photoByPostIdAndOrder/{postId}/{order}")
     @ResponseBody
-    public Photo getPhotoByPostIdAndOrder(@RequestParam("postId") Long postId, @RequestParam("order") Integer order) throws IOException {
-        return photoService.getPhotoByPostIdAndOrder(postId, order);
+    public Binary getPhotoByPostIdAndOrder(@PathVariable("postId") Long postId, @PathVariable("order") Integer order) throws IOException {
+        return photoService.getPhotoByPostIdAndOrder(postId, order).getPhoto();
     }
 }
