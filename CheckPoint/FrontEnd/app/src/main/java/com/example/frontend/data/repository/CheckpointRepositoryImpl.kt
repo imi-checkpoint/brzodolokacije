@@ -109,4 +109,8 @@ class CheckpointRepositoryImpl(
         return api.GetPhotoByPostIdAndOrder(token, postId, order)
     }
 
+    override suspend fun deletePostById(token: String, postId: Long): String {
+        return api.detelePostById(token, postId)
+    }
+
 }

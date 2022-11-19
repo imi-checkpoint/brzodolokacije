@@ -2,7 +2,6 @@ package com.example.frontend.presentation.posts
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Paint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -12,12 +11,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,18 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
-import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
-import com.example.frontend.presentation.posts.components.PostCardState
+import com.example.frontend.presentation.posts.components.PostDeleteState
 import java.util.Base64
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostsScreen(
     navController: NavController,
@@ -46,6 +44,7 @@ fun PostsScreen(
 {
 
     val state = viewModel.state.value
+    val stateDelete = viewModel.stateDelete.value
     
     Column(
         modifier = Modifier
@@ -68,16 +67,18 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(state.posts, navController,viewModel)
+            AllPosts(state.posts, navController, viewModel, stateDelete)
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllPosts(
     posts : List<Post>?,
     navController: NavController,
-    viewModel : PostViewModel
+    viewModel : PostViewModel,
+    stateDelete: PostDeleteState
 )
 {
     if(posts == null){
@@ -92,18 +93,20 @@ fun AllPosts(
     else{
         LazyColumn{
             items(posts){
-                post -> PostCard(post, navController,viewModel)
+                post -> PostCard(post, navController, viewModel, stateDelete)
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostCard(
     post : Post,
     navController: NavController,
-    viewModel : PostViewModel
+    viewModel : PostViewModel,
+    stateDelete: PostDeleteState
 )
 {
 
@@ -125,7 +128,20 @@ fun PostCard(
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
-                Text(post.appUserUsername)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    //dodati oblacic sa slikom korisnika
+                    Text(
+                        text = "${post.appUserUsername}"
+                    )
+
+                    DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
+                }
+
                 Text(post.description)
                 LazyRow(){
                     items(post.photos){
@@ -163,6 +179,28 @@ fun PhotoCard(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DeletePostButton(
+    postId: Long,
+    viewModel: PostViewModel,
+    stateDelete: PostDeleteState
+) {
+    IconButton(onClick = {
+        viewModel.deletePostById(postId)
+    }) {
+        Icon(
+            Icons.Default.Delete,
+            contentDescription = "Delete post",
+            tint = Color(0xfff44336)
+        )
+    }
+    if(stateDelete.isLoading){
+    }
+    else if(stateDelete.error!=""){
+        Text("An error occured while deleting post!");
+    }
+}
 
 
 

@@ -48,5 +48,5 @@ interface CheckpointRepository {
 
     suspend fun getPhotoByPostIdAndOrder(token: String, postid: Long, order: Int): BinaryPhoto
 
-
+    suspend fun deletePostById(token : String, postId: Long) : String
 }
