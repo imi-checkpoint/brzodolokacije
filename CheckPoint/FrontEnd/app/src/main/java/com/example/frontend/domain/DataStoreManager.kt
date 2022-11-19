@@ -1,6 +1,7 @@
 package com.example.frontend.domain
 
 import android.content.Context
+import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -10,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.*
 
 val Context.settingsDataStore : DataStore<Preferences> by preferencesDataStore(name = "MyDataStore");
 
@@ -46,5 +48,23 @@ object DataStoreManager {
             it[wrappedKey] ?: default
         }
         return valueFlow.first()
+    }
+
+    fun decodeToken(jwt : String) : String
+    {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            return "Requires SDK 26";
+
+        val parts = jwt.split(".");
+        return try{
+            var charset = charset("UTF-8");
+            val header = String(Base64.getUrlDecoder().decode(parts[0].toByteArray(charset)), charset);
+            val payload = String(Base64.getUrlDecoder().decode(parts[1].toByteArray(charset)), charset);
+            "$header"
+            "$payload"
+        }
+        catch( e : Exception ){
+            "Error parsing jwt!";
+        }
     }
 }
