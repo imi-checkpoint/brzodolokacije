@@ -155,4 +155,6 @@ interface CheckpointApi {
         @Path("postId") postId: Long,
         @Path("order") order: Int
     ) : BinaryPhoto
+
+
 }

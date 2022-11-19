@@ -4,6 +4,6 @@ import com.example.frontend.domain.model.ProfileData
 
 data class ProfileDataState(
     val isLoading: Boolean = false,
-    val profileData: ProfileData? = null, //ako je lista, onda emptyList()
+    val profileData: ProfileData? = null,
     val error: String = ""
 )

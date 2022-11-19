@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
+import com.example.frontend.domain.model.ProfileData
 import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.ProfileDataState
 
@@ -52,7 +53,12 @@ fun ProfileScreen(
             .fillMaxSize()
     ) {
         TopBar(
-            name = viewModel.username,
+            name =
+            if(viewModel.savedUserId == viewModel.loginUserId)
+                viewModel.username
+            else
+                "USERNAME"
+            ,
             modifier = Modifier.padding(20.dp),
             navController = navController
         )
@@ -61,8 +67,11 @@ fun ProfileScreen(
         ProfileSection(navController, state, viewModel.savedUserId);
         Spacer(modifier = Modifier.height(25.dp))
 
-        ButtonSection(modifier = Modifier.fillMaxWidth());
-        Spacer(modifier = Modifier.height(25.dp))
+        //ako nije moj profil
+        if(viewModel.savedUserId != viewModel.loginUserId){
+            ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
+            Spacer(modifier = Modifier.height(25.dp))
+        }
 
         //MAPA
         if(viewModel.savedUserId != 0L){
@@ -230,6 +239,7 @@ fun ProfileStat(
 
 @Composable
 fun ButtonSection(
+    viewModel : ProfileViewModel,
     modifier: Modifier = Modifier
 ){
     val minWidth = 120.dp
@@ -245,6 +255,7 @@ fun ButtonSection(
         ActionButton(
             text = "Follow",
             icon = Icons.Default.Add,
+            viewModel = viewModel,
             modifier = Modifier
                 .defaultMinSize(minWidth = minWidth)
                 .height(height)
@@ -252,6 +263,7 @@ fun ButtonSection(
 
         ActionButton(
             text = "Message",
+            viewModel = viewModel,
             modifier = Modifier
                 .defaultMinSize(minWidth = minWidth)
                 .height(height)
@@ -262,6 +274,7 @@ fun ButtonSection(
 @Composable
 fun ActionButton(
     modifier: Modifier = Modifier,
+    viewModel : ProfileViewModel,
     text : String? = null,
     icon : ImageVector? = null
 ){
@@ -275,10 +288,28 @@ fun ActionButton(
                 shape = RoundedCornerShape(5.dp)
             )
             .padding(6.dp)
+            .clickable{
+                if(text == "Follow")
+                {
+                    viewModel.followUnfollowUser();
+                }
+                else if(text == "Message"){
+                    //message this user
+
+                }
+            }
     ){
         if(text != null){
             Text(
-                text = text,
+                text =
+                if(text == "Follow")
+                {
+                    if(viewModel.state.value.profileData?.amFollowing == true)
+                        "Unfollow"
+                    else
+                        "Follow"
+                }
+                else text,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp
             )
