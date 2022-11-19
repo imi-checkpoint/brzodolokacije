@@ -7,6 +7,7 @@ import imi.spring.backend.models.PostDTO;
 import imi.spring.backend.repositories.PostRepository;
 import imi.spring.backend.services.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
@@ -71,12 +73,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public String deletePost(Long id) {
-        if (postRepository.existsById(id)) {
-            postRepository.deleteById(id);
-            return "Deleted";
-        }
-        return "Post with that id does not exist!";
+    public String deletePost(Long userId, Long postId) {
+        Post post = getPostById(postId);
+        if (post == null)
+            return "Post with that id does not exist!";
+        if (!(post.getUser().getId().equals(userId)))
+            return "This user is not the owner!";
+        
+        postRepository.deleteById(postId);
+        return "Deleted";
     }
 
     @Override

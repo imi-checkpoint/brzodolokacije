@@ -67,6 +67,13 @@ interface CheckpointApi {
         @Header("Authorization") token : String
     ) : Int
 
+    @Headers("Content-Type: application/json")
+    @DELETE("post/delete/{id}")
+    suspend fun detelePostById(
+        @Header("Authorization") token: String,
+        @Path("id") postId: Long
+    ): String
+
     ///////////////////////////
 
     @Headers("Content-Type: application/json")
