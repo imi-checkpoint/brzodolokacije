@@ -128,4 +128,23 @@ public class AppUserController {
             throw new Exception(e.getMessage());
         }
     }
+
+    @GetMapping("/getUserId")
+    @ResponseBody
+    public Long getUserIdByUsername(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+
+            log.info("Getting id for user [{}]", appUser.getUsername());
+
+            if (appUser != null ) {
+                return appUser.getId();
+            }else{
+                throw new IOException("User not found.");
+            }
+        } catch (ServletException | IOException e) {
+            log.error("Error finishing request. [{}]", e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
 }
