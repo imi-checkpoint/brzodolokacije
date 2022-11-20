@@ -28,8 +28,13 @@ public class PhotoController {
 
     @PostMapping("/add")
     public String addPhoto(@RequestParam("postId") Long postId, @RequestParam("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
-        String id = photoService.addPhoto(postId, order, image);
-        log.info("Added image to MongoDB with id {}", id);
+
+//        String id = photoService.addPhoto(postId, order, image);
+//        log.info("Added image to MongoDB with id {}", id);
+
+        String id = photoService.addCompressedPhoto(postId, order, image);
+        log.info("Added compressed image to MongoDB with id {}", id);
+
         return "redirect:/photos/" + postId;
     }
 

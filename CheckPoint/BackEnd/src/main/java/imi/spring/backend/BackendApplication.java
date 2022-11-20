@@ -1,5 +1,6 @@
 package imi.spring.backend;
 
+import com.tinify.Tinify;
 import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
@@ -24,6 +25,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class BackendApplication {
 
 	public static void main(String[] args) {
+
+		Tinify.setKey("p0k4LdgS2SXVWKQ72xMXStyVbm08GmTL");
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
