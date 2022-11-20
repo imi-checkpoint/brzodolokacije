@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.frontend.presentation.TestScreen
 import com.example.frontend.presentation.login.LoginScreen
 import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
