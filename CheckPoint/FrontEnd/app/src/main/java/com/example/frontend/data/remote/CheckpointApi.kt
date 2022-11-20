@@ -163,5 +163,11 @@ interface CheckpointApi {
         @Path("order") order: Int
     ) : BinaryPhoto
 
+    @Headers("Content-Type: application/json")
+    @GET("api/getUserId")
+    suspend fun getUserId(
+        @Header("Authorization") token : String,
+    ) : Long
+
 
 }

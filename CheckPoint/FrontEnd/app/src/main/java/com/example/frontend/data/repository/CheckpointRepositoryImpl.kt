@@ -113,4 +113,8 @@ class CheckpointRepositoryImpl(
         return api.detelePostById(token, postId)
     }
 
+    override suspend fun getUserId(token: String): Long {
+        return api.getUserId(token)
+    }
+
 }
