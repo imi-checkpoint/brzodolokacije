@@ -117,4 +117,13 @@ class CheckpointRepositoryImpl(
         return api.getUserId(token)
     }
 
+    override suspend fun getNumberOfLikesByPostId(token: String, postId: Long): Int {
+        return api.getNumberOfLikesByPostId(token, postId);
+    }
+
+    override suspend fun getNumberOfCommentsByPostId(token: String, postId: Long): Int {
+        return api.getNumberOfCommentsByPostId(token, postId);
+    }
+
+
 }

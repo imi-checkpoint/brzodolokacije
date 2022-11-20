@@ -3,6 +3,7 @@ package com.example.frontend.presentation.posts
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.widget.Space
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -19,12 +20,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -136,18 +139,39 @@ fun PostCard(
                 ) {
                     //dodati oblacic sa slikom korisnika
                     Text(
-                        text = "${post.appUserUsername}"
+                        text = "${post.appUserUsername}",
+                        color = Color.DarkGray
                     )
-
                     DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
                 }
 
-                Text(post.description)
+                Text(
+                    text = "${post.description}",
+                    color = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(){
                     items(post.photos){
                         photo->
                         PhotoCard(photo = photo, navController = navController)
                     }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${post.numberOfLikes} likes",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        text = "${post.numberOfComments} comments",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }

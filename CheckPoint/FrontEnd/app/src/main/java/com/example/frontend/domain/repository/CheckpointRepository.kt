@@ -51,4 +51,9 @@ interface CheckpointRepository {
     suspend fun deletePostById(token : String, postId: Long) : String
 
     suspend fun getUserId(token:String) : Long
+
+    suspend fun getNumberOfLikesByPostId(token: String, postId: Long) : Int
+
+    suspend fun getNumberOfCommentsByPostId(token: String, postId: Long) : Int
+
 }

@@ -25,7 +25,7 @@ public class PostLikeController {
     @ResponseBody
     public List<PostLike> getAllPostLikes(@PathVariable Long postId) { return postLikeService.getAllLikesByPostId(postId); }
 
-    @GetMapping("/number/{postId}")
+    @GetMapping("/count/{postId}")
     @ResponseBody
     public Integer getNumberOfLikesByPostId(@PathVariable Long postId) { return postLikeService.getNumberOfLikesByPostId(postId); }
 
