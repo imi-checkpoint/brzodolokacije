@@ -12,7 +12,8 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
 import com.example.frontend.domain.use_case.add_post.AddPostUseCase
-import com.example.frontend.presentation.posts.components.PostState
+import com.example.frontend.presentation.post.components.PostState
+import com.example.frontend.presentation.posts.components.PostsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
