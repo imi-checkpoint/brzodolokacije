@@ -4,6 +4,7 @@ import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
+import okhttp3.MultipartBody
 
 class CheckpointRepositoryImpl(
     private val api : CheckpointApi
@@ -119,6 +120,14 @@ class CheckpointRepositoryImpl(
 
     override suspend fun getPostById(token: String, postId: Long): PostDTO {
         return api.getPostById(token, postId)
+    }
+
+    override suspend fun savePost(token: String,description:String,locationId:Long): Long{
+        return api.savePost(token,description,locationId)
+    }
+
+    override suspend fun addImage(token: String, postId: Long, order: Int, photo: MultipartBody.Part) : String {
+        return api.addImage(token,postId,order,photo)
     }
 
 }

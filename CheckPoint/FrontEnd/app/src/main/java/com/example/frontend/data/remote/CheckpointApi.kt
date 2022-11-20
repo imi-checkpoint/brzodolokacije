@@ -2,6 +2,7 @@ package com.example.frontend.data.remote
 
 import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
+import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface CheckpointApi {
@@ -178,4 +179,19 @@ interface CheckpointApi {
     ) : PostDTO
 
 
+    @POST("post/save/location/{locationId}")
+    suspend fun savePost(
+        @Header("Authorization") token : String,
+        @Body description: String,
+        @Path("locationId") locationId: Long
+    ) : Long
+
+    @Multipart
+    @POST("photos/add/{postId}/{order}")
+    suspend fun addImage(
+        @Header("Authorization") token : String,
+        @Path("postId") postId:Long,
+        @Path("order") order:Int,
+        @Part photo: MultipartBody.Part
+    ) : String
 }

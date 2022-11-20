@@ -38,8 +38,8 @@ public class PhotoController {
         return "uploadPhoto";
     }
 
-    @PostMapping("/add")
-    public String addPhoto(@RequestParam("postId") Long postId, @RequestParam("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
+    @PostMapping("/add/{postId}/{order}")
+    public String addPhoto(@PathVariable("postId") Long postId, @PathVariable("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
 
 
         File file = multipartToFile(image, image.getOriginalFilename());

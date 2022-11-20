@@ -13,7 +13,7 @@ port = 10046
 
 app = fastapi.FastAPI()
 
-@app.get("/count_faces")
+@app.post("/count_faces")
 def countFaces(file: bytes = File(...)):
 
     nparr = numpy.fromstring(file, numpy.uint8)

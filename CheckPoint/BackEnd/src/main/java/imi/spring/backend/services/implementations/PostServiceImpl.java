@@ -63,13 +63,13 @@ public class PostServiceImpl implements PostService {
     }
     */
     @Override
-    public String savePost(String description, Long userId, Long locationId) {
+    public Long savePost(String description, Long userId, Long locationId) {
         Location location = locationService.getLocationById(locationId);
         if (location != null) {
-            postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
-            return "Saved";
+            Post p = postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
+            return p.getId();
         }
-        return "Location with that id does not exist!";
+        return -1l;
     }
 
     @Override
