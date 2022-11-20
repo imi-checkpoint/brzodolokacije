@@ -39,7 +39,7 @@ import java.util.Base64
 @Composable
 fun PostsScreen(
     navController: NavController,
-    viewModel : PostViewModel = hiltViewModel()
+    viewModel : PostsViewModel = hiltViewModel()
 )
 {
 
@@ -77,7 +77,7 @@ fun PostsScreen(
 fun AllPosts(
     posts : List<Post>?,
     navController: NavController,
-    viewModel : PostViewModel,
+    viewModel : PostsViewModel,
     stateDelete: PostDeleteState
 )
 {
@@ -105,7 +105,7 @@ fun AllPosts(
 fun PostCard(
     post : Post,
     navController: NavController,
-    viewModel : PostViewModel,
+    viewModel : PostsViewModel,
     stateDelete: PostDeleteState
 )
 {
@@ -118,7 +118,7 @@ fun PostCard(
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick ={
-            navController.navigate(Screen.ProfileScreen.route)
+            navController.navigate(Screen.PostScreen.withArgs(post.postId))
         }
     ){
         Row {
@@ -183,7 +183,7 @@ fun PhotoCard(
 @Composable
 fun DeletePostButton(
     postId: Long,
-    viewModel: PostViewModel,
+    viewModel: PostsViewModel,
     stateDelete: PostDeleteState
 ) {
     IconButton(onClick = {

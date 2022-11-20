@@ -1,5 +1,7 @@
 package com.example.frontend.common.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -15,7 +17,9 @@ import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.user_list.UserListScreen
 import com.example.frontend.presentation.newpost.NovPostScreen
+import com.example.frontend.presentation.post.PostScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation()
 {
@@ -76,6 +80,19 @@ fun Navigation()
         ){
             entry ->
                 UserListScreen(navController = navController)
+        }
+        composable(
+            route = Screen.PostScreen.route + "/{postId}",
+            arguments = listOf(
+                navArgument("postId"){
+                    type = NavType.LongType
+                    defaultValue = 0L
+                    nullable = false
+                }
+            )
+        ){
+            entry->
+               PostScreen(navController = navController)
         }
 
     }

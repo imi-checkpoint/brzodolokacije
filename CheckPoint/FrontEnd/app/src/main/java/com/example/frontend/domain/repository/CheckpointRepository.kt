@@ -51,4 +51,6 @@ interface CheckpointRepository {
     suspend fun deletePostById(token : String, postId: Long) : String
 
     suspend fun getUserId(token:String) : Long
+
+    suspend fun getPostById(token:String, postId:Long) : PostDTO
 }
