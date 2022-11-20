@@ -43,12 +43,12 @@ public class BackendApplication {
 			appUserService.saveUser(new AppUser("user3@gmail.com", "user3", "user3"));
 			appUserService.saveUser(new AppUser("user4@gmail.com", "user4", "user4"));
 
-			locationService.saveLocation(new Location("Eiffel Tower", 0.0, 0.0));
-			locationService.saveLocation(new Location("Stonehenge", 0.0, 0.0));
-			locationService.saveLocation(new Location("Leaning Tower of Pisa", 0.0, 0.0));
-			locationService.saveLocation(new Location("Machu Picchu", 0.0, 0.0));
-			locationService.saveLocation(new Location("The Grand Canyon", 0.0, 0.0));
-			locationService.saveLocation(new Location("Golden Gate Bridge", 0.0, 0.0));
+			locationService.saveLocation(new Location("Eiffel Tower", 48.858093, 2.294694));
+			locationService.saveLocation(new Location("Stonehenge", 51.1740, -1.8224));
+			locationService.saveLocation(new Location("Leaning Tower of Pisa", 43.7230159, 10.3966321974895));
+			locationService.saveLocation(new Location("Machu Picchu", -13.163068, -72.545128));
+			locationService.saveLocation(new Location("The Grand Canyon", 36.056595, -112.125092));
+			locationService.saveLocation(new Location("Golden Gate Bridge", 37.8185, -122.4738));
 
 			/*
 			postService.savePost(new Post("The repainting campaign is an important event in the life of the monument and takes on a truly mythical nature."),

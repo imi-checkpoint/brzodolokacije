@@ -14,7 +14,7 @@ fun LocationDTO.toLocation() : Location{
     return Location(
         id = id,
         name = name,
-        coordinateX = coordinateX,
-        coordinateY = coordinateY
+        lat = coordinateX,
+        lng = coordinateY
     )
 }

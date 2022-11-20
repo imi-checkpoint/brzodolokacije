@@ -7,5 +7,7 @@ public class Constants{
         const val USER_LIST_TYPE = "userTypeList"
 
         const val USER_ID = "userId"
+
+        const val POST_ID = "postId"
     }
 }

@@ -2,6 +2,7 @@ package com.example.frontend.presentation.location
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
+import com.example.frontend.domain.DataStoreManager.decodeToken
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.presentation.location.components.LocationState
@@ -19,6 +21,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,13 +36,15 @@ class LocationViewModel @Inject constructor(
     val context = application.baseContext
     var access_token  = "";
     var refresh_token = "";
+    var username = "";
+    var loginUserId = 0L;
 
     init {
         GlobalScope.launch(Dispatchers.IO){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            Log.d("ACCESS TOKEN", access_token);
+            username = DataStoreManager.getStringValue(context, "username");
+            loginUserId = DataStoreManager.getLongValue(context, "userId");
 
             getAllLocations()
         }
@@ -47,7 +52,7 @@ class LocationViewModel @Inject constructor(
 
     fun getAllLocations()
     {
-        Log.d("ALL", "get all locations with token ${access_token}");
+//        Log.d("ALL", "get all locations with token ${access_token}");
         allLocationsUseCase("Bearer " + access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {

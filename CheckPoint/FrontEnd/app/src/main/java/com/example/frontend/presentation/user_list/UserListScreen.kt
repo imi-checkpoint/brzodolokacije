@@ -26,6 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun UserListScreen(
@@ -34,31 +36,43 @@ fun UserListScreen(
 )
 {
     val state = viewModel.state.value
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchText by remember{ mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp)
-    ){
-        UserListTopBar(modifier = Modifier.padding(20.dp), viewModel.typeOfUsers);
-        Spacer(modifier = Modifier.height(5.dp))
-
-        UserListSearchBar(searchText, onChange = {
-            searchText = it
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isRefreshing),
+        onRefresh = {
             if(searchText == "") viewModel.getAllUsers();
             else viewModel.searchUsers(searchText);
-        });
-        Spacer(modifier = Modifier.height(5.dp))
-
-        if(state.isLoading){
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
-        else if(state.users != null){
-            UserList(userList = state.users, navController = navController)
+    ){
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp)
+        ){
+            UserListTopBar(modifier = Modifier.padding(20.dp), viewModel.typeOfUsers);
+            Spacer(modifier = Modifier.height(5.dp))
+
+            UserListSearchBar(searchText, onChange = {
+                searchText = it
+                if(searchText == "") viewModel.getAllUsers();
+                else viewModel.searchUsers(searchText);
+            });
+            Spacer(modifier = Modifier.height(5.dp))
+
+            if(state.isLoading){
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+            else if(state.users != null){
+                UserList(userList = state.users, navController = navController)
+            }
+
         }
 
     }
+
 }
 
 @Composable
@@ -164,10 +178,13 @@ fun OneUser(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{
-                        Log.d("ID", user.id.toString()) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
-                        navController.navigate(Screen.ProfileScreen.withArgs(user.id))
-                      },
+            .clickable {
+                Log.d(
+                    "ID",
+                    user.id.toString()
+                ) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
+                navController.navigate(Screen.ProfileScreen.withArgs(user.id))
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ){

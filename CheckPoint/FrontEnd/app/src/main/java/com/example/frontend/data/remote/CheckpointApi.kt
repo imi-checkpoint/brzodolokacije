@@ -38,6 +38,13 @@ interface CheckpointApi {
     ): List<PostDTO>
 
     @Headers("Content-Type: application/json")
+    @GET("post/user/{userId}")
+    suspend fun getPostsByUserId(
+        @Header("Authorization") token : String,
+        @Path("userId") userId:Long
+    ): List<PostDTO>
+
+    @Headers("Content-Type: application/json")
     @GET("follow_list/my/following")
     suspend fun getMyFollowing(
         @Header("Authorization") token : String
@@ -66,6 +73,13 @@ interface CheckpointApi {
     suspend fun getMyPostsCount(
         @Header("Authorization") token : String
     ) : Int
+
+    @Headers("Content-Type: application/json")
+    @DELETE("post/delete/{id}")
+    suspend fun detelePostById(
+        @Header("Authorization") token: String,
+        @Path("id") postId: Long
+    ): String
 
     ///////////////////////////
 
@@ -148,4 +162,12 @@ interface CheckpointApi {
         @Path("postId") postId: Long,
         @Path("order") order: Int
     ) : BinaryPhoto
+
+    @Headers("Content-Type: application/json")
+    @GET("api/getUserId")
+    suspend fun getUserId(
+        @Header("Authorization") token : String,
+    ) : Long
+
+
 }

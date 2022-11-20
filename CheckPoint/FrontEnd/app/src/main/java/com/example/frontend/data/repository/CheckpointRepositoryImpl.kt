@@ -29,6 +29,10 @@ class CheckpointRepositoryImpl(
         return api.getPostsFromLocation(token, locationId)
     }
 
+    override suspend fun getPostsByUserId(token: String, userId: Long): List<PostDTO> {
+        return api.getPostsByUserId(token, userId)
+    }
+
     override suspend fun getMyFollowers(token: String): List<UserDTO> {
         return api.getMyFollowers(token)
     }
@@ -103,6 +107,14 @@ class CheckpointRepositoryImpl(
         order: Int
     ): BinaryPhoto {
         return api.GetPhotoByPostIdAndOrder(token, postId, order)
+    }
+
+    override suspend fun deletePostById(token: String, postId: Long): String {
+        return api.detelePostById(token, postId)
+    }
+
+    override suspend fun getUserId(token: String): Long {
+        return api.getUserId(token)
     }
 
 }

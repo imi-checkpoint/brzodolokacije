@@ -5,6 +5,7 @@ import imi.spring.backend.repositories.AppUserRepository;
 import imi.spring.backend.services.AppUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -21,10 +22,12 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AppUserServiceImpl implements AppUserService {
-    private final AppUserRepository appUserRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private AppUserRepository appUserRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public AppUser saveUser(AppUser user) {
@@ -71,6 +74,8 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = appUserRepository.findByUsername(username);
+
+        log.info("Username is {}", username);
 
         if(user==null){
             log.error("User {} not found in database", username);

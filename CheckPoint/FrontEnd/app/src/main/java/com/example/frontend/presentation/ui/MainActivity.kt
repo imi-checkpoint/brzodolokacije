@@ -14,6 +14,7 @@ import androidx.core.view.updatePadding
 import com.example.frontend.R
 import com.example.frontend.common.navigation.Navigation
 import com.example.frontend.ui.theme.FrontEndTheme
+import com.google.android.gms.maps.MapsInitializer
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
         setTheme(R.style.Theme_FrontEnd)
         setContent {
             FrontEndTheme {
+//                MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST, listener)
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
