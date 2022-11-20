@@ -12,13 +12,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.get_profile_data.*
+import com.example.frontend.domain.use_case.refresh_page.RefreshPageUseCase
 import com.example.frontend.presentation.location.components.LocationState
 import com.example.frontend.presentation.user_list.components.UserListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,12 +28,16 @@ class UserListViewModel @Inject constructor(
     private val getUserFollowingUseCase: GetUserFollowingUseCase,
     private val searchUserFollowersUseCase: SearchUserFollowersUseCase,
     private val searchUserFollowingUseCase: SearchUserFollowingUseCase,
+    private val refreshPageUseCase : RefreshPageUseCase,
     private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel(){
 
     private val _state = mutableStateOf(UserListState())
     val state : State<UserListState> = _state
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing : StateFlow<Boolean> get() = _isRefreshing.asStateFlow()
+
     private val context = application.baseContext
     private var access_token = "";
     private var refresh_token = "";
@@ -158,4 +162,11 @@ class UserListViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+    private fun refreshPage(){
+        refreshPageUseCase().onEach{ result ->
+            _isRefreshing.emit(result)
+        }.launchIn(viewModelScope)
+    }
+
 }

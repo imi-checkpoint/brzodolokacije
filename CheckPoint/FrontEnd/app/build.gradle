@@ -87,6 +87,9 @@ dependencies {
     //google maps
     implementation "com.google.android.gms:play-services-maps:18.0.2"
 
+    //swipe refresh
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.26.5-rc"
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
