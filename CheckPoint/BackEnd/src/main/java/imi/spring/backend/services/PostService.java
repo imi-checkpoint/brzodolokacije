@@ -13,7 +13,7 @@ public interface PostService {
     Post getPostById(Long id);
     Integer countCommentsByPostId(Long id);
     //String savePost(Post post, Long userId, Long locationId);
-    String savePost(String description, Long userId, Long locationId);
+    Long savePost(String description, Long userId, Long locationId);
     String deletePost(Long userId, Long postId);
     List<Post> getPostsByUserId(Long userId);
     List<Post> getPostsByLocationId(Long locationId);

@@ -53,11 +53,11 @@ public class PostController {
 
     @PostMapping("/save/location/{locationId}")
     @ResponseBody
-    public String savePost(HttpServletRequest request, @RequestBody String description, @PathVariable Long locationId) throws ServletException {
+    public Long savePost(HttpServletRequest request, @RequestBody String description, @PathVariable Long locationId) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
             return postService.savePost(description, user.getId(), locationId);
-        return "Invalid user!";
+        return -1l;
     }
 
     @DeleteMapping("/delete/{id}")
