@@ -1,5 +1,7 @@
 package com.example.frontend.common.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -7,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.frontend.presentation.TestScreen
 import com.example.frontend.presentation.login.LoginScreen
 import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
@@ -15,7 +16,9 @@ import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.user_list.UserListScreen
 import com.example.frontend.presentation.newpost.NovPostScreen
+import com.example.frontend.presentation.post.PostScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation()
 {
@@ -76,6 +79,19 @@ fun Navigation()
         ){
             entry ->
                 UserListScreen(navController = navController)
+        }
+        composable(
+            route = Screen.PostScreen.route + "/{postId}",
+            arguments = listOf(
+                navArgument("postId"){
+                    type = NavType.LongType
+                    defaultValue = 0L
+                    nullable = false
+                }
+            )
+        ){
+            entry->
+               PostScreen(navController = navController)
         }
 
     }

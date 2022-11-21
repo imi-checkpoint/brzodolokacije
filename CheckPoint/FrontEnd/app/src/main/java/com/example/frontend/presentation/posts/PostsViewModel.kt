@@ -18,7 +18,7 @@ import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 
 import com.example.frontend.presentation.posts.components.PostCardState
 import com.example.frontend.presentation.posts.components.PostStringState
-import com.example.frontend.presentation.posts.components.PostState
+import com.example.frontend.presentation.posts.components.PostsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class PostsViewModel @Inject constructor(
     private val getAllPostsForLocationUseCase : GetAllPostsForLocationUseCase,
     private val getPhotoByPostIdAndOrderUseCase: GetPhotoByPostIdAndOrderUseCase,
     private val deletePostUseCase: DeletePostUseCase,
@@ -38,8 +38,8 @@ class PostViewModel @Inject constructor(
     application: Application
 ) : ViewModel(){
 
-    private val _state = mutableStateOf(PostState())
-    val state : State<PostState> = _state
+    private val _state = mutableStateOf(PostsState())
+    val state : State<PostsState> = _state
     val context = application.baseContext
 
     private val _stateDelete = mutableStateOf(PostStringState())
@@ -66,15 +66,15 @@ class PostViewModel @Inject constructor(
             getAllPostsForLocationUseCase("Bearer "+access_token, locationId).onEach { result ->
                 when(result){
                     is Resource.Success -> {
-                        _state.value = PostState(posts = result.data)
+                        _state.value = PostsState(posts = result.data)
                         println(result.data)
                     }
                     is Resource.Error -> {
-                        _state.value = PostState(error = result.message ?:
+                        _state.value = PostsState(error = result.message ?:
                         "An unexpected error occured")
                     }
                     is Resource.Loading -> {
-                        _state.value = PostState(isLoading = true)
+                        _state.value = PostsState(isLoading = true)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -89,7 +89,7 @@ class PostViewModel @Inject constructor(
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
             println("test------")
             if(!post.photos.isEmpty())
-            getPhotoByPostIdAndOrderUseCase("Bearer "+access_token, post.photos[0].postId,post.photos[0].order).map { result ->
+                getPhotoByPostIdAndOrderUseCase("Bearer "+access_token, post.photos[0].postId,post.photos[0].order).map { result ->
                 when(result){
                     is Resource.Success -> {
                         println("--secces")

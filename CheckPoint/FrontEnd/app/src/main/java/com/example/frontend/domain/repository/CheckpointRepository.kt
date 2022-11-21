@@ -53,6 +53,8 @@ interface CheckpointRepository {
 
     suspend fun getUserId(token:String) : Long
 
+    suspend fun getPostById(token:String, postId:Long) : PostDTO
+
     suspend fun savePost(token: String,description:String,locationId:Long): Long
 
     suspend fun addImage(token: String, postId:Long, order:Int, photo:MultipartBody.Part): String

@@ -43,6 +43,7 @@ class LocationViewModel @Inject constructor(
         GlobalScope.launch(Dispatchers.IO){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
 
@@ -52,7 +53,6 @@ class LocationViewModel @Inject constructor(
 
     fun getAllLocations()
     {
-//        Log.d("ALL", "get all locations with token ${access_token}");
         allLocationsUseCase("Bearer " + access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
@@ -71,7 +71,6 @@ class LocationViewModel @Inject constructor(
 
     fun searchLocations(keyword : String)
     {
-        Log.d("SEARCH", "Searching locations");
         getLocationsKeywordUseCase("Bearer " + access_token, keyword).onEach { result ->
             when (result) {
                 is Resource.Success -> {

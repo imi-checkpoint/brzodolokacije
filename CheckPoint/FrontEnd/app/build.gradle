@@ -89,6 +89,9 @@ dependencies {
 
     //swipe refresh
     implementation "com.google.accompanist:accompanist-swiperefresh:0.26.5-rc"
+    //pagers
+    implementation "com.google.accompanist:accompanist-pager:0.13.0"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.13.0";
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'

@@ -178,6 +178,13 @@ interface CheckpointApi {
     ) : Int
 
     @Headers("Content-Type: application/json")
+    @GET("post/{id}")
+    suspend fun getPostById(
+        @Header("Authorization") token : String,
+        @Path("id") postId : Long
+    ) : PostDTO
+
+
     @POST("post/save/location/{locationId}")
     suspend fun savePost(
         @Header("Authorization") token : String,

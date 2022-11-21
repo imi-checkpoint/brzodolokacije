@@ -35,13 +35,14 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.posts.components.PostStringState
+import com.example.frontend.presentation.location.ProfileTopBar
 import java.util.Base64
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostsScreen(
     navController: NavController,
-    viewModel : PostViewModel = hiltViewModel()
+    viewModel : PostsViewModel = hiltViewModel()
 )
 {
 
@@ -79,11 +80,11 @@ fun PostsScreen(
 fun AllPosts(
     posts : List<Post>?,
     navController: NavController,
-    viewModel : PostViewModel,
+    viewModel : PostsViewModel,
     stateDelete: PostStringState
 )
 {
-    if(posts == null){
+    if(posts == null || posts.size == 0){
         Text(
             text = "No posts found!",
             textAlign = TextAlign.Center,
@@ -107,7 +108,7 @@ fun AllPosts(
 fun PostCard(
     post : Post,
     navController: NavController,
-    viewModel : PostViewModel,
+    viewModel : PostsViewModel,
     stateDelete: PostStringState
 )
 {
@@ -120,7 +121,7 @@ fun PostCard(
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick ={
-            navController.navigate(Screen.ProfileScreen.route)
+            navController.navigate(Screen.PostScreen.withArgs(post.postId))
         }
     ){
         Row {
@@ -207,7 +208,7 @@ fun PhotoCard(
 @Composable
 fun DeletePostButton(
     postId: Long,
-    viewModel: PostViewModel,
+    viewModel: PostsViewModel,
     stateDelete: PostStringState
 ) {
     IconButton(onClick = {
@@ -230,7 +231,7 @@ fun DeletePostButton(
 @Composable
 fun LikeOrUnlikePostButton(
     postId: Long,
-    viewModel: PostViewModel,
+    viewModel: PostsViewModel,
     stateLikeOrUnlike: PostStringState
 ) {
     IconButton(onClick = {

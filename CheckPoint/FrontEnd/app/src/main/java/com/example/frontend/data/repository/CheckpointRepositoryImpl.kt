@@ -118,6 +118,10 @@ class CheckpointRepositoryImpl(
         return api.getUserId(token)
     }
 
+    override suspend fun getPostById(token: String, postId: Long): PostDTO {
+        return api.getPostById(token, postId)
+    }
+
     override suspend fun savePost(token: String,description:String,locationId:Long): Long{
         return api.savePost(token,description,locationId)
     }
