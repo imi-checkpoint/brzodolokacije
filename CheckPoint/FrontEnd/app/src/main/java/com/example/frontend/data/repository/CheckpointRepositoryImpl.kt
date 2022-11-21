@@ -125,5 +125,9 @@ class CheckpointRepositoryImpl(
         return api.getNumberOfCommentsByPostId(token, postId);
     }
 
+    override suspend fun likeOrUnlikePostById(token: String, postId: Long): String {
+        return api.likeOrUnlikePostById(token, postId);
+    }
+
 
 }

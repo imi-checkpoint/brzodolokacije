@@ -1,5 +1,6 @@
 package imi.spring.backend.services;
 
+import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.PostLike;
 import org.hibernate.ObjectNotFoundException;
 
@@ -15,4 +16,6 @@ public interface PostLikeService {
     Integer getNumberOfLikesByPostId(Long postId);
 
     String likeOrUnlikePostById(HttpServletRequest request, Long postId) throws ServletException;
+
+    List<Long> getAllLikedPostsIdsByUser(AppUser user, Long postId);
 }

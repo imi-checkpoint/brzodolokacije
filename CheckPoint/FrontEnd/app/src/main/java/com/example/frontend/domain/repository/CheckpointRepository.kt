@@ -56,4 +56,5 @@ interface CheckpointRepository {
 
     suspend fun getNumberOfCommentsByPostId(token: String, postId: Long) : Int
 
+    suspend fun likeOrUnlikePostById(token: String, postId: Long) : String
 }

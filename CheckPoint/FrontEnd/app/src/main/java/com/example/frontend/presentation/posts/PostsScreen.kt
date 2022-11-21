@@ -3,7 +3,6 @@ package com.example.frontend.presentation.posts
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
-import android.widget.Space
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,6 +17,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +34,7 @@ import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
-import com.example.frontend.presentation.posts.components.PostDeleteState
+import com.example.frontend.presentation.posts.components.PostStringState
 import java.util.Base64
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -81,7 +80,7 @@ fun AllPosts(
     posts : List<Post>?,
     navController: NavController,
     viewModel : PostViewModel,
-    stateDelete: PostDeleteState
+    stateDelete: PostStringState
 )
 {
     if(posts == null){
@@ -109,7 +108,7 @@ fun PostCard(
     post : Post,
     navController: NavController,
     viewModel : PostViewModel,
-    stateDelete: PostDeleteState
+    stateDelete: PostStringState
 )
 {
 
@@ -162,6 +161,7 @@ fun PostCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    LikeOrUnlikePostButton(postId = post.postId, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
                     Text(
                         text = "${post.numberOfLikes} likes",
                         color = Color.Gray,
@@ -208,7 +208,7 @@ fun PhotoCard(
 fun DeletePostButton(
     postId: Long,
     viewModel: PostViewModel,
-    stateDelete: PostDeleteState
+    stateDelete: PostStringState
 ) {
     IconButton(onClick = {
         viewModel.deletePostById(postId)
@@ -226,7 +226,28 @@ fun DeletePostButton(
     }
 }
 
-
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun LikeOrUnlikePostButton(
+    postId: Long,
+    viewModel: PostViewModel,
+    stateLikeOrUnlike: PostStringState
+) {
+    IconButton(onClick = {
+        viewModel.likeOrUnlikePostById(postId)
+    }) {
+        Icon(
+            Icons.Outlined.Favorite,
+            contentDescription = "",
+            tint = Color.Red
+        )
+    }
+    if(stateLikeOrUnlike.isLoading){
+    }
+    else if(stateLikeOrUnlike.error!=""){
+        Text("An error occured while like/unlike post!");
+    }
+}
 
 
 

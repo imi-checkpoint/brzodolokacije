@@ -182,4 +182,11 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("id") postId:Long
     ) : Int
+
+    @Headers("Content-Type: application/json")
+    @POST("post_likes/save/{postId}")
+    suspend fun likeOrUnlikePostById(
+        @Header("Authorization") token : String,
+        @Path("postId") postId:Long
+    ) : String
 }
