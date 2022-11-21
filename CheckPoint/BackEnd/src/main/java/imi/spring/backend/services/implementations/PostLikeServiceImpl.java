@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -50,5 +51,16 @@ public class PostLikeServiceImpl implements PostLikeService {
         }
         postLikeRepository.delete(postLike); //unlike
         return "Unliked";
+    }
+
+    @Override
+    public List<Long> getAllLikedPostsIdsByUser(AppUser user, Long postId) {
+        List<PostLike> postLikeList = user.getPostLikeList();
+        List<Long> postIds = new ArrayList<>();
+        for (PostLike pl : postLikeList)
+        {
+            postIds.add(pl.getPost().getId());
+        }
+        return postIds;
     }
 }

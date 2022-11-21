@@ -128,6 +128,7 @@ public class PostServiceImpl implements PostService {
         postDTO.setLocation(post.getLocation());
         postDTO.setDescription(post.getDescription());
         postDTO.setNumberOfLikes(post.getPostLikeList().size());
+        postDTO.setNumberOfComments(post.getCommentList().size());
 
         postDTO.setPhotos(photoService.getPhotosByPostId(post.getId()));
         postDTO.setVideos(videoService.getVideosByPostId(post.getId()));

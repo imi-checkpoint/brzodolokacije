@@ -14,9 +14,10 @@ import com.example.frontend.domain.model.Post
 import com.example.frontend.domain.use_case.delete_post.DeletePostUseCase
 import com.example.frontend.domain.use_case.location_posts.GetAllPostsForLocationUseCase
 import com.example.frontend.domain.use_case.location_posts.GetPhotoByPostIdAndOrderUseCase
+import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 
 import com.example.frontend.presentation.posts.components.PostCardState
-import com.example.frontend.presentation.posts.components.PostDeleteState
+import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.posts.components.PostState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,7 @@ class PostViewModel @Inject constructor(
     private val getAllPostsForLocationUseCase : GetAllPostsForLocationUseCase,
     private val getPhotoByPostIdAndOrderUseCase: GetPhotoByPostIdAndOrderUseCase,
     private val deletePostUseCase: DeletePostUseCase,
+    private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
     savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel(){
@@ -40,9 +42,12 @@ class PostViewModel @Inject constructor(
     val state : State<PostState> = _state
     val context = application.baseContext
 
-    private val _stateDelete = mutableStateOf(PostDeleteState())
-    val stateDelete : State<PostDeleteState> = _stateDelete;
+    private val _stateDelete = mutableStateOf(PostStringState())
+    val stateDelete : State<PostStringState> = _stateDelete;
     var locationIdTemp = savedStateHandle.get<Long>(LOCATION_ID);
+
+    private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
+    val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
 
     init {
         savedStateHandle.get<Long>(LOCATION_ID)?.let { locationId ->
@@ -116,15 +121,39 @@ class PostViewModel @Inject constructor(
             deletePostUseCase("Bearer "+access_token, postId).onEach { result ->
                 when(result){
                     is Resource.Success -> {
-                        _stateDelete.value = PostDeleteState(message = result.data ?: "")
+                        _stateDelete.value = PostStringState(message = result.data ?: "")
                         getAllPostsForLocation(locationIdTemp!!)
                     }
                     is Resource.Error -> {
-                        _stateDelete.value = PostDeleteState(error = result.message ?:
+                        _stateDelete.value = PostStringState(error = result.message ?:
                         "An unexpected error occured")
                     }
                     is Resource.Loading -> {
-                        _stateDelete.value = PostDeleteState(isLoading = true)
+                        _stateDelete.value = PostStringState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    fun likeOrUnlikePostById(postId: Long)
+    {
+        GlobalScope.launch(Dispatchers.IO){
+            var access_token =  DataStoreManager.getStringValue(context, "access_token");
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+
+            likeOrUnlikePostUseCase("Bearer "+access_token, postId).onEach { result ->
+                when(result){
+                    is Resource.Success -> {
+                        _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
+                        getAllPostsForLocation(locationIdTemp!!)
+                    }
+                    is Resource.Error -> {
+                        _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
+                        "An unexpected error occured")
+                    }
+                    is Resource.Loading -> {
+                        _stateLikeOrUnlike.value = PostStringState(isLoading = true)
                     }
                 }
             }.launchIn(viewModelScope)

@@ -170,6 +170,12 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
     ) : Long
 
+    @Headers("Content-Type: application/json")
+    @GET("post_likes/count/{postId}")
+    suspend fun getNumberOfLikesByPostId(
+        @Header("Authorization") token : String,
+        @Path("postId") postId:Long
+    ) : Int
 
     @Headers("Content-Type: application/json")
     @POST("post/save/location/{locationId}")
@@ -186,5 +192,16 @@ interface CheckpointApi {
         @Path("postId") postId:Long,
         @Path("order") order:Int,
         @Part photo: MultipartBody.Part
+    @GET("post/{id}/comments/count")
+    suspend fun getNumberOfCommentsByPostId(
+        @Header("Authorization") token : String,
+        @Path("id") postId:Long
+    ) : Int
+
+    @Headers("Content-Type: application/json")
+    @POST("post_likes/save/{postId}")
+    suspend fun likeOrUnlikePostById(
+        @Header("Authorization") token : String,
+        @Path("postId") postId:Long
     ) : String
 }

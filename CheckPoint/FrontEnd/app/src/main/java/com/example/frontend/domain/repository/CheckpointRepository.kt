@@ -57,3 +57,9 @@ interface CheckpointRepository {
 
     suspend fun addImage(token: String, postId:Long, order:Int, photo:MultipartBody.Part): String
 }
+    suspend fun getNumberOfLikesByPostId(token: String, postId: Long) : Int
+
+    suspend fun getNumberOfCommentsByPostId(token: String, postId: Long) : Int
+
+    suspend fun likeOrUnlikePostById(token: String, postId: Long) : String
+}
