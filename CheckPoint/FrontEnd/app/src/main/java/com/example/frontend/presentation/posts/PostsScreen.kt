@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.location.ProfileTopBar
 import com.example.frontend.presentation.posts.components.PostDeleteState
 import java.util.Base64
 
@@ -81,7 +82,7 @@ fun AllPosts(
     stateDelete: PostDeleteState
 )
 {
-    if(posts == null){
+    if(posts == null || posts.size == 0){
         Text(
             text = "No posts found!",
             textAlign = TextAlign.Center,

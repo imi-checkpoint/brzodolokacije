@@ -115,8 +115,7 @@ fun LocationSearchBar(
             disabledIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(20.dp)
-
-        )
+    )
 }
 
 @Composable

@@ -40,14 +40,17 @@ class PostViewModel @Inject constructor(
             access_token = DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
-            savedStateHandle.get<Long>(POST_ID)?.let { postId ->
-                getPost(postId)
-            }
+            getPost(savedStateHandle);
         }
     }
 
-    fun getPost(postId : Long){
-        getPostUseCase("Bearer "+access_token, postId).onEach { result ->
+    fun getPost(savedStateHandle : SavedStateHandle){
+        var thisPostId = 0L;
+        savedStateHandle.get<Long>(POST_ID)?.let { postId ->
+            thisPostId = postId;
+        }
+
+        getPostUseCase("Bearer "+access_token, thisPostId).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     _state.value = PostState(post = result.data)
