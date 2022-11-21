@@ -192,6 +192,7 @@ interface CheckpointApi {
         @Path("postId") postId:Long,
         @Path("order") order:Int,
         @Part photo: MultipartBody.Part
+    ): String
     @GET("post/{id}/comments/count")
     suspend fun getNumberOfCommentsByPostId(
         @Header("Authorization") token : String,
