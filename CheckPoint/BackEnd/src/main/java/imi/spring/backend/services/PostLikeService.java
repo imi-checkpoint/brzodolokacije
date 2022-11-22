@@ -15,7 +15,7 @@ public interface PostLikeService {
 
     Integer getNumberOfLikesByPostId(Long postId);
 
-    String likeOrUnlikePostById(HttpServletRequest request, Long postId) throws ServletException;
+    String likeOrUnlikePostById(Long userId, Long postId) throws ServletException;
 
     List<Long> getAllLikedPostsIdsByUser(AppUser user, Long postId);
 }
