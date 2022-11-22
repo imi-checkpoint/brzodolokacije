@@ -74,6 +74,7 @@ fun ProfileScreen(
         }
 
         //MAPA
+        Log.d("MAP FOR USERID", viewModel.savedUserId.toString());
         if(viewModel.savedUserId != 0L){
             MapSection(viewModel.savedUserId)
         }

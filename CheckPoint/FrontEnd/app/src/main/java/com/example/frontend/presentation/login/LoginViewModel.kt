@@ -44,7 +44,7 @@ class LoginViewModel @Inject constructor(
                 is Resource.Success -> {
                     _state.value = LoginState(token = result.data ?: null)
                     //sacuvaj token
-                    GlobalScope.launch(Dispatchers.IO) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
 
@@ -54,14 +54,14 @@ class LoginViewModel @Inject constructor(
                         DataStoreManager.saveValue(context, "username", username)
 
                         saveUserId(result.data!!.access_token);
+
+                        navController.navigate(Screen.MainLocationScreen.route){
+                            popUpTo(Screen.LoginScreen.route){
+                                inclusive = true;
+                            }
+                        };
+
                     }
-
-                    navController.navigate(Screen.MainLocationScreen.route){
-                        popUpTo(Screen.LoginScreen.route){
-                            inclusive = true;
-                        }
-                    };
-
                 }
                 is Resource.Error -> {
                     _state.value = LoginState(error = result.message ?:
@@ -79,9 +79,10 @@ class LoginViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                         val userId = result.data
-                    if (userId != null) {
-                        DataStoreManager.saveValue(context, "userId", userId.toInt())
-                    }
+                        Log.d("User id", "Fetched user id ${userId}")
+                        if (userId != null) {
+                            DataStoreManager.saveValue(context, "userId", userId.toInt())
+                        }
                 }
                 is Resource.Error -> {
                     DataStoreManager.saveValue(context, "userId", 0)

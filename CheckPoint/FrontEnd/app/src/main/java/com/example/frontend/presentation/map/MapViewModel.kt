@@ -1,6 +1,7 @@
 package com.example.frontend.presentation.map
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -43,6 +44,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun getAllPostLocations(userId : Long){
+        Log.d("GETTING POSTS", "Getting posts for userid ${userId.toString()}")
         getUserPostUseCase("Bearer "+refresh_token, userId).onEach { result ->
             when(result){
                 is Resource.Success -> {
