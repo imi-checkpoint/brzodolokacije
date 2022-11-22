@@ -1,5 +1,6 @@
 package imi.spring.backend.services;
 
+import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Post;
 import imi.spring.backend.models.PostDTO;
 
@@ -20,6 +21,6 @@ public interface PostService {
     Long getNumberOfPostsInTotal();
     Long getNumberOfMyPosts(HttpServletRequest request) throws ServletException;
     Long getNumberOfPostsByUserId(Long userId);
-    PostDTO convertPostToPostDTO(Post post) throws IOException;
-    List<PostDTO> convertListOfPostsToPostDTOs(List<Post> posts) throws IOException;
+    PostDTO convertPostToPostDTO(AppUser userFromJWT, Post post) throws IOException;
+    List<PostDTO> convertListOfPostsToPostDTOs(AppUser userFromJWT, List<Post> posts) throws IOException;
 }

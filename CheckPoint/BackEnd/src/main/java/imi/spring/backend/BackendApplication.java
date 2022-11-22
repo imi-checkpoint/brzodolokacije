@@ -2,12 +2,10 @@ package imi.spring.backend;
 
 import com.tinify.Tinify;
 import imi.spring.backend.models.AppUser;
+import imi.spring.backend.models.Comment;
 import imi.spring.backend.models.Location;
 import imi.spring.backend.models.Post;
-import imi.spring.backend.services.AppUserService;
-import imi.spring.backend.services.FollowersService;
-import imi.spring.backend.services.LocationService;
-import imi.spring.backend.services.PostService;
+import imi.spring.backend.services.*;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,7 +34,8 @@ public class BackendApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService, FollowersService followersService){
+	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService,
+						  PostLikeService postLikeService, CommentService commentService, FollowersService followersService){
 		return args -> {
 			appUserService.saveUser(new AppUser("user1@gmail.com", "user1", "user1"));
 			appUserService.saveUser(new AppUser("user2@gmail.com", "user2", "user2"));
@@ -67,7 +66,7 @@ public class BackendApplication {
 
 			postService.savePost("The repainting campaign is an important event in the life of the monument and takes on a truly mythical nature.",
 					1L, 1L);
-			postService.savePost("The beams of light, directed from the bottom towards the top, illuminate the Eiffel Tower from the inside of its structure.t",
+			postService.savePost("The beams of light, directed from the bottom towards the top, illuminate the Eiffel Tower from the inside of its structure.",
 					2L, 1L);
 			postService.savePost("Experience the unforgettable atmosphere of the Stone Circle and follow in the footsteps of the prehistoric people who lived here 4,000 years ago as you walk among the Neolithic houses.",
 					1L, 2L);
@@ -78,6 +77,19 @@ public class BackendApplication {
 			postService.savePost("One of Italy's signature sights, leaning a startling 3.9 degrees off the vertical. The 58m-high tower, officially the Duomo's campanile (bell tower), took almost 200 years to build, but was already listing when it was unveiled in 1372.",
 					3L, 3L);
 
+			postLikeService.likeOrUnlikePostById(1L, 2L);
+			postLikeService.likeOrUnlikePostById(1L, 4L);
+			postLikeService.likeOrUnlikePostById(1L, 6L);
+			postLikeService.likeOrUnlikePostById(1L, 2L);
+			postLikeService.likeOrUnlikePostById(2L, 1L);
+			postLikeService.likeOrUnlikePostById(2L, 3L);
+			postLikeService.likeOrUnlikePostById(3L, 1L);
+			postLikeService.likeOrUnlikePostById(3L, 2L);
+			postLikeService.likeOrUnlikePostById(3L, 4L);
+			postLikeService.likeOrUnlikePostById(4L, 2L);
+			postLikeService.likeOrUnlikePostById(4L, 5L);
+			postLikeService.likeOrUnlikePostById(4L, 6L);
+
 			followersService.followOrUnfollowUser(1L, 2L);
 			followersService.followOrUnfollowUser(1L, 3L);
 			followersService.followOrUnfollowUser(1L, 4L);
@@ -87,6 +99,7 @@ public class BackendApplication {
 			followersService.followOrUnfollowUser(3L, 4L);
 			followersService.followOrUnfollowUser(4L, 2L);
 			followersService.followOrUnfollowUser(4L, 3L);
+
 		};
 	}
 

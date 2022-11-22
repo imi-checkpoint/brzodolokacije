@@ -36,7 +36,10 @@ public class PostLikeController {
     @PostMapping("/save/{postId}")
     @ResponseBody
     public String likeOrUnlikePostById(HttpServletRequest request, @PathVariable Long postId) throws ServletException {
-        return postLikeService.likeOrUnlikePostById(request, postId);
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postLikeService.likeOrUnlikePostById(user.getId(), postId);
+        return "Invalid user!";
     }
 
     @GetMapping("/id_s/{postId}")

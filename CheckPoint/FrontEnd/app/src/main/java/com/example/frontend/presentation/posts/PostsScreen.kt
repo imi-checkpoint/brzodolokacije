@@ -17,7 +17,9 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,7 +63,7 @@ fun PostsScreen(
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "",
-                tint = Color.Black)
+                tint = Color.DarkGray)
         }
         
         if(state.isLoading){
@@ -162,17 +165,23 @@ fun PostCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LikeOrUnlikePostButton(postId = post.postId, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
-                    Text(
-                        text = "${post.numberOfLikes} likes",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = "${post.numberOfComments} comments",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
+                        Text(
+                            text = "${post.numberOfLikes} likes",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "${post.numberOfComments} comments",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }
@@ -197,7 +206,9 @@ fun PhotoCard(
             val mapa:Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
             print(mapa.byteCount)
             if(mapa!=null){
-                Image(bitmap = mapa.asImageBitmap(), contentDescription ="" )
+                Image(bitmap = mapa.asImageBitmap(),
+                    contentDescription = ""
+                )
             }
         }
     }
@@ -230,17 +241,17 @@ fun DeletePostButton(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LikeOrUnlikePostButton(
-    postId: Long,
+    post : Post,
     viewModel: PostsViewModel,
     stateLikeOrUnlike: PostStringState
 ) {
     IconButton(onClick = {
-        viewModel.likeOrUnlikePostById(postId)
+        viewModel.likeOrUnlikePostById(post.postId)
     }) {
         Icon(
-            Icons.Outlined.Favorite,
-            contentDescription = "",
-            tint = Color.Red
+            if(post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = if(post.isLiked) "Unlike" else "Like",
+            tint = if(post.isLiked) Color.Red else Color.DarkGray
         )
     }
     if(stateLikeOrUnlike.isLoading){
