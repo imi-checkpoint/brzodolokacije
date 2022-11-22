@@ -41,7 +41,7 @@ class ProfileViewModel @Inject constructor(
     var loginUserId = 0L;
 
     init {
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.Main){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
             username = DataStoreManager.getStringValue(context, "username");
@@ -62,7 +62,6 @@ class ProfileViewModel @Inject constructor(
 
     private fun getUserProfileData(userId : Long)
     {
-        Log.d("PROFILE", "Getting profile data for userId ${userId}");
         getUserProfileDataUseCase("Bearer "+refresh_token, userId, loginUserId).onEach { result ->
             when(result){
                 is Resource.Success -> {

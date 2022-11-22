@@ -48,7 +48,7 @@ class UserListViewModel @Inject constructor(
     var savedUserId : Long = 0L;
 
     init {
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.Main){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
             username = DataStoreManager.getStringValue(context, "username");

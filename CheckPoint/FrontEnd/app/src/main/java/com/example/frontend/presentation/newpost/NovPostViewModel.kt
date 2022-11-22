@@ -39,7 +39,7 @@ class NovPostViewModel@Inject constructor(
     val context = application.baseContext
 
     fun savePost(navController: NavController,description: String, locationId:Long,photos:List<Bitmap>){
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.Main){
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 

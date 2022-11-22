@@ -59,7 +59,7 @@ class PostsViewModel @Inject constructor(
 
     fun getAllPostsForLocation(locationId : Long)
     {
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.Main){
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 

@@ -40,7 +40,7 @@ class LocationViewModel @Inject constructor(
     var loginUserId = 0L;
 
     init {
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.Main){
             access_token =  DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 

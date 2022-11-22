@@ -53,13 +53,9 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token);
+                        saveUserId(result.data!!.access_token, navController);
 
-                        navController.navigate(Screen.MainLocationScreen.route){
-                            popUpTo(Screen.LoginScreen.route){
-                                inclusive = true;
-                            }
-                        };
+
 
                     }
                 }
@@ -74,7 +70,7 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun saveUserId(access_token: String){
+    fun saveUserId(access_token: String, navController:NavController){
         getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
@@ -82,6 +78,12 @@ class LoginViewModel @Inject constructor(
                         Log.d("User id", "Fetched user id ${userId}")
                         if (userId != null) {
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
+
+                            navController.navigate(Screen.MainLocationScreen.route){
+                                popUpTo(Screen.LoginScreen.route){
+                                    inclusive = true;
+                                }
+                            };
                         }
                 }
                 is Resource.Error -> {
