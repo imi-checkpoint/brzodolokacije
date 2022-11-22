@@ -38,6 +38,8 @@ class PostsViewModel @Inject constructor(
     application: Application
 ) : ViewModel(){
 
+    var loginUserId = 0L;
+
     private val _state = mutableStateOf(PostsState())
     val state : State<PostsState> = _state
     val context = application.baseContext
@@ -60,6 +62,9 @@ class PostsViewModel @Inject constructor(
     fun getAllPostsForLocation(locationId : Long)
     {
         GlobalScope.launch(Dispatchers.Main){
+
+            loginUserId = DataStoreManager.getLongValue(context, "userId");
+
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 

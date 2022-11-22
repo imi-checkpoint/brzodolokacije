@@ -145,7 +145,8 @@ fun PostCard(
                         text = "${post.appUserUsername}",
                         color = Color.DarkGray
                     )
-                    DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
+                    if(viewModel.loginUserId == post.appUserId)
+                        DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
                 }
 
                 Text(
