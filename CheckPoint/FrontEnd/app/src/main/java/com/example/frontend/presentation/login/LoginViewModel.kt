@@ -75,7 +75,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun saveUserId(access_token: String){
-        getLoginUserIdUseCase(access_token).onEach { result ->
+        getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                         val userId = result.data
@@ -90,7 +90,7 @@ class LoginViewModel @Inject constructor(
                     DataStoreManager.saveValue(context, "userId", 0)
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
 }

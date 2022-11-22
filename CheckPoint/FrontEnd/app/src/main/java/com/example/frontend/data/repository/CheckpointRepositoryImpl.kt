@@ -1,5 +1,6 @@
 package com.example.frontend.data.repository
 
+import android.util.Log
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
@@ -115,7 +116,10 @@ class CheckpointRepositoryImpl(
     }
 
     override suspend fun getUserId(token: String): Long {
-        return api.getUserId(token)
+        Log.d("REPO", "Getting user id ");
+        val userIdGot = api.getUserId(token);
+        Log.d("REPO", "Got user id ${userIdGot.toString()}")
+        return userIdGot
     }
 
     override suspend fun getPostById(token: String, postId: Long): PostDTO {
