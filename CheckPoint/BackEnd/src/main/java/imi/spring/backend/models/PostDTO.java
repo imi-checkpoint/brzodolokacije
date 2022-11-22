@@ -19,6 +19,8 @@ public class PostDTO {
     private String description;
     private Integer numberOfLikes;
     private Integer numberOfComments;
+    private Boolean isLiked; //da li je logovani user lajkovao ovaj post
+
 //    @JsonIgnore
     private List<Photo> photos;
     @JsonIgnore

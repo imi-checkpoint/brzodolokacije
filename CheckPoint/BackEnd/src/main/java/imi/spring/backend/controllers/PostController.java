@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -26,15 +27,21 @@ public class PostController {
 
     @GetMapping("/all")
     @ResponseBody
-    public List<PostDTO> getAllPosts() throws IOException {
+    public List<PostDTO> getAllPosts(HttpServletRequest request) throws IOException, ServletException {
         log.info("Getting all posts.");
-        return postService.convertListOfPostsToPostDTOs(postService.getAllPosts());
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.convertListOfPostsToPostDTOs(user, postService.getAllPosts());
+        return Collections.emptyList();
     }
 
     @GetMapping("/{id}")
     @ResponseBody
-    public PostDTO getPostById(@PathVariable Long id) throws IOException {
-        return postService.convertPostToPostDTO(postService.getPostById(id));
+    public PostDTO getPostById(HttpServletRequest request, @PathVariable Long id) throws IOException, ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.convertPostToPostDTO(user, postService.getPostById(id));
+        return null;
     }
 
     @GetMapping("/{id}/comments/count")
@@ -71,15 +78,21 @@ public class PostController {
 
     @GetMapping("/user/{userId}")
     @ResponseBody
-    public List<PostDTO> getPostsByUserId(@PathVariable Long userId) throws IOException {
-        return postService.convertListOfPostsToPostDTOs(postService.getPostsByUserId(userId));
+    public List<PostDTO> getPostsByUserId(HttpServletRequest request, @PathVariable Long userId) throws IOException, ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.convertListOfPostsToPostDTOs(user, postService.getPostsByUserId(userId));
+        return Collections.emptyList();
     }
 
     @GetMapping("/location/{locationId}")
     @ResponseBody
-    public List<PostDTO> getPostsByLocationId(@PathVariable Long locationId) throws IOException {
+    public List<PostDTO> getPostsByLocationId(HttpServletRequest request, @PathVariable Long locationId) throws IOException, ServletException {
         log.info("Calling this one.");
-        return postService.convertListOfPostsToPostDTOs(postService.getPostsByLocationId(locationId));
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return postService.convertListOfPostsToPostDTOs(user, postService.getPostsByLocationId(locationId));
+        return Collections.emptyList();
     }
 
     @GetMapping("/count/all")
