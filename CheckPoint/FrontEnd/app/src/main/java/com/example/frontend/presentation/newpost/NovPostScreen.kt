@@ -45,13 +45,10 @@ fun NovPostScreen(navController:NavController,
         mutableStateOf<Bitmap>(myImage)
     }
     var lista = remember { mutableStateOf<List<Bitmap>>(emptyList())}
-    var listaFiles = remember { mutableStateOf<List<File>>(emptyList())}
     val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
         if(Build.VERSION.SDK_INT < 29){
             result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
             lista.value = lista.value+result.value
-
-            //listaFiles.value = listaFiles.value + it!!.toFile()
         }
         else {
             val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
@@ -59,7 +56,6 @@ fun NovPostScreen(navController:NavController,
             result.value = ImageDecoder.decodeBitmap(source)
 
             lista.value = lista.value+result.value
-            //listaFiles.value = listaFiles.value +File(it.path)
         }
     }
     Column(
@@ -107,7 +103,8 @@ fun NovPostScreen(navController:NavController,
             Text("Add picture")
         }
         Button(onClick = { viewModel.savePost(navController,description.value,location.value.toLong(),
-            lista.value) }) {
+            lista.value)
+        }) {
             Text("Post")
         }
     }
@@ -118,7 +115,7 @@ fun slika(
     photo:Bitmap
 ){
     Row(){
-        Image(bitmap = photo.asImageBitmap(),"")
+        Image(bitmap = photo.asImageBitmap(),"",Modifier.height(150.dp))
     }
 }
 
