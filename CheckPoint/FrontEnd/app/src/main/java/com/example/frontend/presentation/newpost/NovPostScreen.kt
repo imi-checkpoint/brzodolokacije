@@ -50,6 +50,8 @@ fun NovPostScreen(navController:NavController,
         mutableStateOf<Bitmap>(myImage)
     }
     val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
+        if(it != null)
+        {
         if(Build.VERSION.SDK_INT < 29){
             result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
 
@@ -59,6 +61,7 @@ fun NovPostScreen(navController:NavController,
             val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
             result.value = ImageDecoder.decodeBitmap(source)
             viewModel.parsePhoto(result.value)
+        }
         }
     }
     Column(
@@ -105,8 +108,11 @@ fun NovPostScreen(navController:NavController,
         Button(onClick = { choseImage.launch("image/*") }) {
             Text("Add picture")
         }
-        Button(onClick = { viewModel.savePost(navController,description.value,location.value.toLong())
-        }) {
+        Button(onClick = { viewModel.savePost(  navController,
+                                                description.value,
+                                                location.value.toLong())},
+                enabled = viewModel.givePhotos().isNotEmpty()
+            ) {
             Text("Post")
         }
     }
