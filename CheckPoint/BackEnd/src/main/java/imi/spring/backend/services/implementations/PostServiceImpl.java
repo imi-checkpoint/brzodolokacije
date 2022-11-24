@@ -79,6 +79,7 @@ public class PostServiceImpl implements PostService {
             return "This user is not the owner!";
         
         postRepository.deleteById(postId);
+        photoService.deletePhotosByPostId(postId);
         return "Deleted";
     }
 
