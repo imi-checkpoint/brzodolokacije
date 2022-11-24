@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -17,9 +18,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.Delete
+
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,29 +36,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.presentation.newpost.components.NovPostState
+import com.example.frontend.presentation.newpost.components.SlikaState
 import java.io.File
 
 @Composable
 fun NovPostScreen(navController:NavController,
                   viewModel : NovPostViewModel = hiltViewModel()){
     val context = LocalContext.current
-    //val state = viewModel.state.value
+    val state = viewModel.state.value
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
         mutableStateOf<Bitmap>(myImage)
     }
-    var lista = remember { mutableStateOf<List<Bitmap>>(emptyList())}
     val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
         if(Build.VERSION.SDK_INT < 29){
             result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
-            lista.value = lista.value+result.value
+
+            viewModel.parsePhoto(result.value)
         }
         else {
             val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
-
             result.value = ImageDecoder.decodeBitmap(source)
-
-            lista.value = lista.value+result.value
+            viewModel.parsePhoto(result.value)
         }
     }
     Column(
@@ -80,9 +83,9 @@ fun NovPostScreen(navController:NavController,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyRow(){
-            items(lista.value){
+            items(viewModel.givePhotos()){
                 item->
-                    slika(navController = navController, photo = item)
+                    slika(navController = navController, photo = item,viewModel)
             }
         }
         //Image(bitmap = result.value.asImageBitmap(),"",Modifier.fillMaxWidth())
@@ -102,20 +105,29 @@ fun NovPostScreen(navController:NavController,
         Button(onClick = { choseImage.launch("image/*") }) {
             Text("Add picture")
         }
-        Button(onClick = { viewModel.savePost(navController,description.value,location.value.toLong(),
-            lista.value)
+        Button(onClick = { viewModel.savePost(navController,description.value,location.value.toLong())
         }) {
             Text("Post")
         }
     }
 }
+
 @Composable
 fun slika(
     navController: NavController,
-    photo:Bitmap
+    photo:SlikaState,
+    viewModel : NovPostViewModel
 ){
     Row(){
-        Image(bitmap = photo.asImageBitmap(),"",Modifier.height(150.dp))
+        Image(bitmap = photo.slika.asImageBitmap(),"",Modifier.height(150.dp))
+        IconButton(onClick = { viewModel.deletePhoto(photo.slika) }) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.Red,
+                modifier = Modifier.size(20.dp),
+            )
+        }
     }
 }
 

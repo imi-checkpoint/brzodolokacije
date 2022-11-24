@@ -2,6 +2,8 @@ package com.example.frontend.presentation.newpost
 
 import android.app.Application
 import android.graphics.Bitmap
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -10,6 +12,9 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
 import com.example.frontend.domain.use_case.add_post.AddPostUseCase
+import com.example.frontend.presentation.newpost.components.NovPostState
+import com.example.frontend.presentation.newpost.components.SlikaState
+import com.example.frontend.presentation.posts.components.PostsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,33 +35,20 @@ class NovPostViewModel@Inject constructor(
     application: Application,
 
 ): ViewModel() {
-
+    private val _state = mutableStateOf(NovPostState())
+    val state: State<NovPostState> = _state
     val context = application.baseContext
-    init {
-
-    }
-    fun savePost(navController: NavController,description: String, locationId:Long,photos:List<Bitmap>){
-        GlobalScope.launch(Dispatchers.Main){
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
+    fun savePost(navController: NavController, description: String, locationId: Long) {
+        GlobalScope.launch(Dispatchers.Main) {
+            var access_token = DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
-            addPostUseCase("Bearer "+access_token, description,locationId).map { result ->
-                when(result){
+            addPostUseCase("Bearer " + access_token, description, locationId).map { result ->
+                when (result) {
                     is Resource.Success -> {
-                        println("Broj posta je ${result.data!!.toLong()}")
                         var i = 0
-                        for(photo:Bitmap in photos){
-                            println("tempFileName${result.data!!.toLong()}-${i}.jpg")
-                            val path = context.getExternalFilesDir(null)!!.absolutePath
-                            val tempFile = File(path,"tempFileName${result.data!!.toLong()}-${i}.jpg")
-                            val fOut = FileOutputStream(tempFile)
-                            photo.compress(Bitmap.CompressFormat.JPEG,85,fOut)
-                            fOut.flush()
-                            fOut.close()
-                            val file = MultipartBody.Part.createFormData("photo",tempFile.name,
-                                RequestBody.create(MediaType.parse("image/*"),tempFile))
-                            addPhoto(navController,result.data!!.toLong(),i,file)
-                            //tempFile.delete()
+                        for (photo: SlikaState in _state.value.slike) {
+                            addPhoto(navController, result.data!!.toLong(), i, photo)
                             i++;
                         }
                     }
@@ -70,29 +62,92 @@ class NovPostViewModel@Inject constructor(
             }.launchIn(viewModelScope)
         }
     }
-    fun addPhoto(navController:NavController, postId:Long, order:Int, photo: MultipartBody.Part){
-        println(photo.toString())
-        GlobalScope.launch(Dispatchers.IO){
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            println("Uslo u funkciju")
-            addPhotoUseCase("Bearer " + access_token, postId, order, photo).map { result ->
-                when(result){
+
+    fun addPhoto(navController: NavController, postId: Long, order: Int, slikaState: SlikaState) {
+        GlobalScope.launch(Dispatchers.IO) {
+            var access_token = DataStoreManager.getStringValue(context, "access_token")
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token")
+            val path = context.getExternalFilesDir(null)!!.absolutePath
+            val tempFile = File(path, "tempFileName${postId}-${order}.jpg")
+            val fOut = FileOutputStream(tempFile)
+            slikaState.slika.compress(Bitmap.CompressFormat.JPEG, 85, fOut)
+            fOut.flush()
+            fOut.close()
+            val file = MultipartBody.Part.createFormData(
+                "photo", tempFile.name,
+                RequestBody.create(MediaType.parse("image/*"), tempFile)
+            )
+
+            addPhotoUseCase("Bearer " + access_token, postId, order, file).map { result ->
+                when (result) {
                     is Resource.Success -> {
-                        println("stiglo"+result.message)
-                        navController.navigate(Screen.MainLocationScreen.route)
+                        tempFile.delete()
+                        var flag = true
+
+                        var lista = replaceSlikaState(slikaState.slika)
+                        println(lista)
+                        for (i: SlikaState in lista) {
+                            if (i.isLoading) {
+                                flag = false
+                                break;
+                            }
+                        }
+                        if (flag == true) {
+                            navController.navigate(Screen.MainLocationScreen.route)
+                        } else {
+                            println("Nisu sve poslate")
+                        }
                     }
                     is Resource.Error -> {
-                        println("Greska"+result.message)
-
+                        println("Greska" + result.message)
+                        tempFile.delete()
                     }
                     is Resource.Loading -> {
-                        println("Loading"+result.message)
-
+                        var lista: List<SlikaState> = emptyList()
+                        for (i: SlikaState in _state.value.slike) {
+                            lista = if (i.slika == slikaState.slika) {
+                                lista + SlikaState(isLoading = true, slika = i.slika)
+                            } else {
+                                lista + i
+                            }
+                        }
+                        _state.value = NovPostState(slike = lista)
+                        println("Loading " + lista)
                     }
                 }
             }.launchIn(viewModelScope)
         }
     }
 
+    fun parsePhoto(photo: Bitmap) {
+        _state.value = NovPostState(slike = _state.value.slike + SlikaState(slika = photo))
+    }
+
+    fun givePhotos(): List<SlikaState> {
+        return _state.value.slike
+    }
+
+    fun deletePhoto(photo: Bitmap) {
+        var lista: List<SlikaState> = emptyList()
+        for (i: SlikaState in _state.value.slike) {
+            if (i.slika != photo) {
+                lista = lista + i
+                println(i.slika)
+                println(photo)
+            }
+        }
+        _state.value = NovPostState(slike = lista)
+    }
+
+    fun replaceSlikaState(bitmap: Bitmap): List<SlikaState> {
+        var lista: List<SlikaState> = emptyList()
+        for (i: SlikaState in _state.value.slike) {
+            if (i.slika == bitmap)
+                lista = lista + SlikaState(isLoading = false, slika = i.slika)
+            else
+                lista = lista + i
+        }
+        _state.value = NovPostState(slike = lista)
+        return lista
+    }
 }
