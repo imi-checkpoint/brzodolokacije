@@ -147,4 +147,28 @@ public class AppUserController {
             throw new Exception(e.getMessage());
         }
     }
+
+    @PutMapping("/user/info") //email and username
+    @ResponseBody
+    public AppUser changeUserInfo(HttpServletRequest request, @RequestBody UserDTO editedUserDTO) throws ServletException {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            return appUserService.changeEmailAndUsername(appUser, editedUserDTO);
+        } catch (ServletException e) {
+            log.error("Error changing user information, received message [{}]", e.getMessage());
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    @PutMapping("/user/password")
+    @ResponseBody
+    public AppUser changeUserPassword(HttpServletRequest request, @RequestBody String[] passwords) throws ServletException {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            return appUserService.changeUserPassword(appUser, passwords);
+        } catch (ServletException e) {
+            log.error("Error changing user password, received message [{}]", e.getMessage());
+            throw new ServletException(e.getMessage());
+        }
+    }
 }
