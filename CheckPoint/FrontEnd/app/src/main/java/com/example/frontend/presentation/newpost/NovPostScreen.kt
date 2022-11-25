@@ -12,13 +12,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.Icon
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -36,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import java.io.File
@@ -48,6 +47,10 @@ fun NovPostScreen(navController:NavController,
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
         mutableStateOf<Bitmap>(myImage)
+    }
+    var expanded = remember { mutableStateOf(false) }
+    var selected = remember {
+        mutableStateOf(0)
     }
     val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
         if(it != null)
@@ -101,20 +104,42 @@ fun NovPostScreen(navController:NavController,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             )
         var location = remember {
-            mutableStateOf("")
+            mutableStateOf<Location>(Location(0,"",0.0,0.0))
         }
-        TextField(value = location.value, onValueChange = {location.value=it})
-
+        Text(text = if(location!=null)location.value.name else "")
         Button(onClick = { choseImage.launch("image/*") }) {
             Text("Add picture")
         }
-        Button(onClick = { viewModel.savePost(  navController,
-                                                description.value,
-                                                location.value.toLong())},
-                enabled = viewModel.givePhotos().isNotEmpty()
+        Button(onClick = {expanded.value = true}){
+            Text("Izaberi lokaciju")
+        }
+        Button(onClick = {
+            viewModel.savePost(  navController,
+                                description.value,
+                                location.value.id)},
+                enabled = viewModel.givePhotos().isNotEmpty() && location.value.id != 0L
             ) {
             Text("Post")
         }
+
+
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                viewModel.dajLokacije().forEachIndexed{index ,item->
+                    DropdownMenuItem(onClick = {
+                        selected.value = index
+                        location.value = item
+                        expanded.value = false
+                    }) {
+                        Text(item.name)
+                    }
+                }
+            }
+
     }
 }
 

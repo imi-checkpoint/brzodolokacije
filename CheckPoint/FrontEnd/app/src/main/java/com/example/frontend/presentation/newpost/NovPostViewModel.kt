@@ -10,8 +10,11 @@ import androidx.navigation.NavController
 import com.example.frontend.common.Resource
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
+import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
 import com.example.frontend.domain.use_case.add_post.AddPostUseCase
+import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
+import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.posts.components.PostsState
@@ -32,12 +35,19 @@ import javax.inject.Inject
 class NovPostViewModel@Inject constructor(
     private val addPostUseCase: AddPostUseCase,
     private val addPhotoUseCase: AddPhotoUseCase,
+    private val getAllLocationsUseCase: GetAllLocationsUseCase,
+    private val getLocationsKeywordUseCase: GetLocationsKeywordUseCase,
     application: Application,
 
 ): ViewModel() {
     private val _state = mutableStateOf(NovPostState())
     val state: State<NovPostState> = _state
     val context = application.baseContext
+
+    init {
+        ucitajLokacije("")
+    }
+
     fun savePost(navController: NavController, description: String, locationId: Long) {
         GlobalScope.launch(Dispatchers.Main) {
             var access_token = DataStoreManager.getStringValue(context, "access_token");
@@ -149,5 +159,48 @@ class NovPostViewModel@Inject constructor(
         }
         _state.value = NovPostState(slike = lista)
         return lista
+    }
+
+    fun ucitajLokacije(ime:String){
+        GlobalScope.launch(Dispatchers.Main) {
+            var access_token = DataStoreManager.getStringValue(context, "access_token");
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            if(ime == ""){
+                getAllLocationsUseCase("Bearer " + access_token).map { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!)
+                            println("Stigle lokacije "+result.data!!)
+                        }
+                        is Resource.Error -> {
+                            println(result.message)
+                        }
+                        is Resource.Loading -> {
+                            println(result.message)
+                        }
+                    }
+                }.launchIn(viewModelScope)
+            }
+            else{
+                getLocationsKeywordUseCase("Bearer " + access_token, ime).map { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!)
+                            println("Stigle lokacije za rec $ime "+result.data!!)
+                        }
+                        is Resource.Error -> {
+                            println(result.message)
+                        }
+                        is Resource.Loading -> {
+                            println(result.message)
+                        }
+                    }
+                }.launchIn(viewModelScope)
+            }
+        }
+    }
+
+    fun dajLokacije():List<Location>{
+        return _state.value.lokacije
     }
 }
