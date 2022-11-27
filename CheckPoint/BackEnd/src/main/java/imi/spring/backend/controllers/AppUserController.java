@@ -150,10 +150,10 @@ public class AppUserController {
 
     @PutMapping("/user/info") //email and username
     @ResponseBody
-    public AppUser changeUserInfo(HttpServletRequest request, @RequestBody UserDTO editedUserDTO) throws ServletException {
+    public AppUser changeUserInfo(HttpServletRequest request, @RequestBody AppUser editedUser) throws ServletException {
         try {
             AppUser appUser = jwtService.getAppUserFromJWT(request);
-            return appUserService.changeEmailAndUsername(appUser, editedUserDTO);
+            return appUserService.changeEmailAndUsername(appUser, editedUser);
         } catch (ServletException e) {
             log.error("Error changing user information, received message [{}]", e.getMessage());
             throw new ServletException(e.getMessage());

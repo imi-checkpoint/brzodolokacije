@@ -60,7 +60,8 @@ fun ProfileScreen(
                 "USERNAME"
             ,
             modifier = Modifier.padding(20.dp),
-            navController = navController
+            navController = navController,
+            viewModel = viewModel
         )
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -85,7 +86,8 @@ fun ProfileScreen(
 fun TopBar(
     name : String,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewModel: ProfileViewModel
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -110,15 +112,18 @@ fun TopBar(
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        
-        IconButton(onClick = { /*user profile edit*/}) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Back",
-                tint = Color.Black,
-                modifier = modifier.size(24.dp)
-            )
-        }
+
+        if(viewModel.savedUserId == viewModel.loginUserId)
+            IconButton(onClick = {
+                navController.navigate(Screen.ProfileSettingsScreen.route)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = modifier.size(24.dp)
+                )
+            }
     }
 }
 

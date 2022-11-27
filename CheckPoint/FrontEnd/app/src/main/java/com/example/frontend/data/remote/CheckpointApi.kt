@@ -212,4 +212,25 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("postId") postId:Long
     ) : String
+
+    @Headers("Content-Type: application/json")
+    @PUT("api/user/info")
+    suspend fun changeUserInfo(
+        @Header("Authorization") token : String,
+        @Body user: UserDTO
+    ) : UserDTO
+
+    @Headers("Content-Type: application/json")
+    @PUT("api/user/password")
+    suspend fun changeUserPassword(
+        @Header("Authorization") token : String,
+        @Body passwords: Array<String>
+    ) : UserDTO
+
+    @Headers("Content-Type: application/json")
+    @PUT("api/changeProfilePicture")
+    suspend fun changeProfilePicture(
+        @Header("Authorization") token : String,
+        @Part profile_image: MultipartBody.Part
+    ) : String
 }

@@ -146,5 +146,16 @@ class CheckpointRepositoryImpl(
         return api.likeOrUnlikePostById(token, postId);
     }
 
+    override suspend fun changeUserInfo(token: String, user: UserDTO): UserDTO {
+        return api.changeUserInfo(token, user)
+    }
+
+    override suspend fun changeUserPassword(token: String, passwords: Array<String>): UserDTO {
+        return api.changeUserPassword(token, passwords)
+    }
+
+    override suspend fun changeProfilePicture(token: String, profile_image: MultipartBody.Part): String {
+        return api.changeProfilePicture(token, profile_image)
+    }
 
 }
