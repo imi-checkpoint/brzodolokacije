@@ -12,6 +12,6 @@ public interface AppUserService extends UserDetailsService {
     AppUser getUserById(Long id);
     List<AppUser> getAllUsers();
     AppUser updateUser(AppUser user);
-    AppUser changeEmailAndUsername(AppUser appUser, AppUser editedUser);
+    String changeUserEmail(AppUser appUser, String newEmail);
     AppUser changeUserPassword(AppUser appUser, String[] passwords);
 }

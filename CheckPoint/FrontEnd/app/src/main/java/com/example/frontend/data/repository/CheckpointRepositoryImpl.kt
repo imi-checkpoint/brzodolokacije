@@ -122,6 +122,10 @@ class CheckpointRepositoryImpl(
         return userIdGot
     }
 
+    override suspend fun getUserFromJWT(token: String): UserDTO {
+        return api.getUserFromJWT(token);
+    }
+
     override suspend fun getPostById(token: String, postId: Long): PostDTO {
         return api.getPostById(token, postId)
     }
@@ -146,12 +150,16 @@ class CheckpointRepositoryImpl(
         return api.likeOrUnlikePostById(token, postId);
     }
 
-    override suspend fun changeUserInfo(token: String, user: UserDTO): UserDTO {
-        return api.changeUserInfo(token, user)
+    override suspend fun changeUserEmail(token: String, newEmail: String): String {
+        return api.changeUserEmail(token, newEmail)
     }
 
     override suspend fun changeUserPassword(token: String, passwords: Array<String>): UserDTO {
         return api.changeUserPassword(token, passwords)
+    }
+
+    override suspend fun getMyProfilePicture(token: String): String {
+        return api.getMyProfilePicture(token)
     }
 
     override suspend fun changeProfilePicture(token: String, profile_image: MultipartBody.Part): String {

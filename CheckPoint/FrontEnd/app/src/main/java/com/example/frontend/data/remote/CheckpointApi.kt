@@ -215,10 +215,10 @@ interface CheckpointApi {
 
     @Headers("Content-Type: application/json")
     @PUT("api/user/info")
-    suspend fun changeUserInfo(
+    suspend fun changeUserEmail(
         @Header("Authorization") token : String,
-        @Body user: UserDTO
-    ) : UserDTO
+        @Body newEmail: String
+    ) : String
 
     @Headers("Content-Type: application/json")
     @PUT("api/user/password")
@@ -227,10 +227,23 @@ interface CheckpointApi {
         @Body passwords: Array<String>
     ) : UserDTO
 
+    //@Headers("Content-Type: application/octet-stream")
     @Headers("Content-Type: application/json")
+    @GET("api/getMyProfilePicture")
+    suspend fun getMyProfilePicture(
+        @Header("Authorization") token : String
+    ) : String
+
+    @Multipart
     @PUT("api/changeProfilePicture")
     suspend fun changeProfilePicture(
         @Header("Authorization") token : String,
         @Part profile_image: MultipartBody.Part
     ) : String
+
+    @Headers("Content-Type: application/json")
+    @GET("api/user")
+    suspend fun getUserFromJWT(
+        @Header("Authorization") token : String
+    ): UserDTO
 }

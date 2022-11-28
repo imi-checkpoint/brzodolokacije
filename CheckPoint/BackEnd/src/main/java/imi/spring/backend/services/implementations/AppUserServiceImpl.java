@@ -72,11 +72,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUser changeEmailAndUsername(AppUser appUser, AppUser editedUser) {
+    public String changeUserEmail(AppUser appUser, String newEmail) {
         //regex, provera duzina...
-        appUser.setUsername(editedUser.getUsername().trim());
-        appUser.setEmail(editedUser.getEmail().trim());
-        return updateUser(appUser);
+        appUser.setEmail(newEmail.trim());
+        updateUser(appUser);
+        return "Changed";
     }
 
     @Override
