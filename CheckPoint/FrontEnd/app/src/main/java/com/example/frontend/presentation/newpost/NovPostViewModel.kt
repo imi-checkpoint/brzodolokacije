@@ -52,8 +52,8 @@ class NovPostViewModel@Inject constructor(
         GlobalScope.launch(Dispatchers.Main) {
             var access_token = DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            addPostUseCase("Bearer " + access_token, description, locationId).map { result ->
+            println(_state.value.selected)
+            addPostUseCase("Bearer " + access_token, description, _state.value.selected).map { result ->
                 when (result) {
                     is Resource.Success -> {
                         var i = 0
@@ -121,7 +121,7 @@ class NovPostViewModel@Inject constructor(
                                 lista + i
                             }
                         }
-                        _state.value = NovPostState(slike = lista)
+                        _state.value = NovPostState(slike = lista, lokacije = _state.value.lokacije, selected = _state.value.selected)
                         println("Loading " + lista)
                     }
                 }
@@ -130,7 +130,7 @@ class NovPostViewModel@Inject constructor(
     }
 
     fun parsePhoto(photo: Bitmap) {
-        _state.value = NovPostState(slike = _state.value.slike + SlikaState(slika = photo))
+        _state.value = NovPostState(slike = _state.value.slike + SlikaState(slika = photo), lokacije = _state.value.lokacije, selected = _state.value.selected)
     }
 
     fun givePhotos(): List<SlikaState> {
@@ -146,7 +146,7 @@ class NovPostViewModel@Inject constructor(
                 println(photo)
             }
         }
-        _state.value = NovPostState(slike = lista)
+        _state.value = NovPostState(slike = lista, lokacije = _state.value.lokacije, selected = _state.value.selected)
     }
 
     fun replaceSlikaState(bitmap: Bitmap): List<SlikaState> {
@@ -157,7 +157,7 @@ class NovPostViewModel@Inject constructor(
             else
                 lista = lista + i
         }
-        _state.value = NovPostState(slike = lista)
+        _state.value = NovPostState(slike = lista, lokacije = _state.value.lokacije, selected = _state.value.selected)
         return lista
     }
 
@@ -169,7 +169,7 @@ class NovPostViewModel@Inject constructor(
                 getAllLocationsUseCase("Bearer " + access_token).map { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!)
+                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!, selected = _state.value.selected)
                             println("Stigle lokacije "+result.data!!)
                         }
                         is Resource.Error -> {
@@ -185,7 +185,7 @@ class NovPostViewModel@Inject constructor(
                 getLocationsKeywordUseCase("Bearer " + access_token, ime).map { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!)
+                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!, selected = _state.value.selected)
                             println("Stigle lokacije za rec $ime "+result.data!!)
                         }
                         is Resource.Error -> {
@@ -202,5 +202,14 @@ class NovPostViewModel@Inject constructor(
 
     fun dajLokacije():List<Location>{
         return _state.value.lokacije
+    }
+
+    fun setLocation(id:Long){
+        _state.value = NovPostState(lokacije = _state.value.lokacije, slike = _state.value.slike, selected = id)
+    }
+    fun getLocation():String{
+        for(loc:Location in _state.value.lokacije)
+            if(loc.id == _state.value.selected) return loc.name
+        return ""
     }
 }

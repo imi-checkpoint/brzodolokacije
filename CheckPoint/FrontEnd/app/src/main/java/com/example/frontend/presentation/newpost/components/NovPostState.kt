@@ -8,5 +8,6 @@ data class NovPostState(
     val error: String = "",
     val isLoading: Boolean = false,
     val slike: List<SlikaState> = emptyList(),
-    val lokacije: List<Location> = emptyList()
+    val lokacije: List<Location> = emptyList(),
+    val selected: Long = 0,
 )

@@ -11,10 +11,10 @@ import android.provider.MediaStore
 import androidx.compose.foundation.lazy.items
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -27,7 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -74,7 +76,8 @@ fun NovPostScreen(navController:NavController,
     ) {
         IconButton(onClick = {
             navController.popBackStack()
-        }) {
+        }
+        ) {
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "",
@@ -84,61 +87,75 @@ fun NovPostScreen(navController:NavController,
     Column(
         Modifier
             .padding(24.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+
         verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
-        LazyRow(){
-            items(viewModel.givePhotos()){
-                item->
-                    slika(navController = navController, photo = item,viewModel)
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(viewModel.givePhotos()) { item ->
+                slika(navController = navController, photo = item, viewModel)
             }
         }
         //Image(bitmap = result.value.asImageBitmap(),"",Modifier.fillMaxWidth())
         var description = remember {
             mutableStateOf("")
         }
-        TextField(value = description.value,
-            onValueChange = {description.value= it},
-            label = {Text("Description")},
+        TextField(
+            value = description.value,
+            onValueChange = { description.value = it },
+            label = { Text("Description") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            )
+            maxLines = 5
+        )
+
         var location = remember {
-            mutableStateOf<Location>(Location(0,"",0.0,0.0))
+            mutableStateOf<Location>(Location(0, "", 0.0, 0.0))
         }
-        Text(text = if(location!=null)location.value.name else "")
+        Text(text = viewModel.getLocation())
         Button(onClick = { choseImage.launch("image/*") }) {
             Text("Add picture")
         }
-        Button(onClick = {expanded.value = true}){
+        Button(onClick = { expanded.value = true }) {
             Text("Izaberi lokaciju")
         }
-        Button(onClick = {
-            viewModel.savePost(  navController,
-                                description.value,
-                                location.value.id)},
-                enabled = viewModel.givePhotos().isNotEmpty() && location.value.id != 0L
-            ) {
+        Button(
+            onClick = {
+                viewModel.savePost(
+                    navController,
+                    description.value,
+                    location.value.id
+                )
+            },
+            enabled = viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""
+        ) {
             Text("Post")
         }
 
 
-            DropdownMenu(
-                expanded = expanded.value,
-                onDismissRequest = { expanded.value = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                viewModel.dajLokacije().forEachIndexed{index ,item->
-                    DropdownMenuItem(onClick = {
-                        selected.value = index
-                        location.value = item
-                        expanded.value = false
-                    }) {
-                        Text(item.name)
-                    }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+            modifier = Modifier
+                .wrapContentWidth()
+                .height(300.dp),
+
+
+        ) {
+            viewModel.dajLokacije().forEachIndexed { index, item ->
+                DropdownMenuItem(onClick = {
+                    viewModel.setLocation(item.id)
+                }
+                ) {
+                    Text(item.name)
                 }
             }
+        }
 
     }
 }
@@ -149,15 +166,35 @@ fun slika(
     photo:SlikaState,
     viewModel : NovPostViewModel
 ){
-    Row(){
-        Image(bitmap = photo.slika.asImageBitmap(),"",Modifier.height(150.dp))
-        IconButton(onClick = { viewModel.deletePhoto(photo.slika) }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.Red,
-                modifier = Modifier.size(20.dp),
+    Row(
+        Modifier
+            .border(width = 2.dp, color = Color.DarkGray, shape = RoundedCornerShape(20.dp))
+            .wrapContentHeight()
+            .width(300.dp)
+            .padding(20.dp)
+
+    ){
+        Column() {
+            Image(bitmap = photo.slika.asImageBitmap(),"",
+                Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp, 0.dp, 0.dp, 5.dp)
             )
+            IconButton(onClick = { viewModel.deletePhoto(photo.slika) },
+                Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .border(width = 0.dp, color = Color.Gray, shape = RoundedCornerShape(50.dp))
+                    .background(color = Color.LightGray, shape = RoundedCornerShape(50.dp))
+                    .padding(10.dp, 10.dp, 10.dp, 5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
         }
     }
 }
