@@ -14,9 +14,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ModeEdit
@@ -31,16 +34,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.presentation.InputType
+import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
@@ -60,6 +68,12 @@ fun ProfileSettingsScreen(
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
     val stateChangeMyProfilePicture = viewModel.stateChangeProfilePicture.value
 
+    var emailInput = remember {
+        mutableStateOf("")
+    }
+
+    var emailFocusRequester = FocusRequester()
+    val focusManager = LocalFocusManager.current
 
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
@@ -110,8 +124,9 @@ fun ProfileSettingsScreen(
             Text("An error occured while loading user info!");
         }
         else{
+            emailInput.value = viewModel.currentEmail
             ProfilePicture(navController, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
-            UsernameAndEmail(state, stateEmailChange, viewModel)
+            UsernameAndEmail(navController, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
         }
     }
 }
@@ -181,16 +196,18 @@ fun ProfilePicture(
                                 viewModel.changeProfilePicture(navController)
                             },
                                 enabled = viewModel.changePictureEnabled,
-                                colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray),
+                                colors = ButtonDefaults.buttonColors(
+                                    contentColor = Color.White
+                                ),
                                 modifier = Modifier
                                     .height(30.dp)
-                                    .width(60.dp)
+                                    .width(100.dp)
                             ) {
                                 Text(
-                                    text = "Save",
+                                    text = "Update photo",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
+                                    color = Color.White
                                 )
                             }
                         }
@@ -203,51 +220,54 @@ fun ProfilePicture(
 
 @Composable
 fun UsernameAndEmail(
+    navController: NavController,
     state : ProfileSettingsUserState,
     stateEmailChange: UserInfoChangeState,
-    viewModel: ProfileSettingsViewModel
+    viewModel: ProfileSettingsViewModel,
+    emailInput: MutableState<String>,
+    emailFocusRequester: FocusRequester
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(start = 40.dp, end = 40.dp, top = 30.dp, bottom = 20.dp)
     ) {
 
         Text(
             text = "${state.user?.username}",
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Monospace,
             color = Color.DarkGray,
             fontSize = 20.sp
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        /*Text(
-            text = "${state.user?.email}",
-            color = Color.DarkGray,
-        )*/
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        /*var newEmail
-        TextField(value = state.user!!.email, onValueChange = {location.value=it})*/
-        /*var newEmail = remember {
-            mutableStateOf("")
-        }
-        TextField(value = description.value,
-            onValueChange = {description.value= it},
-            label = { androidx.compose.material.Text("Description") },
+        TextField(value = emailInput.value,
+            onValueChange = {emailInput.value = it},
+            label = { androidx.compose.material.Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        )*/
+        )
+        
+        Spacer(modifier = Modifier.height(10.dp))
 
-        IconButton(onClick = {
-            //viewModel.changeEmail()
-        }) {
-            Icon(
-                Icons.Outlined.ChangeCircle,
-                contentDescription = "",
-                tint = Color.DarkGray
+        Button(onClick = {
+            viewModel.currentEmail = emailInput.value
+            viewModel.changeEmail(navController, emailInput.value)
+        },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .height(30.dp)
+                .width(100.dp)
+        ) {
+            Text(
+                text = "Update email",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
     }

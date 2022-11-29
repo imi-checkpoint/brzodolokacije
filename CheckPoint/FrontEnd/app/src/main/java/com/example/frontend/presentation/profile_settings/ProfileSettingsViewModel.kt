@@ -53,6 +53,7 @@ class ProfileSettingsViewModel @Inject constructor(
 
     private val _stateEmailChange = mutableStateOf(UserInfoChangeState())
     val stateEmailChange : State<UserInfoChangeState> = _stateEmailChange
+    var currentEmail: String = "";
 
     private val _stateChangeProfilePicture = mutableStateOf(ChangeProfilePictureState())
     val stateChangeProfilePicture : State<ChangeProfilePictureState> = _stateChangeProfilePicture
@@ -89,7 +90,8 @@ class ProfileSettingsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _state.value = ProfileSettingsUserState(user = result.data)
-                        println("****////////********" + result.data)
+                        println("DAJ PODATKE" + result.data)
+                        currentEmail = result.data!!.email
                     }
                     is Resource.Error -> {
                         _state.value = ProfileSettingsUserState(error = result.message ?:"An unexpected error occured")
@@ -166,14 +168,14 @@ class ProfileSettingsViewModel @Inject constructor(
         changePictureEnabled = true;
     }
 
-    fun changeEmail(newEmail: String)
+    fun changeEmail(navController: NavController, newEmail: String)
     {
         GlobalScope.launch(Dispatchers.Main){
             changeEmailUseCase("Bearer "+ access_token, newEmail).onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _stateEmailChange.value = UserInfoChangeState(message = result.data ?: "")
-                        println("****////////********" + result.data)
+                        navController.navigate(Screen.ProfileSettingsScreen.route)
                     }
                     is Resource.Error -> {
                         _stateEmailChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
