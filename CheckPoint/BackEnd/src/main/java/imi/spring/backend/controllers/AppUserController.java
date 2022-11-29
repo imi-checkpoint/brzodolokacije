@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -40,7 +41,7 @@ public class AppUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user){
+    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user) throws IOException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         AppUser appUser = new AppUser(user.getEmail(), user.getUsername(), user.getPassword());
         return ResponseEntity.created(uri).body(appUserService.saveUser(appUser));
@@ -90,9 +91,10 @@ public class AppUserController {
 
     @GetMapping("/getMyProfilePicture")
     @ResponseBody
-    public byte[] getMyProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    public String getMyProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try{
-            return jwtService.getAppUserFromJWT(request).getImage();
+            byte[] bytePicture = jwtService.getAppUserFromJWT(request).getImage();
+            return new String(Base64.getEncoder().encode(bytePicture));
         } catch (ServletException e) {
             throw new ServletException(e);
         }
@@ -112,7 +114,7 @@ public class AppUserController {
         }
     }
 
-    @GetMapping("/changeProfilePicture")
+    @PutMapping("/changeProfilePicture")
     @ResponseBody
     public String changeProfilePicture(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "profile_image") MultipartFile profileImage) throws Exception {
         try {
@@ -146,5 +148,35 @@ public class AppUserController {
             log.error("Error finishing request. [{}]", e.getMessage());
             throw new Exception(e.getMessage());
         }
+    }
+
+    @PutMapping("/user/info") //email and username
+    @ResponseBody
+    public String changeUserEmail(HttpServletRequest request, @RequestBody String newEmail) throws ServletException {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            return appUserService.changeUserEmail(appUser, newEmail);
+        } catch (ServletException e) {
+            log.error("Error changing user's email, received message [{}]", e.getMessage());
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    @PutMapping("/user/password")
+    @ResponseBody
+    public AppUser changeUserPassword(HttpServletRequest request, @RequestBody String[] passwords) throws ServletException {
+        try {
+            AppUser appUser = jwtService.getAppUserFromJWT(request);
+            return appUserService.changeUserPassword(appUser, passwords);
+        } catch (ServletException e) {
+            log.error("Error changing user password, received message [{}]", e.getMessage());
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user")
+    @ResponseBody
+    public AppUser getUserFromJWT(HttpServletRequest request) throws ServletException {
+        return jwtService.getAppUserFromJWT(request);
     }
 }

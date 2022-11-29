@@ -17,6 +17,7 @@ import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.user_list.UserListScreen
 import com.example.frontend.presentation.newpost.NovPostScreen
 import com.example.frontend.presentation.post.PostScreen
+import com.example.frontend.presentation.profile_settings.ProfileSettingsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -48,6 +49,9 @@ fun Navigation()
         ){
             entry ->
                 ProfileScreen(navController = navController)
+        }
+        composable(route = Screen.ProfileSettingsScreen.route){
+            ProfileSettingsScreen(navController = navController)
         }
         composable(
             route = Screen.PostsScreen.route + "/{locationId}",
