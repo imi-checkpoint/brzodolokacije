@@ -225,7 +225,7 @@ interface CheckpointApi {
     suspend fun changeUserPassword(
         @Header("Authorization") token : String,
         @Body passwords: Array<String>
-    ) : UserDTO
+    ) : String
 
     //@Headers("Content-Type: application/octet-stream")
     @Headers("Content-Type: application/json")

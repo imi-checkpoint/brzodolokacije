@@ -61,10 +61,8 @@ class ProfileSettingsViewModel @Inject constructor(
     var currentPicture: String = "";
 
 
-    /*private val _statePasswordChange = mutableStateOf(ProfileSettingsUserState())
-    val statePasswordChange : State<ProfileSettingsUserState> = _statePasswordChange
-    private val _stateProfilePictureChange = mutableStateOf(ProfileSettingsUserState())
-    val stateProfilePictureChange : State<ProfileSettingsUserState> = _stateProfilePictureChange*/
+    private val _statePasswordChange = mutableStateOf(UserInfoChangeState())
+    val statePasswordChange : State<UserInfoChangeState> = _statePasswordChange
 
     var access_token  = "";
     var refresh_token = "";
@@ -182,6 +180,35 @@ class ProfileSettingsViewModel @Inject constructor(
                     }
                     is Resource.Loading -> {
                         _stateEmailChange.value = UserInfoChangeState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    fun changePassword(navController: NavController, oldPass: String, newPass1: String, newPass2: String)
+    {
+        if (oldPass == "" || newPass1 == "" || newPass2 == "")
+            return;
+        if (newPass1 != newPass2)
+            return;
+
+        val passArray =  arrayOf(oldPass, newPass1);
+
+        GlobalScope.launch(Dispatchers.Main){
+            changePasswordUseCase("Bearer "+ access_token, passArray).onEach { result ->
+                when(result){
+                    is Resource.Success -> {
+                        _statePasswordChange.value = UserInfoChangeState(message = result.data ?: "")
+                        if (result.data == "Changed") {
+                            navController.navigate(Screen.ProfileSettingsScreen.route)
+                        }
+                    }
+                    is Resource.Error -> {
+                        _statePasswordChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
+                    }
+                    is Resource.Loading -> {
+                        _statePasswordChange.value = UserInfoChangeState(isLoading = true)
                     }
                 }
             }.launchIn(viewModelScope)

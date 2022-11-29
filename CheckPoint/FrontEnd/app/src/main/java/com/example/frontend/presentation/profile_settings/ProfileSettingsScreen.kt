@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -34,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -67,6 +69,7 @@ fun ProfileSettingsScreen(
     val stateEmailChange = viewModel.stateEmailChange.value
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
     val stateChangeMyProfilePicture = viewModel.stateChangeProfilePicture.value
+    val statePasswordChange = viewModel.statePasswordChange.value
 
     var emailInput = remember {
         mutableStateOf("")
@@ -74,6 +77,11 @@ fun ProfileSettingsScreen(
 
     var emailFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
+
+    var oldPasswordFocusRequester = FocusRequester()
+    var newPassword1FocusRequester = FocusRequester()
+    var newPassword2FocusRequester = FocusRequester()
+
 
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
@@ -127,6 +135,7 @@ fun ProfileSettingsScreen(
             emailInput.value = viewModel.currentEmail
             ProfilePicture(navController, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
             UsernameAndEmail(navController, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
+            Passwords(navController, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
         }
     }
 }
@@ -231,7 +240,7 @@ fun UsernameAndEmail(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 40.dp, end = 40.dp, top = 30.dp, bottom = 20.dp)
+            .padding(start = 40.dp, end = 40.dp, top = 30.dp, bottom = 10.dp)
     ) {
 
         Text(
@@ -265,6 +274,88 @@ fun UsernameAndEmail(
         ) {
             Text(
                 text = "Update email",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+fun Passwords(
+    navController: NavController,
+    state : ProfileSettingsUserState,
+    stateEmailChange: UserInfoChangeState,
+    viewModel: ProfileSettingsViewModel,
+    oldPasswordFocusRequester: FocusRequester,
+    newPassword1FocusRequester: FocusRequester,
+    newPassword2FocusRequester: FocusRequester,
+    focusManager: FocusManager
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        var oldPasswordValue = "";
+        TextInput(
+            inputType = InputType.Password,
+            focusRequester = oldPasswordFocusRequester,
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    newPassword1FocusRequester.requestFocus()
+                }),
+            valuePar = oldPasswordValue,
+            onChange = {oldPasswordValue = it}
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        var newPassword1Value = "";
+        TextInput(
+            inputType = InputType.Password,
+            focusRequester = newPassword1FocusRequester,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    newPassword2FocusRequester.requestFocus()
+                }),
+            valuePar = newPassword1Value,
+            onChange = {newPassword1Value = it}
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        var newPassword2Value = "";
+        TextInput(
+            inputType = InputType.Password,
+            focusRequester = newPassword2FocusRequester,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }),
+            valuePar = newPassword2Value,
+            onChange = {newPassword2Value = it}
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        Button(onClick = {
+            viewModel.changePassword(navController, oldPasswordValue, newPassword1Value, newPassword2Value)
+        },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .height(30.dp)
+                .width(120.dp)
+        ) {
+            Text(
+                text = "Update password",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White

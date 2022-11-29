@@ -154,7 +154,7 @@ class CheckpointRepositoryImpl(
         return api.changeUserEmail(token, newEmail)
     }
 
-    override suspend fun changeUserPassword(token: String, passwords: Array<String>): UserDTO {
+    override suspend fun changeUserPassword(token: String, passwords: Array<String>): String {
         return api.changeUserPassword(token, passwords)
     }
 
