@@ -72,7 +72,7 @@ interface CheckpointRepository {
 
     suspend fun changeUserEmail(token: String, newEmail: String) : String
 
-    suspend fun changeUserPassword(token: String, passwords: Array<String>) : UserDTO
+    suspend fun changeUserPassword(token: String, passwords: Array<String>) : String
 
     suspend fun getMyProfilePicture(token : String) : String
 

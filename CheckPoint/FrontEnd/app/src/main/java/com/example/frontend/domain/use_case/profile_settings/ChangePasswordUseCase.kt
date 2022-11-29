@@ -14,11 +14,11 @@ import javax.inject.Inject
 class ChangePasswordUseCase @Inject constructor(
     private val repository: CheckpointRepository
 ) {
-    operator fun invoke(token : String, passwords: Array<String>) : Flow<Resource<User>> = flow {
+    operator fun invoke(token : String, passwords: Array<String>) : Flow<Resource<String>> = flow {
         try{
             emit(Resource.Loading())
-            val user = repository.changeUserPassword(token, passwords).toUser()
-            emit(Resource.Success(user));
+            val message = repository.changeUserPassword(token, passwords)
+            emit(Resource.Success(message));
         }catch (e : HttpException){
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))
         }catch (e : IOException){
