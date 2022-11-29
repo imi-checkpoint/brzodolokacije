@@ -15,6 +15,12 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAut
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @SpringBootApplication(exclude = {
 		org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
 		ReactiveSecurityAutoConfiguration.class,
@@ -37,10 +43,14 @@ public class BackendApplication {
 	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService,
 						  PostLikeService postLikeService, CommentService commentService, FollowersService followersService){
 		return args -> {
-			appUserService.saveUser(new AppUser("user1@gmail.com", "user1", "user1"));
-			appUserService.saveUser(new AppUser("user2@gmail.com", "user2", "user2"));
-			appUserService.saveUser(new AppUser("user3@gmail.com", "user3", "user3"));
-			appUserService.saveUser(new AppUser("user4@gmail.com", "user4", "user4"));
+
+			Path path = Paths.get("src/main/resources/static/images/default-user.jpeg");
+			byte[] pictureInBytes = Files.readAllBytes(path);
+
+			appUserService.saveUser(new AppUser("user1@gmail.com", "user1", "user1", pictureInBytes));
+			appUserService.saveUser(new AppUser("user2@gmail.com", "user2", "user2", pictureInBytes));
+			appUserService.saveUser(new AppUser("user3@gmail.com", "user3", "user3", pictureInBytes));
+			appUserService.saveUser(new AppUser("user4@gmail.com", "user4", "user4", pictureInBytes));
 
 			locationService.saveLocation(new Location("Eiffel Tower", 48.858093, 2.294694));
 			locationService.saveLocation(new Location("Stonehenge", 51.1740, -1.8224));
