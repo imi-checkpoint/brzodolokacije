@@ -3,6 +3,9 @@ package com.example.frontend.domain.repository
 import com.example.frontend.data.remote.dto.*
 import com.example.frontend.domain.model.RegisterUser
 import okhttp3.MultipartBody
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Part
 
 interface CheckpointRepository {
     suspend fun register(appUser : RegisterUser) : String
@@ -53,6 +56,8 @@ interface CheckpointRepository {
 
     suspend fun getUserId(token:String) : Long
 
+    suspend fun getUserFromJWT(token : String): UserDTO
+
     suspend fun getPostById(token:String, postId:Long) : PostDTO
 
     suspend fun savePost(token: String,description:String,locationId:Long): Long
@@ -64,4 +69,12 @@ interface CheckpointRepository {
     suspend fun getNumberOfCommentsByPostId(token: String, postId: Long) : Int
 
     suspend fun likeOrUnlikePostById(token: String, postId: Long) : String
+
+    suspend fun changeUserEmail(token: String, newEmail: String) : String
+
+    suspend fun changeUserPassword(token: String, passwords: Array<String>) : UserDTO
+
+    suspend fun getMyProfilePicture(token : String) : String
+
+    suspend fun changeProfilePicture(token : String, profile_image: MultipartBody.Part) : String
 }
