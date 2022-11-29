@@ -16,10 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +82,7 @@ fun ProfileScreen(
         //MAPA
         Log.d("MAP FOR USERID", viewModel.savedUserId.toString());
         if(viewModel.savedUserId != 0L){
-            MapSection(viewModel.savedUserId)
+            UserPostsSection(viewModel.savedUserId);
         }
     }
 }
@@ -380,6 +378,74 @@ fun ActionButton(
                 tint = Color.Black
             )
         }
+    }
+}
+
+@Composable
+fun UserPostsSection(
+    userId: Long
+)
+{
+    var list by remember{ mutableStateOf(true) }
+    var map by remember{ mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ){
+        Button(onClick = {
+            list = true;
+            map = false;
+        },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if(list == true) Color.DarkGray else Color.LightGray,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "LIST" , Modifier.padding(8.dp))
+        }
+
+        Button(onClick = {
+            list = false;
+            map = true;
+        },
+            colors = ButtonDefaults.buttonColors(
+                containerColor =if(map == true) Color.DarkGray else Color.LightGray,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "MAP" , Modifier.padding(8.dp))
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        if(list){
+            PostsSection(userId = userId);
+        }
+        if(map){
+            MapSection(userId = userId);
+        }
+    }
+}
+
+@Composable
+fun PostsSection(
+    userId : Long
+){
+    Column(
+        modifier = Modifier
+            .padding(
+                horizontal = 20.dp,
+                vertical = 20.dp
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text("List of posts");
     }
 }
 
