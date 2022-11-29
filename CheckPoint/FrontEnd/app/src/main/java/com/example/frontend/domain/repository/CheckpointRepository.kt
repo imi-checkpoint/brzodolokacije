@@ -76,5 +76,7 @@ interface CheckpointRepository {
 
     suspend fun getMyProfilePicture(token : String) : String
 
+    suspend fun getUserProfilePicture(token : String, userId: Long) : String
+
     suspend fun changeProfilePicture(token : String, profile_image: MultipartBody.Part) : String
 }

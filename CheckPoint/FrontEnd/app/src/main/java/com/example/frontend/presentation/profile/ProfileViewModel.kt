@@ -13,8 +13,10 @@ import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.follow_or_unfollow.FollowUnfollowUseCase
 import com.example.frontend.domain.use_case.get_profile_data.GetMyProfileDataUseCase
 import com.example.frontend.domain.use_case.get_profile_data.GetUserProfileDataUseCase
+import com.example.frontend.domain.use_case.get_profile_data.GetUserProfilePhotoUseCase
 import com.example.frontend.presentation.location.components.LocationState
 import com.example.frontend.presentation.profile.components.ProfileDataState
+import com.example.frontend.presentation.profile.components.ProfilePictureState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -26,12 +28,17 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val getUserProfileDataUseCase: GetUserProfileDataUseCase,
+    private val getUserProfilePhotoUseCase: GetUserProfilePhotoUseCase,
     private val followUnfollowUseCase : FollowUnfollowUseCase,
     private val savedStateHandle: SavedStateHandle,
     private var application: Application
 ) : ViewModel(){
     private val _state = mutableStateOf(ProfileDataState())
     val state : State<ProfileDataState> = _state
+
+    private val _pictureState = mutableStateOf(ProfilePictureState())
+    val pictureState : State<ProfilePictureState> = _pictureState
+
     val context = application.baseContext
     var savedUserId = 0L;
 
@@ -57,6 +64,7 @@ class ProfileViewModel @Inject constructor(
             Log.d("PROFILE USERID", userId.toString())
             savedUserId = userId;
             getUserProfileData(userId);
+            getUserPhoto(userId);
         }
     }
 
@@ -75,6 +83,24 @@ class ProfileViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _state.value = ProfileDataState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getUserPhoto(userId: Long){
+        getUserProfilePhotoUseCase("Bearer "+refresh_token, userId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    Log.d("PROF PICTURE", "got");
+                    _pictureState.value = ProfilePictureState(profilePicture = result.data ?: "")
+                }
+                is Resource.Error -> {
+                    _pictureState.value = ProfilePictureState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _pictureState.value = ProfilePictureState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

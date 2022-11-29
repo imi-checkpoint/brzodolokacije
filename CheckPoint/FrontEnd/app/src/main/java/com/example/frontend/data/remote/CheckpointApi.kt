@@ -246,4 +246,11 @@ interface CheckpointApi {
     suspend fun getUserFromJWT(
         @Header("Authorization") token : String
     ): UserDTO
+
+    @Headers("Content-Type: application/json")
+    @GET("api/getProfilePictureByUserId/{userId}")
+    suspend fun getUserProfilePicture(
+        @Header("Authorization") token : String,
+        @Path("userId") userId: Long
+    ) : String
 }

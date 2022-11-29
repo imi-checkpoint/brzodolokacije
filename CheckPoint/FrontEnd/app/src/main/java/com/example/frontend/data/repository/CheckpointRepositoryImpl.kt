@@ -162,6 +162,13 @@ class CheckpointRepositoryImpl(
         return api.getMyProfilePicture(token)
     }
 
+    override suspend fun getUserProfilePicture(token: String, userId: Long): String {
+        Log.d("PICTURE REPO", "Getting picture from repo");
+        val picture =  api.getUserProfilePicture(token, userId);
+        Log.d("PICTURE IS", picture);
+        return picture;
+    }
+
     override suspend fun changeProfilePicture(token: String, profile_image: MultipartBody.Part): String {
         return api.changeProfilePicture(token, profile_image)
     }

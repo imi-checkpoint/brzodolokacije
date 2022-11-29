@@ -1,6 +1,10 @@
 package com.example.frontend.presentation.profile
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,9 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,11 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.ProfileDataState
+import com.example.frontend.presentation.profile.components.ProfilePictureState
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen(
     navController: NavController,
@@ -42,6 +53,7 @@ fun ProfileScreen(
 )
 {
     val state = viewModel.state.value
+    val pictureState = viewModel.pictureState.value
 
     Column(
         modifier = Modifier
@@ -60,7 +72,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        ProfileSection(navController, state, viewModel.savedUserId);
+        ProfileSection(navController, state, pictureState, viewModel.savedUserId);
         Spacer(modifier = Modifier.height(25.dp))
 
         //ako nije moj profil
@@ -122,10 +134,12 @@ fun TopBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileSection(
     navController: NavController,
     state : ProfileDataState,
+    pictureState : ProfilePictureState,
     userId : Long,
     modifier: Modifier = Modifier,
 )
@@ -140,12 +154,57 @@ fun ProfileSection(
                 .padding(horizontal = 20.dp)
         ) {
 
-            RoundImage(
-                image = painterResource(id = R.drawable.ic_logo),
-                modifier = Modifier
-                    .size(100.dp)
-                    .weight(3f) //da zauzima 3 sirine ovog reda
+            val painter = rememberImagePainter(
+                data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                builder = {}
             )
+
+            if(pictureState.isLoading){
+                CircularProgressIndicator();
+            }
+            else if(pictureState.error != ""){
+                Image(
+                    painter = painter,
+                    contentDescription = "Profile image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .weight(3f) //da zauzima 3 sirine ovog reda
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+            else{
+                val photo = pictureState.profilePicture;
+                val decoder = Base64.getDecoder()
+                val photoBytes = decoder.decode(photo)
+                if(photoBytes.size>1){
+                    val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                    print(mapa.byteCount)
+                    if(mapa!=null){
+                        Image(
+                            bitmap = mapa.asImageBitmap(),
+                            modifier = Modifier
+                                .size(100.dp)
+                                .weight(3f) //da zauzima 3 sirine ovog reda
+                                .clip(RoundedCornerShape(10.dp)),
+                            contentDescription ="Profile image" ,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                else{
+                    //def picture
+                    Image(
+                        painter = painter,
+                        contentDescription = "Profile image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .weight(3f) //da zauzima 3 sirine ovog reda
+                            .clip(RoundedCornerShape(10.dp))
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -289,12 +348,10 @@ fun ActionButton(
                 shape = RoundedCornerShape(5.dp)
             )
             .padding(6.dp)
-            .clickable{
-                if(text == "Follow")
-                {
+            .clickable {
+                if (text == "Follow") {
                     viewModel.followUnfollowUser();
-                }
-                else if(text == "Message"){
+                } else if (text == "Message") {
                     //message this user
 
                 }

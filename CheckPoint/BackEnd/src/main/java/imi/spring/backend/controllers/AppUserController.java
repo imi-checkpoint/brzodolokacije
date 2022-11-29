@@ -102,14 +102,16 @@ public class AppUserController {
 
     @GetMapping("/getProfilePictureByUserId/{userId}")
     @ResponseBody
-    public byte[] getProfilePictureByUserId(@PathVariable("userId") Long userId) throws IOException {
+    public String getProfilePictureByUserId(@PathVariable("userId") Long userId) throws IOException {
+        log.info("GET PROFILE PICTURE");
         AppUser user = appUserService.getUserById(userId);
 
         if(user != null && user.getImage()!=null){
             log.info("Getting picture for user with id {}", userId);
-            return  user.getImage();
+            return new String(Base64.getEncoder().encode(user.getImage()));
         }
         else{
+            log.error("Error getting picture for user with id {}", userId);
             throw new IOException("Error getting image for that user.");
         }
     }
