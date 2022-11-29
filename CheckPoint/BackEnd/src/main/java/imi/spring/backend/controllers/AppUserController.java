@@ -164,7 +164,7 @@ public class AppUserController {
 
     @PutMapping("/user/password")
     @ResponseBody
-    public AppUser changeUserPassword(HttpServletRequest request, @RequestBody String[] passwords) throws ServletException {
+    public String changeUserPassword(HttpServletRequest request, @RequestBody String[] passwords) throws ServletException {
         try {
             AppUser appUser = jwtService.getAppUserFromJWT(request);
             return appUserService.changeUserPassword(appUser, passwords);
