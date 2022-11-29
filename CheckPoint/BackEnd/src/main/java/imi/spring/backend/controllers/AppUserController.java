@@ -41,7 +41,7 @@ public class AppUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user){
+    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user) throws IOException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         AppUser appUser = new AppUser(user.getEmail(), user.getUsername(), user.getPassword());
         return ResponseEntity.created(uri).body(appUserService.saveUser(appUser));

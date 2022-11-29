@@ -14,36 +14,47 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.outlined.ChangeCircle
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.frontend.presentation.profile.RoundImage
+import com.example.frontend.presentation.InputType
+import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
 import com.example.frontend.presentation.profile_settings.components.UserInfoChangeState
 import java.util.*
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -57,32 +68,32 @@ fun ProfileSettingsScreen(
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
     val stateChangeMyProfilePicture = viewModel.stateChangeProfilePicture.value
 
+    var emailInput = remember {
+        mutableStateOf("")
+    }
+
+    var emailFocusRequester = FocusRequester()
+    val focusManager = LocalFocusManager.current
+
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
         mutableStateOf<Bitmap>(myImage)
-    }
-    var expanded = remember { mutableStateOf(false) }
-    var selected = remember {
-        mutableStateOf(0)
     }
 
     val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
         if(it != null)
         {
             if(Build.VERSION.SDK_INT < 29){
-                result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
-
+                result.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
                 viewModel.parsePhoto(result.value)
             }
             else {
-                val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
+                val source = ImageDecoder.createSource(context.contentResolver, it as Uri)
                 result.value = ImageDecoder.decodeBitmap(source)
                 viewModel.parsePhoto(result.value)
             }
         }
     }
-
-
 
     Column(
         modifier = Modifier
@@ -92,11 +103,20 @@ fun ProfileSettingsScreen(
         IconButton(onClick = {
             navController.popBackStack()
         }) {
-            Icon(
+            androidx.compose.material.Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "",
-                tint = Color.DarkGray)
+                tint = Color.DarkGray
+            )
         }
+    }
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
@@ -104,8 +124,9 @@ fun ProfileSettingsScreen(
             Text("An error occured while loading user info!");
         }
         else{
-            ProfilePicture(viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage)
-            UsernameAndEmail(state, stateEmailChange, viewModel)
+            emailInput.value = viewModel.currentEmail
+            ProfilePicture(navController, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
+            UsernameAndEmail(navController, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
         }
     }
 }
@@ -113,13 +134,14 @@ fun ProfileSettingsScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilePicture(
+    navController: NavController,
     viewModel: ProfileSettingsViewModel,
     stateGetMyProfilePicture: ProfilePictureState,
     stateChangeMyProfilePicture: ChangeProfilePictureState,
-    choseImage: ManagedActivityResultLauncher<String, Uri?>
+    choseImage: ManagedActivityResultLauncher<String, Uri?>,
+    result: MutableState<Bitmap>
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp, top = 80.dp, bottom = 20.dp)
@@ -133,6 +155,7 @@ fun ProfilePicture(
         }
         else {
             var picture = stateGetMyProfilePicture.picture
+            //viewModel.currentPicture = picture;
             //println(picture.toByteArray().size)
             val decoder = Base64.getDecoder()
             val photoInBytes = decoder.decode(picture)
@@ -140,25 +163,54 @@ fun ProfilePicture(
                 val mapa: Bitmap = BitmapFactory.decodeByteArray(photoInBytes,0, photoInBytes.size)
                 //print(mapa.byteCount)
                 if(mapa != null) {
-                    Image(bitmap = mapa.asImageBitmap(),
+                    Image(bitmap = if(viewModel.changePictureEnabled) result.value.asImageBitmap() else mapa.asImageBitmap(),
                         contentDescription = "",
                         modifier = Modifier
                             .size(150.dp)
                             .weight(3f)
+                            .align(Alignment.CenterVertically)
                     )
 
-                    Button(onClick = { choseImage.launch("image/*") }) {
-                        Text("Choose picture")
-                    }
+                    Column(
 
-                    IconButton(onClick = {
-                        viewModel.changeProfilePicture()
-                    }) {
-                        Icon(
-                            Icons.Outlined.ChangeCircle,
-                            contentDescription = "",
-                            tint = Color.DarkGray
-                        )
+                    ) {
+
+                        IconButton(onClick = {
+                            choseImage.launch("image/*")
+                        }, modifier = Modifier
+                            .border(0.dp, Color.Gray, RectangleShape)
+                            .size(30.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.ModeEdit,
+                                contentDescription = "",
+                                tint = Color.DarkGray,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(70.dp))
+
+                        if (viewModel.changePictureEnabled) {
+                            Button(onClick = {
+                                viewModel.changeProfilePicture(navController)
+                            },
+                                enabled = viewModel.changePictureEnabled,
+                                colors = ButtonDefaults.buttonColors(
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .width(100.dp)
+                            ) {
+                                Text(
+                                    text = "Update photo",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -168,51 +220,54 @@ fun ProfilePicture(
 
 @Composable
 fun UsernameAndEmail(
+    navController: NavController,
     state : ProfileSettingsUserState,
     stateEmailChange: UserInfoChangeState,
-    viewModel: ProfileSettingsViewModel
+    viewModel: ProfileSettingsViewModel,
+    emailInput: MutableState<String>,
+    emailFocusRequester: FocusRequester
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(start = 40.dp, end = 40.dp, top = 30.dp, bottom = 20.dp)
     ) {
 
         Text(
             text = "${state.user?.username}",
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Monospace,
             color = Color.DarkGray,
             fontSize = 20.sp
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        /*Text(
-            text = "${state.user?.email}",
-            color = Color.DarkGray,
-        )*/
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        /*var newEmail
-        TextField(value = state.user!!.email, onValueChange = {location.value=it})*/
-        /*var newEmail = remember {
-            mutableStateOf("")
-        }
-        TextField(value = description.value,
-            onValueChange = {description.value= it},
-            label = { androidx.compose.material.Text("Description") },
+        TextField(value = emailInput.value,
+            onValueChange = {emailInput.value = it},
+            label = { androidx.compose.material.Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        )*/
+        )
+        
+        Spacer(modifier = Modifier.height(10.dp))
 
-        IconButton(onClick = {
-            //viewModel.changeEmail()
-        }) {
-            Icon(
-                Icons.Outlined.ChangeCircle,
-                contentDescription = "",
-                tint = Color.DarkGray
+        Button(onClick = {
+            viewModel.currentEmail = emailInput.value
+            viewModel.changeEmail(navController, emailInput.value)
+        },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .height(30.dp)
+                .width(100.dp)
+        ) {
+            Text(
+                text = "Update email",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
     }

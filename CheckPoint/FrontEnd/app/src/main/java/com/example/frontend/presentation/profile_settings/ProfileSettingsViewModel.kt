@@ -7,14 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.frontend.common.Resource
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.get_user.GetMyProfilePictureUseCase
 import com.example.frontend.domain.use_case.get_user.GetUserInfoUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeEmailUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangePasswordUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeProfilePictureUseCase
-import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.UserInfoChangeState
@@ -52,9 +53,12 @@ class ProfileSettingsViewModel @Inject constructor(
 
     private val _stateEmailChange = mutableStateOf(UserInfoChangeState())
     val stateEmailChange : State<UserInfoChangeState> = _stateEmailChange
+    var currentEmail: String = "";
 
     private val _stateChangeProfilePicture = mutableStateOf(ChangeProfilePictureState())
     val stateChangeProfilePicture : State<ChangeProfilePictureState> = _stateChangeProfilePicture
+    var changePictureEnabled: Boolean = false;
+    var currentPicture: String = "";
 
 
     /*private val _statePasswordChange = mutableStateOf(ProfileSettingsUserState())
@@ -86,7 +90,8 @@ class ProfileSettingsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _state.value = ProfileSettingsUserState(user = result.data)
-                        println("****////////********" + result.data)
+                        println("DAJ PODATKE" + result.data)
+                        currentEmail = result.data!!.email
                     }
                     is Resource.Error -> {
                         _state.value = ProfileSettingsUserState(error = result.message ?:"An unexpected error occured")
@@ -108,6 +113,7 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         println("****////////********GETMYPROFILEPICTURE SUCCESS ")
                         _stateGetMyProfilePicture.value = ProfilePictureState(picture = result.data!!)
+                        currentPicture = result.data!!
                     }
                     is Resource.Error -> {
                         println("GETMYPROFILEPICTURE ERROR" + result.message)
@@ -121,7 +127,7 @@ class ProfileSettingsViewModel @Inject constructor(
         }
     }
 
-    fun changeProfilePicture()
+    fun changeProfilePicture(navController: NavController)
     {
         GlobalScope.launch(Dispatchers.IO){
             var access_token = DataStoreManager.getStringValue(context, "access_token")
@@ -142,9 +148,7 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         println("****////////********CHANGEMYPROFILEPICTURE SUCCESS ")
                         tempFile.delete()
-                        //var flag = true
-                        //var lista = replace
-                        //_stateChangeProfilePicture.value = ChangeProfilePictureState(picture = result.data!!)
+                        navController.navigate(Screen.ProfileSettingsScreen.route)
                     }
                     is Resource.Error -> {
                         println("CHANGEMYPROFILEPICTURE ERROR" + result.message)
@@ -161,16 +165,17 @@ class ProfileSettingsViewModel @Inject constructor(
 
     fun parsePhoto(photo: Bitmap) {
         _stateChangeProfilePicture.value = ChangeProfilePictureState(picture = photo)
+        changePictureEnabled = true;
     }
 
-    fun changeEmail(newEmail: String)
+    fun changeEmail(navController: NavController, newEmail: String)
     {
         GlobalScope.launch(Dispatchers.Main){
             changeEmailUseCase("Bearer "+ access_token, newEmail).onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _stateEmailChange.value = UserInfoChangeState(message = result.data ?: "")
-                        println("****////////********" + result.data)
+                        navController.navigate(Screen.ProfileSettingsScreen.route)
                     }
                     is Resource.Error -> {
                         _stateEmailChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
