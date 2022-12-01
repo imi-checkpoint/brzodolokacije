@@ -10,6 +10,7 @@ sealed class Screen(val route : String) {
     object NovPostScreen : Screen("newPost_screen");
     object PostScreen : Screen("post_screen");
     object ProfileSettingsScreen: Screen("profile_settings_screen");
+    object NovPostMapScreen: Screen("novPostMap_screen")
 
     fun withArgs(vararg args : Long) : String {
         return buildString{

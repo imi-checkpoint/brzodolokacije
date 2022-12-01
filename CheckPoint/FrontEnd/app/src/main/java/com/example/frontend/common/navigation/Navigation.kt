@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.example.frontend.presentation.login.LoginScreen
 import com.example.frontend.presentation.register.RegisterScreen
 import com.example.frontend.presentation.location.MainLocationScreen
+import com.example.frontend.presentation.newpost.NovPostMapScreen
 import com.example.frontend.presentation.posts.PostsScreen
 import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.user_list.UserListScreen
@@ -36,6 +37,9 @@ fun Navigation()
         }
         composable(route = Screen.NovPostScreen.route){
             NovPostScreen(navController = navController)
+        }
+        composable(route = Screen.NovPostMapScreen.route){
+            NovPostMapScreen(navController = navController)
         }
         composable(
             route = Screen.ProfileScreen.route + "/{userId}",

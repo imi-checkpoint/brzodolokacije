@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
@@ -155,6 +156,9 @@ fun NovPostScreen(navController:NavController,
                     Text(item.name)
                 }
             }
+        }
+        Button(onClick = { navController.navigate(Screen.NovPostMapScreen.route)}) {
+            Text("Izaberi lokaciju sa mape")
         }
 
     }
