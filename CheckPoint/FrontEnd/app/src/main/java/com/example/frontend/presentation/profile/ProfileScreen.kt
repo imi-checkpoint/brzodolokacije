@@ -6,41 +6,47 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
+import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
+import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -52,38 +58,47 @@ fun ProfileScreen(
 {
     val state = viewModel.state.value
     val pictureState = viewModel.pictureState.value
+    val postsState = viewModel.postsState.value
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        TopBar(
-            name =
-            if(viewModel.savedUserId == viewModel.loginUserId)
-                viewModel.username
-            else
-                "USERNAME"
-            ,
-            modifier = Modifier.padding(20.dp),
-            navController = navController,
-            viewModel = viewModel
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isRefreshing),
+        onRefresh = {
+            viewModel.getProfileData();
+        }
+    ){
 
-        ProfileSection(navController, state, pictureState, viewModel.savedUserId);
-        Spacer(modifier = Modifier.height(25.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            TopBar(
+                name =
+                if(viewModel.savedUserId == viewModel.loginUserId)
+                    viewModel.username
+                else
+                    viewModel.othUsername
+                ,
+                modifier = Modifier.padding(20.dp),
+                navController = navController,
+                viewModel = viewModel
+            )
+            Spacer(modifier = Modifier.height(4.dp))
 
-        //ako nije moj profil
-        if(viewModel.savedUserId != viewModel.loginUserId){
-            ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
+            ProfileSection(navController, state, pictureState, viewModel.savedUserId);
             Spacer(modifier = Modifier.height(25.dp))
+
+            //ako nije moj profil
+            if(viewModel.savedUserId != viewModel.loginUserId){
+                ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+
+            if(viewModel.savedUserId != 0L){
+                UserPostsSection(postsState, viewModel.savedUserId, navController);
+            }
         }
 
-        //MAPA
-        Log.d("MAP FOR USERID", viewModel.savedUserId.toString());
-        if(viewModel.savedUserId != 0L){
-            UserPostsSection(viewModel.savedUserId);
-        }
     }
 }
 
@@ -168,7 +183,7 @@ fun ProfileSection(
                     modifier = Modifier
                         .size(100.dp)
                         .weight(3f) //da zauzima 3 sirine ovog reda
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(CircleShape)
                 )
             }
             else{
@@ -184,7 +199,7 @@ fun ProfileSection(
                             modifier = Modifier
                                 .size(100.dp)
                                 .weight(3f) //da zauzima 3 sirine ovog reda
-                                .clip(RoundedCornerShape(10.dp)),
+                                .clip(CircleShape),
                             contentDescription ="Profile image" ,
                             contentScale = ContentScale.Crop
                         )
@@ -199,7 +214,7 @@ fun ProfileSection(
                         modifier = Modifier
                             .size(100.dp)
                             .weight(3f) //da zauzima 3 sirine ovog reda
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(CircleShape)
                     )
                 }
             }
@@ -383,7 +398,9 @@ fun ActionButton(
 
 @Composable
 fun UserPostsSection(
-    userId: Long
+    postsState : UserPostsState,
+    userId: Long,
+    navController: NavController
 )
 {
     var list by remember{ mutableStateOf(true) }
@@ -423,21 +440,31 @@ fun UserPostsSection(
         modifier = Modifier
             .fillMaxWidth()
     ){
-        if(list){
-            PostsSection(userId = userId);
+        if(postsState.userPosts!=null){
+            if(list){
+                PostsSection(userId = userId, postsState.userPosts, navController);
+            }
+            if(map){
+                MapSection(userId = userId, postsState.userPosts,navController);
+            }
+        }else if(postsState.isLoading){
+            CircularProgressIndicator();
         }
-        if(map){
-            MapSection(userId = userId);
+        else{
+            Text("ERROR");
         }
     }
 }
 
 @Composable
 fun PostsSection(
-    userId : Long
+    userId : Long,
+    posts: List<Post>,
+    navController: NavController
 ){
     Column(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(
                 horizontal = 20.dp,
                 vertical = 20.dp
@@ -445,13 +472,92 @@ fun PostsSection(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text("List of posts");
+
+        if(posts.size < 1)
+        {
+            Text("No posts yet");
+        }
+        else{
+
+
+            var searchPosts by remember{ mutableStateOf(posts) }
+            var searchText by remember{ mutableStateOf("") }
+
+            val trailingIconView = @Composable {
+                IconButton(onClick = {
+                    searchText = ""
+                    searchPosts = posts;
+                }) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription ="",
+                        tint = Color.Black
+                    )
+                }
+            }
+
+            TextField(
+                value = searchText,
+                trailingIcon = if(searchText.isNotBlank()) trailingIconView else null,
+                onValueChange = {
+                    searchText = it
+                    if(searchText!="")
+                        searchPosts = posts.filter { p ->
+                            p.location.name.lowercase().contains(searchText.trim().lowercase());
+                        }
+                    else
+                        searchPosts = posts;
+                },
+                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null)},
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = {
+                    Text("Search user posts")
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.LightGray,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(20.dp)
+            )
+
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+            ){
+                items(searchPosts){
+                        post -> PostCard(post = post, navController = navController)
+                }
+            }
+
+
+        }
+    }
+}
+
+@Composable
+fun PostCard(
+    post : Post,
+    navController: NavController
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable{
+                navController.navigate(Screen.PostScreen.withArgs(post.postId))
+            }
+    ){
+        Text(post.location.name);
     }
 }
 
 @Composable
 fun MapSection(
-    userId : Long
+    userId : Long,
+    posts: List<Post>,
+    navController: NavController
 )
 {
     Column(
@@ -466,6 +572,6 @@ fun MapSection(
                 shape = RoundedCornerShape(5.dp)
             )
     ) {
-        MapWindow(userId)
+        MapWindow(userId, posts)
     }
 }

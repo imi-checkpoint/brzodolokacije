@@ -182,7 +182,7 @@ fun OneUser(
                 Log.d(
                     "ID",
                     user.id.toString()
-                ) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
+                )
                 navController.navigate(Screen.ProfileScreen.withArgs(user.id))
             },
         verticalAlignment = Alignment.CenterVertically,

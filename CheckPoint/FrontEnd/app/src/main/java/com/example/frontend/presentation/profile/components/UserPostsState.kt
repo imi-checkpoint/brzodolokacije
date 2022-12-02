@@ -1,4 +1,4 @@
-package com.example.frontend.presentation.map.components
+package com.example.frontend.presentation.profile.components
 
 import com.example.frontend.domain.model.Post
 
