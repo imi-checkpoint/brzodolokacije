@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
 import com.example.frontend.presentation.destinations.UserListScreenDestination
 import com.example.frontend.presentation.location.LocationCard
@@ -561,7 +562,9 @@ fun PostCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable{
-//                navController.navigate(Screen.PostScreen.withArgs(post.postId))
+                navigator.navigate(
+                    PostScreenDestination(post.postId)
+                )
             }
     ){
         Text(post.location.name);

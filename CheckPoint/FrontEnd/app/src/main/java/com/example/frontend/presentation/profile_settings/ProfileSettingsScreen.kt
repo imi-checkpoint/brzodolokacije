@@ -137,7 +137,7 @@ fun ProfileSettingsScreen(
         else{
             emailInput.value = viewModel.currentEmail
             ProfilePicture(navigator, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
-            UsernameAndEmail(navigator, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
+            UsernameAndEmail(navigator, state, stateEmailChange, viewModel, emailInput, emailFocusRequester, focusManager)
             Passwords(navigator, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
         }
     }
@@ -237,7 +237,8 @@ fun UsernameAndEmail(
     stateEmailChange: UserInfoChangeState,
     viewModel: ProfileSettingsViewModel,
     emailInput: MutableState<String>,
-    emailFocusRequester: FocusRequester
+    emailFocusRequester: FocusRequester,
+    focusManager: FocusManager
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -256,11 +257,16 @@ fun UsernameAndEmail(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        TextField(value = emailInput.value,
-            onValueChange = {emailInput.value = it},
-            label = { androidx.compose.material.Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        )
+        TextInput(
+            inputType = InputType.Mail,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }),
+            valuePar = emailInput.value,
+            onChange = {emailInput.value = it}
+        );
+
         
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -307,8 +313,7 @@ fun Passwords(
 
         var oldPasswordValue = "";
         TextInput(
-            inputType = InputType.Password,
-            focusRequester = oldPasswordFocusRequester,
+            inputType = InputType.OldPassword,
             keyboardActions = KeyboardActions(
                 onNext = {
                     newPassword1FocusRequester.requestFocus()
@@ -321,7 +326,7 @@ fun Passwords(
 
         var newPassword1Value = "";
         TextInput(
-            inputType = InputType.Password,
+            inputType = InputType.NewPassword,
             focusRequester = newPassword1FocusRequester,
             keyboardActions = KeyboardActions(
                 onDone = {
@@ -335,7 +340,7 @@ fun Passwords(
 
         var newPassword2Value = "";
         TextInput(
-            inputType = InputType.Password,
+            inputType = InputType.NewPasswordConfirm,
             focusRequester = newPassword2FocusRequester,
             keyboardActions = KeyboardActions(
                 onDone = {
