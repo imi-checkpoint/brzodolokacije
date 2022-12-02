@@ -68,34 +68,46 @@ fun ProfileScreen(
         }
     ){
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            TopBar(
-                name =
-                if(viewModel.savedUserId == viewModel.loginUserId)
-                    viewModel.username
-                else
-                    viewModel.othUsername
-                ,
-                modifier = Modifier.padding(20.dp),
-                navController = navController,
-                viewModel = viewModel
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-
-            ProfileSection(navController, state, pictureState, viewModel.savedUserId);
-            Spacer(modifier = Modifier.height(25.dp))
-
-            //ako nije moj profil
-            if(viewModel.savedUserId != viewModel.loginUserId){
-                ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
-                Spacer(modifier = Modifier.height(25.dp))
+        if(state.isLoading || pictureState.isLoading || postsState.isLoading){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                CircularProgressIndicator();
             }
+        }
+        else{
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                TopBar(
+                    name =
+                    if(viewModel.savedUserId == viewModel.loginUserId)
+                        viewModel.username
+                    else
+                        viewModel.othUsername
+                    ,
+                    modifier = Modifier.padding(20.dp),
+                    navController = navController,
+                    viewModel = viewModel
+                )
+                Spacer(modifier = Modifier.height(4.dp))
 
-            if(viewModel.savedUserId != 0L){
-                UserPostsSection(postsState, viewModel.savedUserId, navController);
+                ProfileSection(navController, state, pictureState, viewModel.savedUserId);
+                Spacer(modifier = Modifier.height(25.dp))
+
+                //ako nije moj profil
+                if(viewModel.savedUserId != viewModel.loginUserId){
+                    ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
+                    Spacer(modifier = Modifier.height(25.dp))
+                }
+
+                if(viewModel.savedUserId != 0L){
+                    UserPostsSection(postsState, viewModel.savedUserId, navController);
+                }
             }
         }
 
@@ -171,11 +183,7 @@ fun ProfileSection(
                 data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 builder = {}
             )
-
-            if(pictureState.isLoading){
-                CircularProgressIndicator();
-            }
-            else if(pictureState.error != ""){
+            if(pictureState.error != ""){
                 Image(
                     painter = painter,
                     contentDescription = "Profile image",
@@ -264,10 +272,7 @@ fun StatSection(
             Text("Error!");
         }
 
-        if(state.isLoading){
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
-        }
-        else if(state.profileData != null){
+        if(state.profileData != null){
             ProfileStat(numberText = state.profileData.postCount.toString(), text = "Posts",
             onClick = {})
             ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers",
@@ -447,8 +452,6 @@ fun UserPostsSection(
             if(map){
                 MapSection(userId = userId, postsState.userPosts,navController);
             }
-        }else if(postsState.isLoading){
-            CircularProgressIndicator();
         }
         else{
             Text("ERROR");

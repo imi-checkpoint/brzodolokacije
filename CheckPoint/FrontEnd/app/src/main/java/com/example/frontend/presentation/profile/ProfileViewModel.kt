@@ -123,6 +123,7 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Success -> {
                     this.getUserProfileData(savedUserId);
                     //da se na prethodnoj strani refreshuje state
+                    
                 }
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
