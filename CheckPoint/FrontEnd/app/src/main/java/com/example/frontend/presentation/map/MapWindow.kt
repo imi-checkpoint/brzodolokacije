@@ -80,6 +80,10 @@ fun MapWindow(
             onMapLoaded = {
 
             },
+            onMapLongClick = {
+                Log.d("Long click", "Map long click");
+                Log.d("LATLNG", it.toString());
+            },
             cameraPositionState = camPosState
         ){
 
