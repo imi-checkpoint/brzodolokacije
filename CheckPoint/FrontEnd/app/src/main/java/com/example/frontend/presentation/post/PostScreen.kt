@@ -26,12 +26,16 @@ import androidx.navigation.NavController
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Destination
 @Composable
 fun PostScreen(
-    navController: NavController,
+    postId : Long,
+    navigator : DestinationsNavigator,
     viewModel: PostViewModel = hiltViewModel()
 )
 {
@@ -49,7 +53,7 @@ fun PostScreen(
             )
         }
         else if(state.post!=null){
-            PostDetails(post = state.post, navController = navController)
+            PostDetails(post = state.post, navigator = navigator)
         }
 
     }
@@ -60,7 +64,7 @@ fun PostScreen(
 @Composable
 fun PostDetails(
     post: Post,
-    navController: NavController
+    navigator: DestinationsNavigator
 ){
     Column(
         modifier = Modifier
@@ -68,13 +72,13 @@ fun PostDetails(
     ){
 
         //sad se prikazuje samo prva
-        PostPhotos(post.photos, navController);
+        PostPhotos(post.photos, navigator);
         Spacer(modifier = Modifier.height(20.dp))
 
-        PostDescription(post, navController);
+        PostDescription(post, navigator);
         Spacer(modifier = Modifier.height(20.dp))
 
-        PostMap(post, navController)
+        PostMap(post, navigator)
         Spacer(modifier = Modifier.height(20.dp))
     }
 
@@ -84,7 +88,7 @@ fun PostDetails(
 @Composable
 fun PostPhotos(
     photos : List<Photo>,
-    navController: NavController,
+    navigator: DestinationsNavigator,
 )
 {
 
@@ -190,7 +194,7 @@ fun OnePhoto(
 @Composable
 fun PostDescription(
     post : Post,
-    navController: NavController
+    navigator: DestinationsNavigator
 ){
     Text(text = post.location.name);
     Text(text = post.appUserUsername);
@@ -203,7 +207,7 @@ fun PostDescription(
 @Composable
 fun PostMap(
     post : Post,
-    navController : NavController
+    navigator: DestinationsNavigator
 ){
     Text("POST MAP")
 }

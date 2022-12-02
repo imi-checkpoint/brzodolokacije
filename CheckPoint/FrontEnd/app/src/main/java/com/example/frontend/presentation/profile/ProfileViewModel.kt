@@ -71,7 +71,7 @@ class ProfileViewModel @Inject constructor(
     fun getProfileData()
     {
         savedStateHandle.get<Long>(USER_ID)?.let { userId ->
-            Log.d("PROFILE USERID", userId.toString())
+            Log.d("PROFILE USERID IS", userId.toString())
             savedUserId = userId;
             getUserProfileData(userId);
             getUserPhoto(userId);
@@ -123,7 +123,7 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Success -> {
                     this.getUserProfileData(savedUserId);
                     //da se na prethodnoj strani refreshuje state
-                    
+
                 }
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:

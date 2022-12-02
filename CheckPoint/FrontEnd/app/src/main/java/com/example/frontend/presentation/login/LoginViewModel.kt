@@ -14,7 +14,10 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.login_user.GetLoginUserIdUseCase
 import com.example.frontend.domain.use_case.login_user.LoginUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.login.components.LoginState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +40,7 @@ class LoginViewModel @Inject constructor(
     val context = application.baseContext
 
 
-    fun login(username:String, password:String, navController: NavController)
+    fun login(username:String, password:String, navigator : DestinationsNavigator)
     {
         loginUseCase(username, password).onEach { result ->
             when(result){
@@ -53,10 +56,7 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token, navController);
-
-
-
+                        saveUserId(result.data!!.access_token, navigator);
                     }
                 }
                 is Resource.Error -> {
@@ -70,7 +70,7 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun saveUserId(access_token: String, navController:NavController){
+    fun saveUserId(access_token: String, navigator : DestinationsNavigator){
         getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
@@ -79,11 +79,13 @@ class LoginViewModel @Inject constructor(
                         if (userId != null) {
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
 
-                            navController.navigate(Screen.MainLocationScreen.route){
-                                popUpTo(Screen.LoginScreen.route){
+                            navigator.navigate(
+                                MainLocationScreenDestination()
+                            ){
+                                popUpTo(LoginScreenDestination.route){
                                     inclusive = true;
                                 }
-                            };
+                            }
                         }
                 }
                 is Resource.Error -> {

@@ -40,6 +40,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
+import com.example.frontend.presentation.destinations.UserListScreenDestination
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.UserPostsState
@@ -47,12 +49,16 @@ import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Destination
 @Composable
 fun ProfileScreen(
-    navController: NavController,
+    userId : Long,
+    navigator : DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 )
 {
@@ -91,12 +97,12 @@ fun ProfileScreen(
                         viewModel.othUsername
                     ,
                     modifier = Modifier.padding(20.dp),
-                    navController = navController,
+                    navigator = navigator,
                     viewModel = viewModel
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
-                ProfileSection(navController, state, pictureState, viewModel.savedUserId);
+                ProfileSection(navigator, state, pictureState, viewModel.savedUserId);
                 Spacer(modifier = Modifier.height(25.dp))
 
                 //ako nije moj profil
@@ -106,7 +112,7 @@ fun ProfileScreen(
                 }
 
                 if(viewModel.savedUserId != 0L){
-                    UserPostsSection(postsState, viewModel.savedUserId, navController);
+                    UserPostsSection(postsState, viewModel.savedUserId, navigator);
                 }
             }
         }
@@ -118,7 +124,7 @@ fun ProfileScreen(
 fun TopBar(
     name : String,
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navigator : DestinationsNavigator,
     viewModel: ProfileViewModel
 ){
     Row(
@@ -128,7 +134,7 @@ fun TopBar(
             .fillMaxWidth()
     ){
         IconButton(onClick = {
-            navController.popBackStack()
+            navigator.popBackStack()
         }) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
@@ -147,7 +153,9 @@ fun TopBar(
 
         if(viewModel.savedUserId == viewModel.loginUserId)
             IconButton(onClick = {
-                navController.navigate(Screen.ProfileSettingsScreen.route)
+                navigator.navigate(
+                    ProfileSettingsScreenDestination()
+                )
             }) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -162,7 +170,7 @@ fun TopBar(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileSection(
-    navController: NavController,
+    navigator : DestinationsNavigator,
     state : ProfileDataState,
     pictureState : ProfilePictureState,
     userId : Long,
@@ -229,7 +237,7 @@ fun ProfileSection(
             
             Spacer(modifier = Modifier.width(16.dp))
 
-            StatSection(navController, state, userId, modifier.weight(7f))
+            StatSection(navigator, state, userId, modifier.weight(7f))
 
         }
     }
@@ -258,7 +266,7 @@ fun RoundImage(
 
 @Composable
 fun StatSection(
-    navController : NavController,
+    navigator : DestinationsNavigator,
     state : ProfileDataState,
     userId: Long,
     modifier: Modifier = Modifier
@@ -277,11 +285,15 @@ fun StatSection(
             onClick = {})
             ProfileStat(numberText = state.profileData.followersCount.toString(), text = "Followers",
             onClick = {
-                navController.navigate(Screen.UserListScreen.route + "/followers/${userId}");
+                navigator.navigate(
+                    UserListScreenDestination("followers", userId)
+                )
             })
             ProfileStat(numberText = state.profileData.followingCount.toString(), text = "Following",
             onClick = {
-                navController.navigate(Screen.UserListScreen.route + "/following/${userId}");
+                navigator.navigate(
+                    UserListScreenDestination("following", userId)
+                )
             })
         }
     }
@@ -405,7 +417,7 @@ fun ActionButton(
 fun UserPostsSection(
     postsState : UserPostsState,
     userId: Long,
-    navController: NavController
+    navigator : DestinationsNavigator
 )
 {
     var list by remember{ mutableStateOf(true) }
@@ -447,10 +459,10 @@ fun UserPostsSection(
     ){
         if(postsState.userPosts!=null){
             if(list){
-                PostsSection(userId = userId, postsState.userPosts, navController);
+                PostsSection(userId = userId, postsState.userPosts, navigator);
             }
             if(map){
-                MapSection(userId = userId, postsState.userPosts,navController);
+                MapSection(userId = userId, postsState.userPosts,navigator);
             }
         }
         else{
@@ -463,7 +475,7 @@ fun UserPostsSection(
 fun PostsSection(
     userId : Long,
     posts: List<Post>,
-    navController: NavController
+    navigator : DestinationsNavigator
 ){
     Column(
         modifier = Modifier
@@ -531,7 +543,7 @@ fun PostsSection(
                 verticalArrangement = Arrangement.spacedBy(15.dp),
             ){
                 items(searchPosts){
-                        post -> PostCard(post = post, navController = navController)
+                        post -> PostCard(post = post, navigator = navigator)
                 }
             }
 
@@ -543,13 +555,13 @@ fun PostsSection(
 @Composable
 fun PostCard(
     post : Post,
-    navController: NavController
+    navigator : DestinationsNavigator
 ){
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable{
-                navController.navigate(Screen.PostScreen.withArgs(post.postId))
+//                navController.navigate(Screen.PostScreen.withArgs(post.postId))
             }
     ){
         Text(post.location.name);
@@ -560,7 +572,7 @@ fun PostCard(
 fun MapSection(
     userId : Long,
     posts: List<Post>,
-    navController: NavController
+    navigator : DestinationsNavigator
 )
 {
     Column(

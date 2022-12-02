@@ -55,13 +55,16 @@ import com.example.frontend.presentation.profile_settings.components.ChangeProfi
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
 import com.example.frontend.presentation.profile_settings.components.UserInfoChangeState
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
 
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Destination
 @Composable
 fun ProfileSettingsScreen(
-    navController: NavController,
+    navigator : DestinationsNavigator,
     viewModel: ProfileSettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -109,7 +112,7 @@ fun ProfileSettingsScreen(
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            navController.popBackStack()
+            navigator.popBackStack()
         }) {
             androidx.compose.material.Icon(
                 Icons.Default.ArrowBack,
@@ -133,9 +136,9 @@ fun ProfileSettingsScreen(
         }
         else{
             emailInput.value = viewModel.currentEmail
-            ProfilePicture(navController, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
-            UsernameAndEmail(navController, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
-            Passwords(navController, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
+            ProfilePicture(navigator, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
+            UsernameAndEmail(navigator, state, stateEmailChange, viewModel, emailInput, emailFocusRequester)
+            Passwords(navigator, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
         }
     }
 }
@@ -143,7 +146,7 @@ fun ProfileSettingsScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilePicture(
-    navController: NavController,
+    navigator: DestinationsNavigator,
     viewModel: ProfileSettingsViewModel,
     stateGetMyProfilePicture: ProfilePictureState,
     stateChangeMyProfilePicture: ChangeProfilePictureState,
@@ -202,7 +205,7 @@ fun ProfilePicture(
 
                         if (viewModel.changePictureEnabled) {
                             Button(onClick = {
-                                viewModel.changeProfilePicture(navController)
+                                viewModel.changeProfilePicture(navigator)
                             },
                                 enabled = viewModel.changePictureEnabled,
                                 colors = ButtonDefaults.buttonColors(
@@ -229,7 +232,7 @@ fun ProfilePicture(
 
 @Composable
 fun UsernameAndEmail(
-    navController: NavController,
+    navigator: DestinationsNavigator,
     state : ProfileSettingsUserState,
     stateEmailChange: UserInfoChangeState,
     viewModel: ProfileSettingsViewModel,
@@ -263,7 +266,7 @@ fun UsernameAndEmail(
 
         Button(onClick = {
             viewModel.currentEmail = emailInput.value
-            viewModel.changeEmail(navController, emailInput.value)
+            viewModel.changeEmail(navigator, emailInput.value)
         },
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White
@@ -284,7 +287,7 @@ fun UsernameAndEmail(
 
 @Composable
 fun Passwords(
-    navController: NavController,
+    navigator: DestinationsNavigator,
     state : ProfileSettingsUserState,
     stateEmailChange: UserInfoChangeState,
     viewModel: ProfileSettingsViewModel,
@@ -345,7 +348,7 @@ fun Passwords(
         Spacer(modifier = Modifier.height(5.dp))
 
         Button(onClick = {
-            viewModel.changePassword(navController, oldPasswordValue, newPassword1Value, newPassword2Value)
+            viewModel.changePassword(navigator, oldPasswordValue, newPassword1Value, newPassword2Value)
         },
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White

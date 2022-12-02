@@ -37,14 +37,19 @@ import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.location.ProfileTopBar
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.Base64
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Destination
 @Composable
 fun PostsScreen(
-    navController: NavController,
+    locationId : Long,
+    navigator: DestinationsNavigator,
     viewModel : PostsViewModel = hiltViewModel()
 )
 {
@@ -58,7 +63,7 @@ fun PostsScreen(
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            navController.popBackStack()
+            navigator.popBackStack()
         }) {
             Icon(
                 Icons.Default.ArrowBack,
@@ -73,7 +78,7 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(state.posts, navController, viewModel, stateDelete)
+            AllPosts(state.posts, navigator, viewModel, stateDelete)
         }
     }
 }
@@ -82,7 +87,7 @@ fun PostsScreen(
 @Composable
 fun AllPosts(
     posts : List<Post>?,
-    navController: NavController,
+    navigator: DestinationsNavigator,
     viewModel : PostsViewModel,
     stateDelete: PostStringState
 )
@@ -99,7 +104,7 @@ fun AllPosts(
     else{
         LazyColumn{
             items(posts){
-                post -> PostCard(post, navController, viewModel, stateDelete)
+                post -> PostCard(post, navigator, viewModel, stateDelete)
             }
         }
     }
@@ -110,7 +115,7 @@ fun AllPosts(
 @Composable
 fun PostCard(
     post : Post,
-    navController: NavController,
+    navigator : DestinationsNavigator,
     viewModel : PostsViewModel,
     stateDelete: PostStringState
 )
@@ -124,7 +129,9 @@ fun PostCard(
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick ={
-            navController.navigate(Screen.PostScreen.withArgs(post.postId))
+            navigator.navigate(
+                PostScreenDestination(post.postId)
+            )
         }
     ){
         Row {
@@ -157,7 +164,7 @@ fun PostCard(
                 LazyRow(){
                     items(post.photos){
                         photo->
-                        PhotoCard(photo = photo, navController = navController)
+                        PhotoCard(photo = photo, navigator)
                     }
                 }
 
@@ -193,7 +200,7 @@ fun PostCard(
 @Composable
 fun PhotoCard(
     photo : Photo,
-    navController: NavController
+    navigator: DestinationsNavigator,
 ){
     Row(
         modifier = Modifier

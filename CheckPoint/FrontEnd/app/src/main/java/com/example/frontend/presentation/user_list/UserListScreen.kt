@@ -26,12 +26,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination
 @Composable
 fun UserListScreen(
-    navController: NavController,
+    userTypeList: String,
+    userId : Long,
+    navigator : DestinationsNavigator,
     viewModel: UserListViewModel = hiltViewModel()
 )
 {
@@ -66,7 +72,7 @@ fun UserListScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             else if(state.users != null){
-                UserList(userList = state.users, navController = navController)
+                UserList(userList = state.users, navigator = navigator)
             }
 
         }
@@ -139,7 +145,7 @@ fun UserListSearchBar(
 @Composable
 fun UserList(
     userList : List<User>?,
-    navController: NavController
+    navigator: DestinationsNavigator
 ){
     if(userList == null || userList.isEmpty()){
         Text(
@@ -163,7 +169,7 @@ fun UserList(
 
         ){
             items(userList){
-                user -> OneUser(user, navController = navController)
+                user -> OneUser(user, navigator = navigator)
             }
         }
 
@@ -173,7 +179,7 @@ fun UserList(
 @Composable
 fun OneUser(
     user : User,
-    navController: NavController
+    navigator: DestinationsNavigator
 ){
     Row(
         modifier = Modifier
@@ -183,7 +189,9 @@ fun OneUser(
                     "ID",
                     user.id.toString()
                 )
-                navController.navigate(Screen.ProfileScreen.withArgs(user.id))
+                navigator.navigate(
+                    ProfileScreenDestination(user.id)
+                )
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
