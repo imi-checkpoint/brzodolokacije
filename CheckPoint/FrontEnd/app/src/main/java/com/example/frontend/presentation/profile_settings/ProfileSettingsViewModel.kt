@@ -16,10 +16,12 @@ import com.example.frontend.domain.use_case.get_user.GetUserInfoUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeEmailUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangePasswordUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeProfilePictureUseCase
+import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.UserInfoChangeState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -125,7 +127,7 @@ class ProfileSettingsViewModel @Inject constructor(
         }
     }
 
-    fun changeProfilePicture(navController: NavController)
+    fun changeProfilePicture(navigator : DestinationsNavigator)
     {
         GlobalScope.launch(Dispatchers.IO){
             var access_token = DataStoreManager.getStringValue(context, "access_token")
@@ -146,7 +148,7 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         println("****////////********CHANGEMYPROFILEPICTURE SUCCESS ")
                         tempFile.delete()
-                        navController.navigate(Screen.ProfileSettingsScreen.route)
+                        navigator.navigate(ProfileSettingsScreenDestination())
                     }
                     is Resource.Error -> {
                         println("CHANGEMYPROFILEPICTURE ERROR" + result.message)
@@ -166,14 +168,14 @@ class ProfileSettingsViewModel @Inject constructor(
         changePictureEnabled = true;
     }
 
-    fun changeEmail(navController: NavController, newEmail: String)
+    fun changeEmail(navigator: DestinationsNavigator, newEmail: String)
     {
         GlobalScope.launch(Dispatchers.Main){
             changeEmailUseCase("Bearer "+ access_token, newEmail).onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _stateEmailChange.value = UserInfoChangeState(message = result.data ?: "")
-                        navController.navigate(Screen.ProfileSettingsScreen.route)
+                        navigator.navigate(ProfileSettingsScreenDestination())
                     }
                     is Resource.Error -> {
                         _stateEmailChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
@@ -186,7 +188,7 @@ class ProfileSettingsViewModel @Inject constructor(
         }
     }
 
-    fun changePassword(navController: NavController, oldPass: String, newPass1: String, newPass2: String)
+    fun changePassword(navigator: DestinationsNavigator, oldPass: String, newPass1: String, newPass2: String)
     {
         if (oldPass == "" || newPass1 == "" || newPass2 == "")
             return;
@@ -201,7 +203,7 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         _statePasswordChange.value = UserInfoChangeState(message = result.data ?: "")
                         if (result.data == "Changed") {
-                            navController.navigate(Screen.ProfileSettingsScreen.route)
+                            navigator.navigate(ProfileSettingsScreenDestination())
                         }
                     }
                     is Resource.Error -> {

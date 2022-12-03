@@ -19,93 +19,93 @@ import com.example.frontend.presentation.newpost.NovPostScreen
 import com.example.frontend.presentation.post.PostScreen
 import com.example.frontend.presentation.profile_settings.ProfileSettingsScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun Navigation()
-{
-    val navController = rememberNavController();
-    NavHost(navController = navController, startDestination = Screen.LoginScreen.route){
-        composable(route = Screen.LoginScreen.route){
-            LoginScreen(navController = navController)
-        }
-        composable(route = Screen.RegisterScreen.route){
-            RegisterScreen(navController = navController)
-        }
-        composable(route = Screen.MainLocationScreen.route){
-            MainLocationScreen(navController = navController)
-        }
-        composable(route = Screen.NovPostScreen.route){
-            NovPostScreen(navController = navController)
-        }
-        composable(
-            route = Screen.ProfileScreen.route + "/{userId}",
-            arguments = listOf(
-                navArgument("userId"){
-                    type = NavType.LongType
-                    defaultValue = 0
-                    nullable = false
-                }
-            )
-        ){
-            entry ->
-                ProfileScreen(navController = navController)
-        }
-        composable(route = Screen.ProfileSettingsScreen.route){
-            ProfileSettingsScreen(navController = navController)
-        }
-        composable(
-            route = Screen.PostsScreen.route + "/{locationId}",
-            arguments = listOf(
-                navArgument("locationId"){
-                    type = NavType.LongType
-                    defaultValue = 0
-                    nullable = false
-                }
-            )
-        ){
-                entry ->
-            PostsScreen(navController = navController)
-        }
-        composable(
-            route = Screen.UserListScreen.route + "/{userTypeList}/{userId}",
-            arguments = listOf(
-                navArgument("userTypeList"){
-                    type = NavType.StringType
-                    defaultValue = ""
-                    nullable = false
-                },
-                navArgument("userId"){
-                    type = NavType.LongType
-                    defaultValue = 0
-                    nullable = false
-                }
-            )
-        ){
-            entry ->
-                UserListScreen(navController = navController)
-        }
-        composable(
-            route = Screen.PostScreen.route + "/{postId}",
-            arguments = listOf(
-                navArgument("postId"){
-                    type = NavType.LongType
-                    defaultValue = 0L
-                    nullable = false
-                }
-            )
-        ){
-            entry->
-               PostScreen(navController = navController)
-        }
-
-    }
-}
-
-fun NavHostController.navigateAndClean(route : String){
-    navigate(route = route){
-        popUpTo(graph.startDestinationId){
-            inclusive = true;
-        }
-        graph.setStartDestination(route);
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Composable
+//fun Navigation()
+//{
+//    val navController = rememberNavController();
+//    NavHost(navController = navController, startDestination = Screen.LoginScreen.route){
+//        composable(route = Screen.LoginScreen.route){
+//            LoginScreen(navController = navController)
+//        }
+//        composable(route = Screen.RegisterScreen.route){
+//            RegisterScreen(navController = navController)
+//        }
+//        composable(route = Screen.MainLocationScreen.route){
+//            MainLocationScreen(navController = navController)
+//        }
+//        composable(route = Screen.NovPostScreen.route){
+//            NovPostScreen(navController = navController)
+//        }
+//        composable(
+//            route = Screen.ProfileScreen.route + "/{userId}",
+//            arguments = listOf(
+//                navArgument("userId"){
+//                    type = NavType.LongType
+//                    defaultValue = 0
+//                    nullable = false
+//                }
+//            )
+//        ){
+//            entry ->
+//                ProfileScreen(navController = navController)
+//        }
+//        composable(route = Screen.ProfileSettingsScreen.route){
+//            ProfileSettingsScreen(navController = navController)
+//        }
+//        composable(
+//            route = Screen.PostsScreen.route + "/{locationId}",
+//            arguments = listOf(
+//                navArgument("locationId"){
+//                    type = NavType.LongType
+//                    defaultValue = 0
+//                    nullable = false
+//                }
+//            )
+//        ){
+//                entry ->
+//            PostsScreen(navController = navController)
+//        }
+//        composable(
+//            route = Screen.UserListScreen.route + "/{userTypeList}/{userId}",
+//            arguments = listOf(
+//                navArgument("userTypeList"){
+//                    type = NavType.StringType
+//                    defaultValue = ""
+//                    nullable = false
+//                },
+//                navArgument("userId"){
+//                    type = NavType.LongType
+//                    defaultValue = 0
+//                    nullable = false
+//                }
+//            )
+//        ){
+//            entry ->
+//                UserListScreen(navController = navController)
+//        }
+//        composable(
+//            route = Screen.PostScreen.route + "/{postId}",
+//            arguments = listOf(
+//                navArgument("postId"){
+//                    type = NavType.LongType
+//                    defaultValue = 0L
+//                    nullable = false
+//                }
+//            )
+//        ){
+//            entry->
+//               PostScreen(navController = navController)
+//        }
+//
+//    }
+//}
+//
+//fun NavHostController.navigateAndClean(route : String){
+//    navigate(route = route){
+//        popUpTo(graph.startDestinationId){
+//            inclusive = true;
+//        }
+//        graph.setStartDestination(route);
+//    }
+//}
