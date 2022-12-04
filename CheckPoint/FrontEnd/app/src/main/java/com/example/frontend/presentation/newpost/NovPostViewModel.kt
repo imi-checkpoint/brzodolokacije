@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.newpost
 
+import Constants
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.compose.runtime.State
@@ -15,6 +16,7 @@ import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
 import com.example.frontend.domain.use_case.add_post.AddPostUseCase
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
+import com.example.frontend.domain.use_case.get_locations.SaveLocationUseCase
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.posts.components.PostsState
@@ -37,6 +39,7 @@ class NovPostViewModel@Inject constructor(
     private val addPhotoUseCase: AddPhotoUseCase,
     private val getAllLocationsUseCase: GetAllLocationsUseCase,
     private val getLocationsKeywordUseCase: GetLocationsKeywordUseCase,
+    private val saveLocationUseCase: SaveLocationUseCase,
     application: Application,
 
 ): ViewModel() {
@@ -212,4 +215,15 @@ class NovPostViewModel@Inject constructor(
             if(loc.id == _state.value.selected) return loc.name
         return ""
     }
+    fun proveriConstants(){
+        if(Constants.locationId != 0L){
+            _state.value = NovPostState(slike = _state.value.slike, lokacije = _state.value.lokacije, selected = Constants.locationId)
+            Constants.locationId = 0L
+            ucitajLokacije("")
+        }
+        else{
+            _state.value = NovPostState(slike = _state.value.slike, lokacije = _state.value.lokacije, selected = _state.value.selected)
+        }
+    }
+
 }

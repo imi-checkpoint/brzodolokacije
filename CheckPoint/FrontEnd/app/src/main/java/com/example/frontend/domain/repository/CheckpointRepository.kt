@@ -1,6 +1,7 @@
 package com.example.frontend.domain.repository
 
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import okhttp3.MultipartBody
 import retrofit2.http.GET
@@ -79,4 +80,6 @@ interface CheckpointRepository {
     suspend fun getUserProfilePicture(token : String, userId: Long) : String
 
     suspend fun changeProfilePicture(token : String, profile_image: MultipartBody.Part) : String
+
+    suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
 }

@@ -9,5 +9,7 @@ public class Constants{
         const val USER_ID = "userId"
 
         const val POST_ID = "postId"
+
+        var locationId:Long = 0
     }
 }

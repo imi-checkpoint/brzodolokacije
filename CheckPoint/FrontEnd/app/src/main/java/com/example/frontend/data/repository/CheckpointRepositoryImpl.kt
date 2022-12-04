@@ -3,6 +3,7 @@ package com.example.frontend.data.repository
 import android.util.Log
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
 import okhttp3.MultipartBody
@@ -171,6 +172,10 @@ class CheckpointRepositoryImpl(
 
     override suspend fun changeProfilePicture(token: String, profile_image: MultipartBody.Part): String {
         return api.changeProfilePicture(token, profile_image)
+    }
+
+    override suspend fun saveLocation(token: String, location: LocationDTO): LocationDTO {
+        return api.saveLocation(token, location)
     }
 
 }

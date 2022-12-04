@@ -15,10 +15,14 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import android.location.Geocoder
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
 @Composable
-fun NovPostMapScreen (navController: NavController) {
+fun NovPostMapScreen (
+    navController: NavController,
+    viewModel: NovPostMapViewModel =  hiltViewModel()
+) {
     val context = LocalContext.current
     val uiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false)
@@ -52,6 +56,8 @@ fun NovPostMapScreen (navController: NavController) {
         }
         GoogleMap(
             modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
                 .onGloballyPositioned { coords ->
                     mapWidth = with(localDensity) { coords.size.width }
                     mapHeight = with(localDensity) { coords.size.height }
@@ -65,7 +71,7 @@ fun NovPostMapScreen (navController: NavController) {
                 markerLatLng.value = it
                 markerPOI.value = null
                 imeLokacije.value = ""
-                var lokator = Geocoder(context)
+                /*var lokator = Geocoder(context)
                 var lista = lokator.getFromLocation(it.latitude, it.latitude, 0)
                 println(Geocoder.isPresent())
                 if (lista != null && lista.isNotEmpty()) {
@@ -73,7 +79,7 @@ fun NovPostMapScreen (navController: NavController) {
                     println(lista[0].countryName)
                 } else {
                     println("Prazno")
-                }
+                }*/
             },
             onPOIClick = {
                 markerLatLng.value = null
@@ -98,7 +104,14 @@ fun NovPostMapScreen (navController: NavController) {
                     singleLine = true,
                 )
             }
-            Button(onClick = { /*TODO*/ }, Modifier.wrapContentSize()) {
+            Button(onClick = {
+                if(markerLatLng.value != null) {
+                    viewModel.saveLocation(imeLokacije.value,markerLatLng.value!!,navController)
+                }
+                else{
+                    viewModel.saveLocation(markerPOI.value!!.name,markerPOI.value!!.latLng,navController)
+                }
+            }, Modifier.wrapContentSize()) {
                 Text("Set location")
             }
         }

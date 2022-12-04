@@ -47,6 +47,7 @@ fun NovPostScreen(navController:NavController,
                   viewModel : NovPostViewModel = hiltViewModel()){
     val context = LocalContext.current
     val state = viewModel.state.value
+    viewModel.proveriConstants()
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
         mutableStateOf<Bitmap>(myImage)

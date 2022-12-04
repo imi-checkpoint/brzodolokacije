@@ -1,6 +1,7 @@
 package com.example.frontend.data.remote
 
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import okhttp3.MultipartBody
 import retrofit2.http.*
@@ -253,4 +254,10 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("userId") userId: Long
     ) : String
+    @Headers("Content-Type: application/json")
+    @POST("location/save")
+    suspend fun saveLocation(
+        @Header("Authorization") token : String,
+        @Body location:LocationDTO
+    ) : LocationDTO
 }
