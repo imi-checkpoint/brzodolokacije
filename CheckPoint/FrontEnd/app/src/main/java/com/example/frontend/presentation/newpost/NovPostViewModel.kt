@@ -17,9 +17,11 @@ import com.example.frontend.domain.use_case.add_post.AddPostUseCase
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.domain.use_case.get_locations.SaveLocationUseCase
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.posts.components.PostsState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -51,7 +53,7 @@ class NovPostViewModel@Inject constructor(
         ucitajLokacije("")
     }
 
-    fun savePost(navController: NavController, description: String, locationId: Long) {
+    fun savePost(navigator: DestinationsNavigator, description: String, locationId: Long) {
         GlobalScope.launch(Dispatchers.Main) {
             var access_token = DataStoreManager.getStringValue(context, "access_token");
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
@@ -61,7 +63,7 @@ class NovPostViewModel@Inject constructor(
                     is Resource.Success -> {
                         var i = 0
                         for (photo: SlikaState in _state.value.slike) {
-                            addPhoto(navController, result.data!!.toLong(), i, photo)
+                            addPhoto(navigator, result.data!!.toLong(), i, photo)
                             i++;
                         }
                     }
@@ -76,7 +78,7 @@ class NovPostViewModel@Inject constructor(
         }
     }
 
-    fun addPhoto(navController: NavController, postId: Long, order: Int, slikaState: SlikaState) {
+    fun addPhoto(navigator : DestinationsNavigator, postId: Long, order: Int, slikaState: SlikaState) {
         GlobalScope.launch(Dispatchers.IO) {
             var access_token = DataStoreManager.getStringValue(context, "access_token")
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token")
@@ -106,7 +108,9 @@ class NovPostViewModel@Inject constructor(
                             }
                         }
                         if (flag == true) {
-                            navController.navigate(Screen.MainLocationScreen.route)
+                            navigator.navigate(
+                                MainLocationScreenDestination()
+                            )
                         } else {
                             println("Nisu sve poslate")
                         }

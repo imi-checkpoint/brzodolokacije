@@ -40,10 +40,13 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.io.File
 
+@Destination
 @Composable
-fun NovPostScreen(navController:NavController,
+fun NovPostScreen(navigator: DestinationsNavigator,
                   viewModel : NovPostViewModel = hiltViewModel()){
     val context = LocalContext.current
     val state = viewModel.state.value
@@ -77,7 +80,7 @@ fun NovPostScreen(navController:NavController,
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            navController.popBackStack()
+            navigator.popBackStack()
         }
         ) {
             Icon(
@@ -101,7 +104,7 @@ fun NovPostScreen(navController:NavController,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(viewModel.givePhotos()) { item ->
-                slika(navController = navController, photo = item, viewModel)
+                slika(navigator, photo = item, viewModel)
             }
         }
         //Image(bitmap = result.value.asImageBitmap(),"",Modifier.fillMaxWidth())
@@ -129,7 +132,7 @@ fun NovPostScreen(navController:NavController,
         Button(
             onClick = {
                 viewModel.savePost(
-                    navController,
+                    navigator,
                     description.value,
                     location.value.id
                 )
@@ -167,7 +170,7 @@ fun NovPostScreen(navController:NavController,
 
 @Composable
 fun slika(
-    navController: NavController,
+    navigator: DestinationsNavigator,
     photo:SlikaState,
     viewModel : NovPostViewModel
 ){

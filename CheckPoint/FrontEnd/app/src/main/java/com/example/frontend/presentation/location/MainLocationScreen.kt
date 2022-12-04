@@ -35,10 +35,16 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
+import com.example.frontend.presentation.destinations.NovPostScreenDestination
+import com.example.frontend.presentation.destinations.PostsScreenDestination
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination
 @Composable
 fun MainLocationScreen(
-    navController: NavController,
+    navigator : DestinationsNavigator,
     viewModel : LocationViewModel = hiltViewModel()
 )
 {
@@ -52,7 +58,7 @@ fun MainLocationScreen(
             .padding(20.dp)
     )
     {
-        ProfileTopBar(navController, viewModel)
+        ProfileTopBar(navigator, viewModel)
 
         LocationSearchBar(searchText, onChange = {
             searchText = it
@@ -68,7 +74,7 @@ fun MainLocationScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
-            LocationList(locationList = state.locations, navController = navController)
+            LocationList(locationList = state.locations, navigator)
         }
     }
 }
@@ -121,7 +127,7 @@ fun LocationSearchBar(
 @Composable
 fun LocationList(
     locationList : List<Location>?,
-    navController: NavController
+    navigator : DestinationsNavigator
 )
 {
 
@@ -141,7 +147,7 @@ fun LocationList(
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ){
             items(locationList){
-                    location -> LocationCard(location = location, navController = navController)
+                    location -> LocationCard(location = location, navigator)
             }
         }
     }
@@ -151,7 +157,7 @@ fun LocationList(
 @Composable
 fun LocationCard(
     location : Location,
-    navController: NavController
+    navigator : DestinationsNavigator
 )
 {
     val painter = rememberImagePainter(
@@ -171,7 +177,9 @@ fun LocationCard(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable{
-                    navController.navigate(Screen.PostsScreen.withArgs(location.id));
+                    navigator.navigate(
+                        PostsScreenDestination(location.id)
+                    )
                 }
                 .height(200.dp)
                 .fillMaxWidth()
@@ -187,7 +195,7 @@ fun LocationCard(
 
 @Composable
 fun ProfileTopBar(
-    navController: NavController,
+    navigator : DestinationsNavigator,
     viewModel: LocationViewModel
 )
 {
@@ -200,9 +208,9 @@ fun ProfileTopBar(
     ) {
         Row(){
             IconButton(onClick = {
-                navController.navigate(Screen.NovPostScreen.route)
-//                viewModel.getAllLocations()
-//                navController.navigate(Screen.ProfileScreen.route); //navigate to new post
+                navigator.navigate(
+                    NovPostScreenDestination()
+                )
             }) {
                 Icon(
                     Icons.Default.AddCircle,
@@ -213,7 +221,10 @@ fun ProfileTopBar(
 
             IconButton(onClick = {
                 viewModel.getAllLocations()
-                navController.navigate(Screen.ProfileScreen.withArgs(viewModel.loginUserId));
+                navigator.navigate(
+                    ProfileScreenDestination(viewModel.loginUserId)
+                );
+
             }) {
                 Icon(
                     Icons.Default.Person,
@@ -224,7 +235,7 @@ fun ProfileTopBar(
 
             IconButton(onClick = {
 //                viewModel.getAllLocations()
-//                navController.navigate(Screen.ProfileScreen.route); //navigate to messages
+//                navigator.navigate() //navigate to messages
             }) {
                 Icon(
                     Icons.Default.Send,
