@@ -39,9 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Post
-import com.example.frontend.presentation.destinations.PostScreenDestination
-import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
-import com.example.frontend.presentation.destinations.UserListScreenDestination
+import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.UserPostsState
@@ -66,6 +64,14 @@ fun ProfileScreen(
     val pictureState = viewModel.pictureState.value
     val postsState = viewModel.postsState.value
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    if(state.error.contains("403") || pictureState.error.contains("403") || postsState.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = isRefreshing),

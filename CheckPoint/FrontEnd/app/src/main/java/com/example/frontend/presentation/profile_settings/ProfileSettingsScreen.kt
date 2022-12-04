@@ -51,6 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
@@ -73,6 +75,15 @@ fun ProfileSettingsScreen(
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
     val stateChangeMyProfilePicture = viewModel.stateChangeProfilePicture.value
     val statePasswordChange = viewModel.statePasswordChange.value
+
+    if(state.error.contains("403") || stateEmailChange.error.contains("403") || stateGetMyProfilePicture.error.contains("403")
+        || stateChangeMyProfilePicture.error.contains("403") || statePasswordChange.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
     var emailInput = remember {
         mutableStateOf("")

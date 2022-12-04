@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.domain.model.Location
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.NovPostMapScreenDestination
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
@@ -50,6 +52,16 @@ fun NovPostScreen(navigator: DestinationsNavigator,
                   viewModel : NovPostViewModel = hiltViewModel()){
     val context = LocalContext.current
     val state = viewModel.state.value
+
+
+    if(state.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
+
     viewModel.proveriConstants()
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {

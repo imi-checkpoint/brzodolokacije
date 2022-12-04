@@ -39,6 +39,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.example.frontend.presentation.posts.components.PostStringState
@@ -59,6 +61,14 @@ fun PostsScreen(
 
     val state = viewModel.state.value
     val stateDelete = viewModel.stateDelete.value
+
+    if(state.error.contains("403") || stateDelete.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
     
     Column(
         modifier = Modifier
