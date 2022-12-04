@@ -12,6 +12,8 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
@@ -84,17 +87,11 @@ fun ProfileSettingsScreen(
     val stateChangeProfilePicture = viewModel.stateChangeProfilePicture.value
     val statePasswordChange = viewModel.statePasswordChange.value
 
-    var emailInput = remember {
-        mutableStateOf("")
-    }
-
-    var emailFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
-
+    var emailFocusRequester = FocusRequester()
     var oldPasswordFocusRequester = FocusRequester()
     var newPassword1FocusRequester = FocusRequester()
     var newPassword2FocusRequester = FocusRequester()
-
 
     val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
     val result = remember {
@@ -121,15 +118,15 @@ fun ProfileSettingsScreen(
     }
 
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            //navigator.popBackStack();
-            navigator.navigate(ProfileScreenDestination(viewModel.loginUserId)) //ne radi na back dugme na telefonu
+            navigator.popBackStack()
+            //navigator.clearBackStack()
+            //navigator.navigate(ProfileScreenDestination(viewModel.loginUserId)) //ne radi na back dugme na telefonu
         }) {
             androidx.compose.material.Icon(
                 Icons.Default.ArrowBack,
@@ -138,7 +135,6 @@ fun ProfileSettingsScreen(
             )
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -152,11 +148,9 @@ fun ProfileSettingsScreen(
             Text("An error occured while loading user info!");
         }
         else{
-            println("ucitao podatke korisnika")
-            emailInput.value = viewModel.currentEmail
-            ProfilePicture(navigator, viewModel, stateGetMyProfilePicture, stateChangeProfilePicture, choseImage, result, context)
-            UsernameAndEmail(navigator, state, stateEmailChange, viewModel, emailInput, emailFocusRequester, focusManager)
-            Passwords(navigator, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
+            ProfilePicture(viewModel, stateGetMyProfilePicture, choseImage, result)
+            UsernameAndEmail(navigator, state, viewModel, focusManager)
+            Passwords(viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
         }
     }
 }
@@ -164,18 +158,16 @@ fun ProfileSettingsScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilePicture(
-    navigator: DestinationsNavigator,
     viewModel: ProfileSettingsViewModel,
     stateGetMyProfilePicture: ProfilePictureState,
-    stateChangeProfilePicture: ChangeProfilePictureState,
     choseImage: ManagedActivityResultLauncher<String, Uri?>,
     result: MutableState<Bitmap>,
-    context: Context
     ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 80.dp, bottom = 20.dp)
+            .padding(start = 50.dp, end = 20.dp, top = 65.dp, bottom = 0.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
 
         var picture = stateGetMyProfilePicture.picture
@@ -193,9 +185,8 @@ fun ProfilePicture(
                     //bitmap = if(viewModel.flagPictureFirstShow) mapa.asImageBitmap() else result.value.asImageBitmap(),
                         bitmap = result.value.asImageBitmap(),
                     modifier = Modifier
-                        .height(100.dp)
-                        .width(100.dp)
-                        //.weight(3f)
+                        .height(120.dp)
+                        .width(120.dp)
                         .clip(CircleShape)
                         .align(Alignment.CenterVertically),
                     contentDescription = "Profile image",
@@ -205,12 +196,12 @@ fun ProfilePicture(
                 Column(
 
                 ) {
-
                     IconButton(onClick = {
                         choseImage.launch("image/*")
-                    }, modifier = Modifier
-                        .border(0.dp, Color.Gray, RectangleShape)
-                        .size(30.dp)
+                    },
+                        modifier = Modifier
+                            .border(0.dp, Color.Gray, RectangleShape)
+                            .size(30.dp)
                     ) {
                         Icon(
                             Icons.Filled.ModeEdit,
@@ -219,8 +210,6 @@ fun ProfilePicture(
                             modifier = Modifier.size(20.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(70.dp))
                 }
             }
         }
@@ -231,28 +220,25 @@ fun ProfilePicture(
 fun UsernameAndEmail(
     navigator: DestinationsNavigator,
     state : ProfileSettingsUserState,
-    stateEmailChange: UserInfoChangeState,
     viewModel: ProfileSettingsViewModel,
-    emailInput: MutableState<String>,
-    emailFocusRequester: FocusRequester,
     focusManager: FocusManager
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 40.dp, end = 40.dp, top = 30.dp, bottom = 10.dp)
+            .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 30.dp)
     ) {
 
         Text(
             text = "${state.user?.username}",
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Medium,
+            fontFamily = FontFamily.SansSerif,
             color = Color.DarkGray,
-            fontSize = 20.sp
+            fontSize = 25.sp
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         TextInput(
             inputType = InputType.Mail,
@@ -260,28 +246,26 @@ fun UsernameAndEmail(
                 onDone = {
                     focusManager.clearFocus()
                 }),
-            valuePar = emailInput.value,
-            onChange = {emailInput.value = it}
+            valuePar = viewModel.currentEmail,
+            onChange = {viewModel.currentEmail = it}
         );
 
-        
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = {
-            viewModel.currentEmail = emailInput.value
-            viewModel.changeEmail(navigator, emailInput.value)
+            viewModel.changeEmail(navigator)
         },
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White
             ),
             modifier = Modifier
-                .height(30.dp)
-                .width(100.dp)
+                .height(38.dp)
+                .width(110.dp)
         ) {
             Text(
                 text = "Update email",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.White
             )
         }
@@ -290,9 +274,6 @@ fun UsernameAndEmail(
 
 @Composable
 fun Passwords(
-    navigator: DestinationsNavigator,
-    state : ProfileSettingsUserState,
-    stateEmailChange: UserInfoChangeState,
     viewModel: ProfileSettingsViewModel,
     oldPasswordFocusRequester: FocusRequester,
     newPassword1FocusRequester: FocusRequester,
@@ -302,26 +283,26 @@ fun Passwords(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
 
-        var oldPasswordValue = "";
         TextInput(
             inputType = InputType.OldPassword,
+            focusRequester = oldPasswordFocusRequester,
             keyboardActions = KeyboardActions(
                 onNext = {
                     newPassword1FocusRequester.requestFocus()
                 }),
-            valuePar = oldPasswordValue,
-            onChange = {oldPasswordValue = it}
+            valuePar = viewModel.currentOldPassInputValue,
+            onChange = {viewModel.currentOldPassInputValue = it}
         )
 
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        var newPassword1Value = "";
         TextInput(
             inputType = InputType.NewPassword,
             focusRequester = newPassword1FocusRequester,
@@ -329,13 +310,12 @@ fun Passwords(
                 onDone = {
                     newPassword2FocusRequester.requestFocus()
                 }),
-            valuePar = newPassword1Value,
-            onChange = {newPassword1Value = it}
+            valuePar = viewModel.currentNewPass1InputValue,
+            onChange = {viewModel.currentNewPass1InputValue = it}
         )
 
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        var newPassword2Value = "";
         TextInput(
             inputType = InputType.NewPasswordConfirm,
             focusRequester = newPassword2FocusRequester,
@@ -343,26 +323,26 @@ fun Passwords(
                 onDone = {
                     focusManager.clearFocus()
                 }),
-            valuePar = newPassword2Value,
-            onChange = {newPassword2Value = it}
+            valuePar = viewModel.currentNewPass2InputValue,
+            onChange = {viewModel.currentNewPass2InputValue = it}
         )
 
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = {
-            viewModel.changePassword(navigator, oldPasswordValue, newPassword1Value, newPassword2Value)
+            viewModel.changePassword()
         },
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White
             ),
             modifier = Modifier
-                .height(30.dp)
-                .width(120.dp)
+                .height(40.dp)
+                .width(130.dp)
         ) {
             Text(
                 text = "Update password",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.White
             )
         }
