@@ -14,9 +14,11 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.login_user.GetLoginUserIdUseCase
 import com.example.frontend.domain.use_case.login_user.LoginUseCase
+import com.example.frontend.presentation.NavGraphs
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.login.components.LoginState
+import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,6 +80,7 @@ class LoginViewModel @Inject constructor(
                         Log.d("User id", "Fetched user id ${userId}")
                         if (userId != null) {
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
+
 
                             navigator.navigate(
                                 MainLocationScreenDestination()

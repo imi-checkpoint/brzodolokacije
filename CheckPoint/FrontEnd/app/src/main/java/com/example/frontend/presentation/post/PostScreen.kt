@@ -4,9 +4,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
+import android.widget.RatingBar
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -19,16 +24,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
-import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import java.util.*
+import kotlin.math.absoluteValue
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Destination
@@ -71,8 +82,10 @@ fun PostDetails(
             .fillMaxWidth()
     ){
 
-        //sad se prikazuje samo prva
-        PostPhotos(post.photos, navigator);
+        //photo slider
+        if(post.photos.size > 0)
+            ImagePagerSlider(post.photos);
+
         Spacer(modifier = Modifier.height(20.dp))
 
         PostDescription(post, navigator);
@@ -84,112 +97,110 @@ fun PostDetails(
 
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
 @Composable
-fun PostPhotos(
-    photos : List<Photo>,
-    navigator: DestinationsNavigator,
-)
-{
+fun ImagePagerSlider(
+    photos: List<Photo>
+){
+
+    val pagerState = rememberPagerState(
+        pageCount = photos.size,
+        initialPage = 0
+    )
+
+//    LaunchedEffect(Unit){
+//        while(true){
+//            yield()
+//            delay(2000)
+//            pagerState.animateScrollToPage(
+//                page = (pagerState.currentPage + 1) % pagerState.pageCount,
+//                animationSpec = tween(600)
+//            )
+//        }
+//    }
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-    ) {
-
-        if(photos != null && photos.size != 0)
-        {
-            PhotoSlider(photos)
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun PhotoSlider(
-    photos : List<Photo>
-)
-{
-    var index by remember{
-        mutableStateOf(0)
-    }
-
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ){
-        OnePhoto(photos = photos, index = index)
-    }
-
-
-    Row(
-        modifier = Modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ){
-        IconButton(
-            onClick =
-            {
-                index -= 1 ;
-                Log.d("NEW INDEX", index.toString());
-            },
-            enabled = if(photos.size > 1 && index!=0) true else false
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = if(photos.size > 1 && index!=0) Color.Black else Color.Gray,
-                modifier = Modifier.size(20.dp),
-            )
-        }
 
-        IconButton(
-            onClick =
-            {
-                index += 1 ;
-                Log.d("NEW INDEX", index.toString());
-            },
-            enabled = if(photos.size > 1 && index != (photos.size - 1) ) true else false
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = "Forward",
-                tint = if(photos.size > 1 && index != (photos.size - 1) ) Color.Black else Color.Gray,
-                modifier = Modifier.size(20.dp),
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+        ){
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(0.dp, 40.dp, 0.dp, 40.dp)
+            ) {
+                    page->
+                Card(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
+                            }
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            )
+                        }
+                        .fillMaxWidth()
+                        .padding(25.dp, 0.dp, 25.dp, 0.dp),
+                    shape = RoundedCornerShape(20.dp)
+                ){
+
+                    val photo = photos[page];
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.LightGray)
+                            .align(Alignment.Center)
+                    )
+
+                    val decoder = Base64.getDecoder()
+                    val photoBytes = decoder.decode(photo.photo.data)
+                    if(photoBytes.size>1) {
+                        val mapa: Bitmap =
+                            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
+                        print(mapa.byteCount)
+                        if (mapa != null) {
+                            Image(
+                                bitmap = mapa.asImageBitmap(),
+                                contentDescription = "",
+                                contentScale = ContentScale.FillHeight
+                            )
+                        }
+                    }
+                }
+            }
         }
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
+        )
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun OnePhoto(
-    photos : List<Photo>,
-    index : Int
-){
-   Column(
-       modifier = Modifier
-           .fillMaxWidth()
-           .height(250.dp),
-       horizontalAlignment = Alignment.CenterHorizontally,
-       verticalArrangement = Arrangement.Center
-   ) {
-       val photo = photos.get(index);
-
-       val decoder = Base64.getDecoder()
-       val photoBytes = decoder.decode(photo.photo.data)
-       if(photoBytes.size>1){
-           val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
-           print(mapa.byteCount)
-           if(mapa!=null){
-               Image(
-                   bitmap = mapa.asImageBitmap(),
-                   contentDescription ="" ,
-                   contentScale = ContentScale.FillHeight
-               )
-           }
-       }
-   }
-}
 
 @Composable
 fun PostDescription(
@@ -211,4 +222,3 @@ fun PostMap(
 ){
     Text("POST MAP")
 }
-

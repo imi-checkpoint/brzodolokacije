@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -156,17 +157,18 @@ fun PostCard(
                         DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
                 }
 
+                Row(){
+                    if(post.photos.size > 0){
+                        Spacer(modifier = Modifier.height(5.dp))
+                        PhotoCard(photo = post.photos[0], navigator)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "${post.description}",
                     color = Color.DarkGray
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(){
-                    items(post.photos){
-                        photo->
-                        PhotoCard(photo = photo, navigator)
-                    }
-                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -205,7 +207,7 @@ fun PhotoCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(150.dp)
     ) {
         println(photo.photo.data.toByteArray().size)
         val decoder = Base64.getDecoder()
@@ -214,8 +216,10 @@ fun PhotoCard(
             val mapa:Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
             print(mapa.byteCount)
             if(mapa!=null){
-                Image(bitmap = mapa.asImageBitmap(),
-                    contentDescription = ""
+                Image(
+                    bitmap = mapa.asImageBitmap(),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
                 )
             }
         }
