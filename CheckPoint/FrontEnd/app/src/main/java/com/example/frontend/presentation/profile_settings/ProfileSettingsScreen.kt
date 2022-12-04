@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.profile_settings
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,7 +15,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
@@ -33,13 +36,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
@@ -49,8 +55,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
+import com.example.frontend.presentation.destinations.UserListScreenDestination
+import com.example.frontend.presentation.profile.ProfileScreen
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
@@ -71,7 +81,7 @@ fun ProfileSettingsScreen(
     val state = viewModel.state.value
     val stateEmailChange = viewModel.stateEmailChange.value
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
-    val stateChangeMyProfilePicture = viewModel.stateChangeProfilePicture.value
+    val stateChangeProfilePicture = viewModel.stateChangeProfilePicture.value
     val statePasswordChange = viewModel.statePasswordChange.value
 
     var emailInput = remember {
@@ -96,15 +106,21 @@ fun ProfileSettingsScreen(
         {
             if(Build.VERSION.SDK_INT < 29){
                 result.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                //viewModel.imgbitmap = result.value
                 viewModel.parsePhoto(result.value)
+                viewModel.changeProfilePicture(navigator)
             }
             else {
                 val source = ImageDecoder.createSource(context.contentResolver, it as Uri)
                 result.value = ImageDecoder.decodeBitmap(source)
+                //viewModel.imgbitmap = result.value
                 viewModel.parsePhoto(result.value)
+                viewModel.changeProfilePicture(navigator)
             }
         }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -112,7 +128,8 @@ fun ProfileSettingsScreen(
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            navigator.popBackStack()
+            //navigator.popBackStack();
+            navigator.navigate(ProfileScreenDestination(viewModel.loginUserId)) //ne radi na back dugme na telefonu
         }) {
             androidx.compose.material.Icon(
                 Icons.Default.ArrowBack,
@@ -128,15 +145,16 @@ fun ProfileSettingsScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        if(state.isLoading){
+        if(state.isLoading || stateGetMyProfilePicture.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else if(state.error != ""){
             Text("An error occured while loading user info!");
         }
         else{
+            println("ucitao podatke korisnika")
             emailInput.value = viewModel.currentEmail
-            ProfilePicture(navigator, viewModel, stateGetMyProfilePicture, stateChangeMyProfilePicture, choseImage, result)
+            ProfilePicture(navigator, viewModel, stateGetMyProfilePicture, stateChangeProfilePicture, choseImage, result, context)
             UsernameAndEmail(navigator, state, stateEmailChange, viewModel, emailInput, emailFocusRequester, focusManager)
             Passwords(navigator, state, stateEmailChange, viewModel, oldPasswordFocusRequester, newPassword1FocusRequester, newPassword2FocusRequester, focusManager)
         }
@@ -149,81 +167,60 @@ fun ProfilePicture(
     navigator: DestinationsNavigator,
     viewModel: ProfileSettingsViewModel,
     stateGetMyProfilePicture: ProfilePictureState,
-    stateChangeMyProfilePicture: ChangeProfilePictureState,
+    stateChangeProfilePicture: ChangeProfilePictureState,
     choseImage: ManagedActivityResultLauncher<String, Uri?>,
-    result: MutableState<Bitmap>
-) {
+    result: MutableState<Bitmap>,
+    context: Context
+    ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp, top = 80.dp, bottom = 20.dp)
     ) {
 
-        if(stateGetMyProfilePicture.isLoading){
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
-        }
-        else if(stateGetMyProfilePicture.error != ""){
-            Text("An error occured while loading user profile picture!");
-        }
-        else {
-            var picture = stateGetMyProfilePicture.picture
-            //viewModel.currentPicture = picture;
-            //println(picture.toByteArray().size)
-            val decoder = Base64.getDecoder()
-            val photoInBytes = decoder.decode(picture)
-            if(photoInBytes.size > 1) {
-                val mapa: Bitmap = BitmapFactory.decodeByteArray(photoInBytes,0, photoInBytes.size)
-                //print(mapa.byteCount)
-                if(mapa != null) {
-                    Image(bitmap = if(viewModel.changePictureEnabled) result.value.asImageBitmap() else mapa.asImageBitmap(),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .weight(3f)
-                            .align(Alignment.CenterVertically)
-                    )
+        var picture = stateGetMyProfilePicture.picture
+        val decoder = Base64.getDecoder()
+        val photoInBytes = decoder.decode(picture)
 
-                    Column(
+        if(photoInBytes.size > 1) {
+            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoInBytes,0, photoInBytes.size)
+            if(mapa != null) {
+                if (!viewModel.changePictureEnabled)
+                    result.value = mapa;
+                //println("*************usao")
+                    Image(
+                    //bitmap = if(viewModel.changePictureEnabled) result.value.asImageBitmap() else mapa.asImageBitmap(),
+                    //bitmap = if(viewModel.flagPictureFirstShow) mapa.asImageBitmap() else result.value.asImageBitmap(),
+                        bitmap = result.value.asImageBitmap(),
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(100.dp)
+                        //.weight(3f)
+                        .clip(CircleShape)
+                        .align(Alignment.CenterVertically),
+                    contentDescription = "Profile image",
+                    contentScale = ContentScale.Crop
+                )
 
+                Column(
+
+                ) {
+
+                    IconButton(onClick = {
+                        choseImage.launch("image/*")
+                    }, modifier = Modifier
+                        .border(0.dp, Color.Gray, RectangleShape)
+                        .size(30.dp)
                     ) {
-
-                        IconButton(onClick = {
-                            choseImage.launch("image/*")
-                        }, modifier = Modifier
-                            .border(0.dp, Color.Gray, RectangleShape)
-                            .size(30.dp)
-                        ) {
-                            Icon(
-                                Icons.Filled.ModeEdit,
-                                contentDescription = "",
-                                tint = Color.DarkGray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(70.dp))
-
-                        if (viewModel.changePictureEnabled) {
-                            Button(onClick = {
-                                viewModel.changeProfilePicture(navigator)
-                            },
-                                enabled = viewModel.changePictureEnabled,
-                                colors = ButtonDefaults.buttonColors(
-                                    contentColor = Color.White
-                                ),
-                                modifier = Modifier
-                                    .height(30.dp)
-                                    .width(100.dp)
-                            ) {
-                                Text(
-                                    text = "Update photo",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
+                        Icon(
+                            Icons.Filled.ModeEdit,
+                            contentDescription = "",
+                            tint = Color.DarkGray,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
+
+                    Spacer(modifier = Modifier.height(70.dp))
                 }
             }
         }

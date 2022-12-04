@@ -61,6 +61,8 @@ class ProfileSettingsViewModel @Inject constructor(
     val stateChangeProfilePicture : State<ChangeProfilePictureState> = _stateChangeProfilePicture
     var changePictureEnabled: Boolean = false;
     var currentPicture: String = "";
+    //var flagPictureFirstShow = true;
+    var imgbitmap: Bitmap? = null;
 
 
     private val _statePasswordChange = mutableStateOf(UserInfoChangeState())
@@ -148,7 +150,9 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         println("****////////********CHANGEMYPROFILEPICTURE SUCCESS ")
                         tempFile.delete()
-                        navigator.navigate(ProfileSettingsScreenDestination())
+                        //navigator.navigate(ProfileSettingsScreenDestination())
+                        changePictureEnabled = true;
+                        println(result.data)
                     }
                     is Resource.Error -> {
                         println("CHANGEMYPROFILEPICTURE ERROR" + result.message)
