@@ -6,9 +6,9 @@ data class Post(
     val appUserId:Long,
     val appUserUsername:String,
     val location: Location,
-    val numberOfLikes:Int,
+    var numberOfLikes:Int,
     val numberOfComments:Int,
-    val isLiked:Boolean,
+    var isLiked:Boolean,
     val photos:List<Photo>,
     //val videos:List<Video>
 )
