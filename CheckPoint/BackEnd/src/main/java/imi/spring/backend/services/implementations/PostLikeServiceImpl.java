@@ -9,6 +9,7 @@ import imi.spring.backend.services.JWTService;
 import imi.spring.backend.services.PostLikeService;
 import imi.spring.backend.services.PostService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class PostLikeServiceImpl implements PostLikeService {
@@ -47,9 +49,11 @@ public class PostLikeServiceImpl implements PostLikeService {
         PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, user.getId());
         if (postLike == null){ //like
             postLikeRepository.save(new PostLike(post, user, LocalDateTime.now()));
+            //log.info("Liked post with id {}", post.getId());
             return "Liked";
         }
         postLikeRepository.delete(postLike); //unlike
+        //log.info("Unliked post with id {}", post.getId());
         return "Unliked";
     }
 
