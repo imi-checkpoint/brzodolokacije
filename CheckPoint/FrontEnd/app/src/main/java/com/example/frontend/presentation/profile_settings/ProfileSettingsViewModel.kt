@@ -82,7 +82,8 @@ class ProfileSettingsViewModel @Inject constructor(
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
 
-            getMyData();
+            //Constants.refreshPhotoConstant = loginUserId
+            getMyData()
             getMyProfilePicture()
         }
     }
@@ -135,6 +136,9 @@ class ProfileSettingsViewModel @Inject constructor(
     fun changeProfilePicture(navigator : DestinationsNavigator)
     {
         GlobalScope.launch(Dispatchers.IO){
+
+            Constants.refreshPhotoConstant = loginUserId
+
             var access_token = DataStoreManager.getStringValue(context, "access_token")
             var refresh_token = DataStoreManager.getStringValue(context, "refresh_token")
             val path = context.getExternalFilesDir(null)!!.absolutePath
