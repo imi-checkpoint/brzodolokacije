@@ -203,9 +203,9 @@ fun ProfileSection(
                     contentDescription = "Profile image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(100.dp)
-                        .weight(3f) //da zauzima 3 sirine ovog reda
-                        .clip(CircleShape)
+                        .height(100.dp)
+                        .width(100.dp)
+                        .clip(CircleShape),
                 )
             }
             else{
@@ -219,8 +219,8 @@ fun ProfileSection(
                         Image(
                             bitmap = mapa.asImageBitmap(),
                             modifier = Modifier
-                                .size(100.dp)
-                                .weight(3f) //da zauzima 3 sirine ovog reda
+                                .height(100.dp)
+                                .width(100.dp)
                                 .clip(CircleShape),
                             contentDescription ="Profile image" ,
                             contentScale = ContentScale.Crop
@@ -234,9 +234,9 @@ fun ProfileSection(
                         contentDescription = "Profile image",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(100.dp)
-                            .weight(3f) //da zauzima 3 sirine ovog reda
-                            .clip(CircleShape)
+                            .height(100.dp)
+                            .width(100.dp)
+                            .clip(CircleShape),
                     )
                 }
             }

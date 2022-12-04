@@ -91,7 +91,7 @@ public class AppUserServiceImpl implements AppUserService {
             return "Changed";
         }
 
-        log.info("Incorrect old password.");
+        log.error("Incorrect old password.");
         return "Invalid old password";
     }
 

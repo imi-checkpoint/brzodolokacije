@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.data.remote.dto.PostDTO
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.LoginScreenDestination
@@ -258,12 +259,12 @@ fun PhotoCard(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DeletePostButton(
-    postId: Long,
+    post: Post,
     viewModel: PostsViewModel,
     stateDelete: PostStringState
 ) {
     IconButton(onClick = {
-        viewModel.deletePostById(postId)
+        viewModel.deletePostById(post.postId, post.location.id)
     }) {
         Icon(
             Icons.Default.Delete,
@@ -287,6 +288,11 @@ fun LikeOrUnlikePostButton(
 ) {
     IconButton(onClick = {
         viewModel.likeOrUnlikePostById(post.postId)
+        post.isLiked = !post.isLiked
+        if (post.isLiked)
+            post.numberOfLikes += 1;
+        else
+            post.numberOfLikes -= 1;
     }) {
         Icon(
             if(post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

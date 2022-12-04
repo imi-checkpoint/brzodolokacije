@@ -46,7 +46,6 @@ class PostsViewModel @Inject constructor(
 
     private val _stateDelete = mutableStateOf(PostStringState())
     val stateDelete : State<PostStringState> = _stateDelete;
-    var locationIdTemp = savedStateHandle.get<Long>(LOCATION_ID);
 
     private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
     val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
@@ -55,7 +54,6 @@ class PostsViewModel @Inject constructor(
         savedStateHandle.get<Long>(LOCATION_ID)?.let { locationId ->
             Log.d("Location id", locationId.toString())
             getAllPostsForLocation(locationId)
-            locationIdTemp = locationId;
         }
     }
 
@@ -128,7 +126,7 @@ class PostsViewModel @Inject constructor(
     }
 
 
-    fun deletePostById(postId: Long)
+    fun deletePostById(postId: Long, locationId: Long)
     {
         GlobalScope.launch(Dispatchers.IO){
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
@@ -138,7 +136,7 @@ class PostsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _stateDelete.value = PostStringState(message = result.data ?: "")
-                        getAllPostsForLocation(locationIdTemp!!)
+                        getAllPostsForLocation(locationId)
                     }
                     is Resource.Error -> {
                         _stateDelete.value = PostStringState(error = result.message ?:
@@ -167,7 +165,6 @@ class PostsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
-                        getAllPostsForLocation(locationIdTemp!!)
                     }
                     is Resource.Error -> {
                         _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
