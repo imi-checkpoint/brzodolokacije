@@ -23,6 +23,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DoorSliding
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.outlined.ChangeCircle
 import androidx.compose.material.icons.outlined.Save
@@ -122,14 +124,32 @@ fun ProfileSettingsScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        IconButton(onClick = {
-            navigator.popBackStack()
-        }) {
-            androidx.compose.material.Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "",
-                tint = Color.DarkGray
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            IconButton(onClick = {
+                navigator.popBackStack()
+            }) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "",
+                    tint = Color.DarkGray
+                )
+            }
+
+            IconButton(onClick = {
+                viewModel.logoutUser(navigator);
+            }) {
+                Icon(
+                    Icons.Default.Logout,
+                    contentDescription = "",
+                    tint = Color.DarkGray
+                )
+            }
+
         }
     }
 

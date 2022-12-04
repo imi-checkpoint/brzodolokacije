@@ -178,4 +178,8 @@ class CheckpointRepositoryImpl(
         return api.saveLocation(token, location)
     }
 
+    override suspend fun authorizeUser(token: String): Boolean {
+        return api.authorizeUser(token);
+    }
+
 }

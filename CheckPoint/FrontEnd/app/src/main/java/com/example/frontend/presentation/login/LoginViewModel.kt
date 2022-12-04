@@ -13,10 +13,13 @@ import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.login_user.GetLoginUserIdUseCase
 import com.example.frontend.domain.use_case.login_user.LoginUseCase
+import com.example.frontend.domain.use_case.session.SessionUseCase
 import com.example.frontend.presentation.NavGraphs
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
+import com.example.frontend.presentation.login.components.AuthState
 import com.example.frontend.presentation.login.components.LoginState
+import com.example.frontend.presentation.post.components.PostState
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
@@ -33,6 +36,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val getLoginUserIdUseCase: GetLoginUserIdUseCase,
+    private val sessionUseCase : SessionUseCase,
     private var application: Application
 ) : ViewModel() {
 
@@ -40,6 +44,41 @@ class LoginViewModel @Inject constructor(
     val state : State<LoginState> = _state
     val context = application.baseContext
 
+    private val _authState = mutableStateOf(AuthState())
+    val authState : State<AuthState> = _authState
+
+    var access_token  = "";
+    var refresh_token = "";
+
+    init {
+        //proveri da li je ulogovan, ako jeste prosledi ga na mainlocation
+        GlobalScope.launch(Dispatchers.Main){
+            access_token =  DataStoreManager.getStringValue(context, "access_token");
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+
+            if(refresh_token != ""){
+                Log.d("Auth user", "Auth user");
+//                authUser();
+            }
+        }
+    }
+
+    private fun authUser(){
+        sessionUseCase("Bearer "+refresh_token).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _authState.value = AuthState(isAuthorized = result.data ?: false)
+                }
+                is Resource.Error -> {
+                    _authState.value = AuthState(error = result.message ?:
+                    "An unexpected error occured")
+                }
+                is Resource.Loading -> {
+                    _authState.value = AuthState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun login(username:String, password:String, navigator : DestinationsNavigator)
     {

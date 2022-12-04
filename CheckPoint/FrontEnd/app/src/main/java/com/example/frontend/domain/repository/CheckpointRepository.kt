@@ -82,4 +82,6 @@ interface CheckpointRepository {
     suspend fun changeProfilePicture(token : String, profile_image: MultipartBody.Part) : String
 
     suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
+
+    suspend fun authorizeUser(token: String) : Boolean
 }

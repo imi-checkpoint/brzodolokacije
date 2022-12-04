@@ -26,7 +26,9 @@ import com.example.frontend.R
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.RegisterScreenDestination
+import com.example.frontend.presentation.location.MainLocationScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -40,6 +42,15 @@ fun LoginScreen(
 )
 {
     val state = viewModel.state.value
+    val authState = viewModel.authState.value
+
+    if(authState.isAuthorized == true){
+        navigator.navigate(MainLocationScreenDestination){
+            popUpTo(LoginScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
     var passwordFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current

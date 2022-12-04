@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.get_user.GetMyProfilePictureUseCase
@@ -15,7 +16,10 @@ import com.example.frontend.domain.use_case.get_user.GetUserInfoUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeEmailUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangePasswordUseCase
 import com.example.frontend.domain.use_case.profile_settings.ChangeProfilePictureUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
+import com.example.frontend.presentation.destinations.RegisterScreenDestination
 import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.UserInfoChangeState
@@ -94,6 +98,12 @@ class ProfileSettingsViewModel @Inject constructor(
                     }
                     is Resource.Error -> {
                         _state.value = ProfileSettingsUserState(error = result.message ?:"An unexpected error occured")
+
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
                     }
                     is Resource.Loading -> {
                         _state.value = ProfileSettingsUserState(isLoading = true)
@@ -117,6 +127,12 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Error -> {
                         println("GETMYPROFILEPICTURE ERROR" + result.message)
                         _stateGetMyProfilePicture.value = ProfilePictureState(error = result.message ?:"An unexpected error occured")
+
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
                     }
                     is Resource.Loading -> {
                         _stateGetMyProfilePicture.value = ProfilePictureState(isLoading = true)
@@ -150,6 +166,12 @@ class ProfileSettingsViewModel @Inject constructor(
                         navigator.navigate(ProfileSettingsScreenDestination())
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         println("CHANGEMYPROFILEPICTURE ERROR" + result.message)
                         _stateChangeProfilePicture.value = ChangeProfilePictureState(error = result.message ?:"An unexpected error occured")
                         tempFile.delete()
@@ -177,6 +199,11 @@ class ProfileSettingsViewModel @Inject constructor(
                         navigator.navigate(ProfileSettingsScreenDestination())
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
                         _stateEmailChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
                     }
                     is Resource.Loading -> {
@@ -206,6 +233,12 @@ class ProfileSettingsViewModel @Inject constructor(
                         }
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         _statePasswordChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
                     }
                     is Resource.Loading -> {
@@ -213,6 +246,20 @@ class ProfileSettingsViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
+        }
+    }
+
+    fun logoutUser(navigator : DestinationsNavigator){
+        GlobalScope.launch(Dispatchers.Main){
+//            DataStoreManager.deleteAllPreferences(context)
+
+
+            navigator.navigate(LoginScreenDestination()){
+                popUpTo(ProfileSettingsScreenDestination.route){
+                    inclusive = true;
+                }
+            }
+
         }
     }
 }

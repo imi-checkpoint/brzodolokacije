@@ -91,6 +91,12 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = ProfileDataState(isLoading = true)
@@ -109,6 +115,12 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Error -> {
                     _pictureState.value = ProfilePictureState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _pictureState.value = ProfilePictureState(isLoading = true)
@@ -128,6 +140,12 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = ProfileDataState(isLoading = true)
@@ -145,6 +163,12 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Error -> {
                     _postsState.value = UserPostsState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _postsState.value = UserPostsState(isLoading = true)

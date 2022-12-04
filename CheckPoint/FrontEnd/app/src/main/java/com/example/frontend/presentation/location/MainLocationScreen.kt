@@ -37,6 +37,9 @@ import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.destinations.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Destination
 @Composable

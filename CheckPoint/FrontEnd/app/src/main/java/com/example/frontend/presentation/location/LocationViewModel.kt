@@ -64,10 +64,11 @@ class LocationViewModel @Inject constructor(
                     _state.value = LocationState(error = result.message ?:
                     "An unexpected error occured")
 
-//                    if(result.message?.contains("403") == true){
-//                        Log.d("ERROR LOGIN", "UNAUTHORIZED");
-//                        navigator.navigate(LoginScreenDestination);
-//                    }
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)
@@ -87,10 +88,12 @@ class LocationViewModel @Inject constructor(
                     _state.value = LocationState(
                         error = result.message ?: "An unexpected error occured"
                     )
-//                    if(result.message?.contains("403") == true){
-//                        Log.d("ERROR LOGIN", "UNAUTHORIZED");
-//                        navigator.navigate(LoginScreenDestination);
-//                    }
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)

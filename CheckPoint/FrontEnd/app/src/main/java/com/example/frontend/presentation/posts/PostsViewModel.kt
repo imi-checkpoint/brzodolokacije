@@ -77,6 +77,11 @@ class PostsViewModel @Inject constructor(
                     is Resource.Error -> {
                         _state.value = PostsState(error = result.message ?:
                         "An unexpected error occured")
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
                     }
                     is Resource.Loading -> {
                         _state.value = PostsState(isLoading = true)
@@ -101,6 +106,12 @@ class PostsViewModel @Inject constructor(
                         _CardState.value = PostCardState(picture = result.data!!.data.toByteArray())
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         println("--error")
                         _CardState.value = PostCardState(error = result.message ?:
                         "An unexpected error occured")
@@ -132,6 +143,11 @@ class PostsViewModel @Inject constructor(
                     is Resource.Error -> {
                         _stateDelete.value = PostStringState(error = result.message ?:
                         "An unexpected error occured")
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
                     }
                     is Resource.Loading -> {
                         _stateDelete.value = PostStringState(isLoading = true)
@@ -156,6 +172,12 @@ class PostsViewModel @Inject constructor(
                     is Resource.Error -> {
                         _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
                         "An unexpected error occured")
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                     }
                     is Resource.Loading -> {
                         _stateLikeOrUnlike.value = PostStringState(isLoading = true)

@@ -59,7 +59,7 @@ public class AppUserController {
         }catch (Exception exception){
             jwtService.tokenErrorResponse(response, exception);
         }
-    }
+    }   
 
     @GetMapping("/register")
     public String registerForm(Model model){

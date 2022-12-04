@@ -115,6 +115,12 @@ class NovPostViewModel@Inject constructor(
                         }
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         println("Greska" + result.message)
                         tempFile.delete()
                     }

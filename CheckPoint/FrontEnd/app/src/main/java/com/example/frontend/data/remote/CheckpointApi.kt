@@ -260,4 +260,10 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Body location:LocationDTO
     ) : LocationDTO
+
+    @Headers("Content-Type: application/json")
+    @POST("api/token/refresh")
+    suspend fun authorizeUser(
+        @Header("Authorization") token : String
+    ) : Boolean
 }

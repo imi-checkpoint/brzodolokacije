@@ -45,8 +45,14 @@ class NovPostMapViewModel @Inject constructor(
                         navController.popBackStack()
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         println("Error1")
-                        println(result.message)
+                        println(result.message);
                     }
                     is Resource.Loading -> {
                         println("Loading1")

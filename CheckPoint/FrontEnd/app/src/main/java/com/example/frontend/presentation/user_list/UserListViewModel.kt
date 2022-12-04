@@ -104,6 +104,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -121,6 +126,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -138,6 +148,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -155,6 +170,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
