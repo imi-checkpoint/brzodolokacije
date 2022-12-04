@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.swiperefresh.SwipeRefresh

@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.frontend.common.Resource
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.get_user.GetMyProfilePictureUseCase
 import com.example.frontend.domain.use_case.get_user.GetUserInfoUseCase

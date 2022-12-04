@@ -33,7 +33,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.destinations.NovPostScreenDestination
 import com.example.frontend.presentation.destinations.PostsScreenDestination

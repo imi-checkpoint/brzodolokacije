@@ -9,15 +9,16 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -57,6 +59,16 @@ fun PostScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
+
+        IconButton(onClick = {
+            navigator.popBackStack()
+        }) {
+            Icon(
+                Icons.Default.ArrowBack,
+                contentDescription = "",
+                tint = Color.DarkGray
+            )
+        }
 
         if(state.isLoading){
             CircularProgressIndicator(
@@ -110,6 +122,7 @@ fun ImagePagerSlider(
         initialPage = 0
     )
 
+//    ako zelimo da se menjaju slike i same
 //    LaunchedEffect(Unit){
 //        while(true){
 //            yield()
@@ -207,12 +220,52 @@ fun PostDescription(
     post : Post,
     navigator: DestinationsNavigator
 ){
-    Text(text = post.location.name);
-    Text(text = post.appUserUsername);
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Row(
+            modifier = Modifier
+                .clickable{
+                    navigator.navigate(ProfileScreenDestination(post.appUserId))
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                Icons.Default.Person,
+                contentDescription = "",
+                tint = Color.DarkGray,
+            )
+            Text(
+                text = post.appUserUsername,
+                style = MaterialTheme.typography.bodyLarge
+            );
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                Icons.Default.LocationOn,
+                contentDescription = "",
+                tint = Color.DarkGray
+            )
+            Text(
+                text = post.location.name,
+                style = MaterialTheme.typography.bodyLarge
+            );
+        }
+    }
     Spacer(modifier = Modifier.height(10.dp))
 
-    Text("Description");
-    Text(text = post.description);
+    Text(
+        text = post.description,
+        color = Color.Gray,
+        style = MaterialTheme.typography.bodyMedium
+    );
 }
 
 @Composable

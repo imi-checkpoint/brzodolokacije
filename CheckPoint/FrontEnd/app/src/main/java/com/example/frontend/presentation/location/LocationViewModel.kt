@@ -13,7 +13,9 @@ import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.DataStoreManager.decodeToken
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.location.components.LocationState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +63,11 @@ class LocationViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = LocationState(error = result.message ?:
                     "An unexpected error occured")
+
+//                    if(result.message?.contains("403") == true){
+//                        Log.d("ERROR LOGIN", "UNAUTHORIZED");
+//                        navigator.navigate(LoginScreenDestination);
+//                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)
@@ -80,6 +87,10 @@ class LocationViewModel @Inject constructor(
                     _state.value = LocationState(
                         error = result.message ?: "An unexpected error occured"
                     )
+//                    if(result.message?.contains("403") == true){
+//                        Log.d("ERROR LOGIN", "UNAUTHORIZED");
+//                        navigator.navigate(LoginScreenDestination);
+//                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)

@@ -25,13 +25,11 @@ class MainActivity : ComponentActivity() {
         setTheme(R.style.Theme_FrontEnd)
         setContent {
             FrontEndTheme {
-//                MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST, listener)
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    Navigation()
+                    //ako je ulogovan da ne ide na login, nego drugi navgraph
                     DestinationsNavHost(navGraph = NavGraphs.root)
                 }
             }

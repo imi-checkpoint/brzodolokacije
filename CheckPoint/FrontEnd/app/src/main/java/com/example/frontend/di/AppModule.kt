@@ -6,6 +6,9 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.repository.CheckpointRepositoryImpl
 import com.example.frontend.domain.repository.CheckpointRepository
+import com.example.frontend.presentation.NavGraphs
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module

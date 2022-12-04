@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
