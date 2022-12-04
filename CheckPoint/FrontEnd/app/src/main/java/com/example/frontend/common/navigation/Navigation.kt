@@ -20,7 +20,7 @@ import com.example.frontend.presentation.newpost.NovPostScreen
 import com.example.frontend.presentation.post.PostScreen
 import com.example.frontend.presentation.profile_settings.ProfileSettingsScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
+/*@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation()
 {
@@ -113,3 +113,4 @@ fun NavHostController.navigateAndClean(route : String){
         graph.setStartDestination(route);
     }
 }
+*/

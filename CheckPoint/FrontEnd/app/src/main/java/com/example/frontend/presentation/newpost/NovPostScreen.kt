@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
+import com.example.frontend.presentation.destinations.NovPostMapScreenDestination
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -161,7 +162,7 @@ fun NovPostScreen(navigator: DestinationsNavigator,
                 }
             }
         }
-        Button(onClick = { navController.navigate(Screen.NovPostMapScreen.route)}) {
+        Button(onClick = { navigator.navigate(NovPostMapScreenDestination)}) {
             Text("Izaberi lokaciju sa mape")
         }
 
