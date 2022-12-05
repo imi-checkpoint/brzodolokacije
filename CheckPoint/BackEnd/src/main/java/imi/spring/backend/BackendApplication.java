@@ -9,20 +9,13 @@ import imi.spring.backend.services.FollowersService;
 import imi.spring.backend.services.LocationService;
 import imi.spring.backend.services.PostService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @SpringBootApplication(exclude = {
 		org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
@@ -30,9 +23,6 @@ import java.nio.file.Paths;
 		SecurityFilterAutoConfiguration.class}
 )
 public class BackendApplication {
-
-	@Autowired
-	private Environment env;
 
 	public static void main(String[] args) {
 
@@ -48,27 +38,10 @@ public class BackendApplication {
 	@Bean
 	CommandLineRunner run(AppUserService appUserService, LocationService locationService, PostService postService, FollowersService followersService){
 		return args -> {
-
-
-			System.out.println(env.getProperty("profile.image.default"));
-
-			byte[] pictureInBytes = Files.readAllBytes(Path.of(env.getProperty("profile.image.default")));
-
-			AppUser user = new AppUser("user1@gmail.com", "user1", "user1");
-			user.setImage(pictureInBytes);
-			appUserService.saveUser(user);
-
-			user = new AppUser("user2@gmail.com", "user2", "user2");
-			user.setImage(pictureInBytes);
-			appUserService.saveUser(user);
-
-			user = new AppUser("user3@gmail.com", "user3", "user3");
-			user.setImage(pictureInBytes);
-			appUserService.saveUser(user);
-
-			user = new AppUser("user4@gmail.com", "user4", "user4");
-			user.setImage(pictureInBytes);
-			appUserService.saveUser(user);
+			appUserService.saveUser(new AppUser("user1@gmail.com", "user1", "user1"));
+			appUserService.saveUser(new AppUser("user2@gmail.com", "user2", "user2"));
+			appUserService.saveUser(new AppUser("user3@gmail.com", "user3", "user3"));
+			appUserService.saveUser(new AppUser("user4@gmail.com", "user4", "user4"));
 
 			locationService.saveLocation(new Location("Eiffel Tower", 48.858093, 2.294694));
 			locationService.saveLocation(new Location("Stonehenge", 51.1740, -1.8224));
