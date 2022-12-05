@@ -61,10 +61,15 @@ class ProfileSettingsViewModel @Inject constructor(
     val stateChangeProfilePicture : State<ChangeProfilePictureState> = _stateChangeProfilePicture
     var changePictureEnabled: Boolean = false;
     var currentPicture: String = "";
+    //var flagPictureFirstShow = true;
+    var imgbitmap: Bitmap? = null;
 
 
     private val _statePasswordChange = mutableStateOf(UserInfoChangeState())
     val statePasswordChange : State<UserInfoChangeState> = _statePasswordChange
+    var currentOldPassInputValue: String = ""
+    var currentNewPass1InputValue: String = ""
+    var currentNewPass2InputValue: String = ""
 
     var access_token  = "";
     var refresh_token = "";
@@ -148,10 +153,11 @@ class ProfileSettingsViewModel @Inject constructor(
                     is Resource.Success -> {
                         println("****////////********CHANGEMYPROFILEPICTURE SUCCESS ")
                         tempFile.delete()
-                        navigator.navigate(ProfileSettingsScreenDestination())
+                        //navigator.navigate(ProfileSettingsScreenDestination())
+                        changePictureEnabled = true;
+                        println(result.data)
                     }
                     is Resource.Error -> {
-                        println("CHANGEMYPROFILEPICTURE ERROR" + result.message)
                         _stateChangeProfilePicture.value = ChangeProfilePictureState(error = result.message ?:"An unexpected error occured")
                         tempFile.delete()
                     }
@@ -168,14 +174,13 @@ class ProfileSettingsViewModel @Inject constructor(
         changePictureEnabled = true;
     }
 
-    fun changeEmail(navigator: DestinationsNavigator, newEmail: String)
+    fun changeEmail(navigator: DestinationsNavigator)
     {
         GlobalScope.launch(Dispatchers.Main){
-            changeEmailUseCase("Bearer "+ access_token, newEmail).onEach { result ->
+            changeEmailUseCase("Bearer "+ access_token, currentEmail).onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _stateEmailChange.value = UserInfoChangeState(message = result.data ?: "")
-                        navigator.navigate(ProfileSettingsScreenDestination())
                     }
                     is Resource.Error -> {
                         _stateEmailChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
@@ -188,23 +193,20 @@ class ProfileSettingsViewModel @Inject constructor(
         }
     }
 
-    fun changePassword(navigator: DestinationsNavigator, oldPass: String, newPass1: String, newPass2: String)
+    fun changePassword()
     {
-        if (oldPass == "" || newPass1 == "" || newPass2 == "")
+        if (currentOldPassInputValue == "" || currentNewPass1InputValue == "" || currentNewPass2InputValue == "")
             return;
-        if (newPass1 != newPass2)
+        if (currentNewPass1InputValue != currentNewPass2InputValue)
             return;
 
-        val passArray =  arrayOf(oldPass, newPass1);
+        val passwordArray =  arrayOf(currentOldPassInputValue, currentNewPass1InputValue);
 
         GlobalScope.launch(Dispatchers.Main){
-            changePasswordUseCase("Bearer "+ access_token, passArray).onEach { result ->
+            changePasswordUseCase("Bearer "+ access_token, passwordArray).onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _statePasswordChange.value = UserInfoChangeState(message = result.data ?: "")
-                        if (result.data == "Changed") {
-                            navigator.navigate(ProfileSettingsScreenDestination())
-                        }
                     }
                     is Resource.Error -> {
                         _statePasswordChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")

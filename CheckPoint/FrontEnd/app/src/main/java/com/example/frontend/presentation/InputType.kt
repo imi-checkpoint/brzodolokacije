@@ -31,25 +31,25 @@ sealed class InputType(val label:String,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
     )
-    object PasswordConfirm : InputType(label = "Confirm Password",
+    object PasswordConfirm : InputType(label = "Confirm password",
         icon = Icons.Default.Lock,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
     )
 
-    object OldPassword : InputType(label = "Old Password",
+    object OldPassword : InputType(label = "Old password",
         icon = Icons.Default.Lock,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
     )
 
-    object NewPassword : InputType(label = "New Password",
+    object NewPassword : InputType(label = "New password",
         icon = Icons.Default.Lock,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
     )
 
-    object NewPasswordConfirm : InputType(label = "Confirm New Password",
+    object NewPasswordConfirm : InputType(label = "Confirm new password",
         icon = Icons.Default.Lock,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
