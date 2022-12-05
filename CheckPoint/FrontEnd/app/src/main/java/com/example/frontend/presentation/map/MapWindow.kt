@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.frontend.domain.model.Post
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -31,6 +32,7 @@ import com.google.maps.android.compose.*
 @Composable
 fun MapWindow(
     userId : Long,
+    posts : List<Post>,
     viewModel: MapViewModel = hiltViewModel()
 )
 {
@@ -76,33 +78,35 @@ fun MapWindow(
             properties = viewModel.state.value.properties,
             uiSettings = uiSettings,
             onMapLoaded = {
-                viewModel.getAllPostLocations(userId);
+
+            },
+            onMapLongClick = {
+                Log.d("Long click", "Map long click");
+                Log.d("LATLNG", it.toString());
             },
             cameraPositionState = camPosState
         ){
 
-            if(viewModel.statePosts.value.userPosts != null){
-                viewModel.statePosts.value.userPosts!!.forEach { post ->
+            posts.forEach { post ->
 
-                    val postLocation = LatLng(post.location.lat, post.location.lng)
-                    builder.include(postLocation)
+                val postLocation = LatLng(post.location.lat, post.location.lng)
+                builder.include(postLocation)
 
-                    Marker(
-                        position = postLocation,
-                        title = post.location.name,
-                        snippet = "User post location",
-                        onInfoWindowClick = {},
-                        onInfoWindowLongClick = {},
-                        icon = BitmapDescriptorFactory.defaultMarker(
-                            BitmapDescriptorFactory.HUE_AZURE
-                        )
+                Marker(
+                    position = postLocation,
+                    title = post.location.name,
+                    snippet = "User post location",
+                    onInfoWindowClick = {},
+                    onInfoWindowLongClick = {},
+                    icon = BitmapDescriptorFactory.defaultMarker(
+                        BitmapDescriptorFactory.HUE_AZURE
                     )
-                }
+                )
+            }
 
-                if(!viewModel.statePosts.value.userPosts!!.isEmpty())
-                {
-                    updateCamera(camPosState, builder, mapWidth, mapHeight)
-                }
+            if(!posts.isEmpty())
+            {
+                updateCamera(camPosState, builder, mapWidth, mapHeight)
             }
         }
     }
