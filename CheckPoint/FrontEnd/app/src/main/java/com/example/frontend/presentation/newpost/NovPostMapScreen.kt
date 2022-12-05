@@ -37,6 +37,7 @@ fun NovPostMapScreen (
     }
 
     val camPosState = rememberCameraPositionState {
+        position = CameraPosition( LatLng(50.0,25.0),5F,0F,0F)
     }
     val builder = LatLngBounds.Builder()
     var imeLokacije = remember {
@@ -56,6 +57,34 @@ fun NovPostMapScreen (
         Button(onClick = { navigator.popBackStack() }, Modifier.wrapContentSize()) {
             Text(text = "Back")
         }
+        Row(Modifier.fillMaxWidth().height(50.dp)) {
+
+            TextField(
+                value = imeLokacije.value, onValueChange = {
+                    if (markerLatLng.value != null) {
+                        imeLokacije.value = it
+                    }
+                },
+                label = {Text("Location name")},
+                singleLine = true,
+            )
+
+            Button(onClick = {
+                if(markerLatLng.value != null) {
+                    viewModel.saveLocation(imeLokacije.value,markerLatLng.value!!,navigator)
+                }
+                else{
+                    viewModel.saveLocation(markerPOI.value!!.name,markerPOI.value!!.latLng,navigator)
+                }
+            },
+                Modifier.wrapContentSize(),
+                enabled = ((markerPOI.value!=null|| markerLatLng.value!= null) && imeLokacije.value != "")
+            ) {
+                Text("Set location")
+            }
+
+        }
+
         GoogleMap(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,17 +100,14 @@ fun NovPostMapScreen (
             cameraPositionState = camPosState,
             onMapClick = {
                 markerLatLng.value = it
-                markerPOI.value = null
-                imeLokacije.value = ""
-                var lokator = Geocoder(context)
-                var lista = lokator.getFromLocation(it.latitude, it.latitude, 0)
-                println(Geocoder.isPresent())
-                if (lista != null && lista.isNotEmpty()) {
-                    println(lista[0].featureName)
-                    println(lista[0].countryName)
-                } else {
-                    println("Prazno")
+                if(markerPOI.value != null){
+                    imeLokacije.value = ""
+                    markerPOI.value = null
                 }
+                else{
+                    imeLokacije.value = imeLokacije.value
+                }
+
             },
             onPOIClick = {
                 markerLatLng.value = null
@@ -94,27 +120,6 @@ fun NovPostMapScreen (
             }
             if (markerPOI.value != null) {
                 Marker(position = markerPOI.value!!.latLng, title = markerPOI.value!!.name)
-            }
-
-        }
-        Row(Modifier.fillMaxWidth().height(50.dp)) {
-            if (markerLatLng.value != null) {
-                TextField(
-                    value = imeLokacije.value, onValueChange = {
-                        imeLokacije.value = it
-                    },
-                    singleLine = true,
-                )
-            }
-            Button(onClick = {
-                if(markerLatLng.value != null) {
-                    viewModel.saveLocation(imeLokacije.value,markerLatLng.value!!,navigator)
-                }
-                else{
-                    viewModel.saveLocation(markerPOI.value!!.name,markerPOI.value!!.latLng,navigator)
-                }
-            }, Modifier.wrapContentSize()) {
-                Text("Set location")
             }
         }
     }
