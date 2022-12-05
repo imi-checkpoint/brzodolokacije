@@ -15,6 +15,7 @@ import com.example.frontend.domain.use_case.get_profile_data.GetUserProfileDataU
 import com.example.frontend.domain.use_case.get_profile_data.GetUserProfilePhotoUseCase
 import com.example.frontend.domain.use_case.get_user_posts.GetUserPostsUseCase
 import com.example.frontend.domain.use_case.refresh_page.RefreshPageUseCase
+import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
@@ -123,7 +124,7 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Success -> {
                     this.getUserProfileData(savedUserId);
                     //da se na prethodnoj strani refreshuje state
-
+                    Constants.refreshFollowUnfollowConstant = savedUserId
                 }
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
@@ -157,5 +158,13 @@ class ProfileViewModel @Inject constructor(
         refreshPageUseCase().onEach{ result ->
             _isRefreshing.emit(result)
         }.launchIn(viewModelScope)
+    }
+
+    fun proveriConstants(){
+        if(Constants.refreshPhotoConstant != 0L || (this.loginUserId == this.savedUserId && Constants.refreshFollowUnfollowConstant != 0L)){
+            Constants.refreshPhotoConstant = 0L
+            Constants.refreshFollowUnfollowConstant = 0L
+            getProfileData()
+        }
     }
 }

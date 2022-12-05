@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toLowerCase
@@ -63,9 +64,13 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 )
 {
+    val context = LocalContext.current
     val state = viewModel.state.value
     val pictureState = viewModel.pictureState.value
     val postsState = viewModel.postsState.value
+
+    viewModel.proveriConstants()
+
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     SwipeRefresh(
@@ -381,6 +386,7 @@ fun ActionButton(
             .padding(6.dp)
             .clickable {
                 if (text == "Follow") {
+                    //Constants.refreshPhotoConstant = viewModel.loginUserId
                     viewModel.followUnfollowUser();
                 } else if (text == "Message") {
                     //message this user

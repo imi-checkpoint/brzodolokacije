@@ -11,5 +11,8 @@ public class Constants{
         const val POST_ID = "postId"
 
         var locationId:Long = 0
+
+        var refreshPhotoConstant:Long = 0
+        var refreshFollowUnfollowConstant:Long = 0
     }
 }

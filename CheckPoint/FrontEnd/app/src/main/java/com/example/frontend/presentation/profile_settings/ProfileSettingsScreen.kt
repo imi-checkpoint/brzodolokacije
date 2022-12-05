@@ -124,9 +124,8 @@ fun ProfileSettingsScreen(
             .padding(20.dp)
     ) {
         IconButton(onClick = {
+            //Constants.refreshPhotoConstant = viewModel.loginUserId
             navigator.popBackStack()
-            //navigator.clearBackStack()
-            //navigator.navigate(ProfileScreenDestination(viewModel.loginUserId)) //ne radi na back dugme na telefonu
         }) {
             androidx.compose.material.Icon(
                 Icons.Default.ArrowBack,
