@@ -26,6 +26,7 @@ public class Comment {
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
+    @JsonIgnore
     @ManyToOne()
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     private Post post;
@@ -38,5 +39,7 @@ public class Comment {
     private List<Comment> subCommentList = new ArrayList<>();
 
     private String text;
+
+    @JsonIgnore
     private LocalDateTime time;
 }

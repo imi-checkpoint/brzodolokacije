@@ -3,6 +3,7 @@ package com.example.frontend.data.repository
 import android.util.Log
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
@@ -176,6 +177,10 @@ class CheckpointRepositoryImpl(
 
     override suspend fun saveLocation(token: String, location: LocationDTO): LocationDTO {
         return api.saveLocation(token, location)
+    }
+
+    override suspend fun getFirstCommentsByPostId(token: String, postId: Long): List<Comment> {
+        return api.getFirstCommentsByPostId(token, postId)
     }
 
 }

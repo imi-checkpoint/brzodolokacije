@@ -112,6 +112,9 @@ public class BackendApplication {
 
 			commentService.addComment("Great picture!", 2L, 1L, 0L);
 			commentService.addComment("Thanks!", 1L, 1L, 1L);
+			commentService.addComment("Nice place", 3L, 1L, 0L);
+			commentService.addComment("I know", 1L, 1L, 3L);
+			commentService.addComment("Wow", 4L, 1L, 0L);
 			commentService.addComment("Very nice", 3L, 2L, 0L);
 			commentService.addComment("Like your content", 4L, 3L, 0L);
 			commentService.addComment("I like it", 1L, 2L, 0L);

@@ -1,6 +1,7 @@
 package com.example.frontend.data.remote
 
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import okhttp3.MultipartBody
@@ -260,4 +261,12 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Body location:LocationDTO
     ) : LocationDTO
+
+
+    @Headers("Content-Type: application/json")
+    @GET("comments/first/{postId}")
+    suspend fun getFirstCommentsByPostId(
+        @Header("Authorization") token: String,
+        @Path("postId") postId: Long
+    ): List<Comment>
 }

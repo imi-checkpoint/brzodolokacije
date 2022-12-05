@@ -40,6 +40,7 @@ fun PostScreen(
 )
 {
     val state = viewModel.state.value
+    val stateGetComments = viewModel.stateGetComments.value
 
     Column(
         modifier = Modifier
@@ -47,12 +48,12 @@ fun PostScreen(
             .padding(20.dp)
     ) {
 
-        if(state.isLoading){
+        if(state.isLoading || stateGetComments.isLoading){
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-        else if(state.post!=null){
+        else if(state.post!=null && stateGetComments.comments!=null){
             PostDetails(post = state.post, navigator = navigator)
         }
 
@@ -80,6 +81,8 @@ fun PostDetails(
 
         PostMap(post, navigator)
         Spacer(modifier = Modifier.height(20.dp))
+
+        PostComments(post, navigator)
     }
 
 }
@@ -212,3 +215,10 @@ fun PostMap(
     Text("POST MAP")
 }
 
+@Composable
+fun PostComments(
+    post : Post,
+    navigator: DestinationsNavigator
+){
+    Text("komentari")
+}
