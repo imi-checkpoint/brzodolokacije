@@ -26,18 +26,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
-import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
 @Composable
 fun UserListScreen(
-    userTypeList: String,
-    userId : Long,
-    navigator : DestinationsNavigator,
+    navController: NavController,
     viewModel: UserListViewModel = hiltViewModel()
 )
 {
@@ -72,7 +66,7 @@ fun UserListScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             else if(state.users != null){
-                UserList(userList = state.users, navigator = navigator)
+                UserList(userList = state.users, navController = navController)
             }
 
         }
@@ -145,7 +139,7 @@ fun UserListSearchBar(
 @Composable
 fun UserList(
     userList : List<User>?,
-    navigator: DestinationsNavigator
+    navController: NavController
 ){
     if(userList == null || userList.isEmpty()){
         Text(
@@ -169,7 +163,7 @@ fun UserList(
 
         ){
             items(userList){
-                user -> OneUser(user, navigator = navigator)
+                user -> OneUser(user, navController = navController)
             }
         }
 
@@ -179,7 +173,7 @@ fun UserList(
 @Composable
 fun OneUser(
     user : User,
-    navigator: DestinationsNavigator
+    navController: NavController
 ){
     Row(
         modifier = Modifier
@@ -188,10 +182,8 @@ fun OneUser(
                 Log.d(
                     "ID",
                     user.id.toString()
-                )
-                navigator.navigate(
-                    ProfileScreenDestination(user.id)
-                )
+                ) //ovde treba da se navigacijom ode na profil nekog drugog korisnika
+                navController.navigate(Screen.ProfileScreen.withArgs(user.id))
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly

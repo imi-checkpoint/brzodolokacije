@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface PhotoRepository extends MongoRepository<Photo, String> {
     List<Photo> getPhotosByPostId(Long postId);
-    String deletePhotosByPostId(Long postId);
 }

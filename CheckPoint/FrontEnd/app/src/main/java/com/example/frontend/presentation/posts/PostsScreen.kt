@@ -17,41 +17,29 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.common.navigation.Screen
-import com.example.frontend.data.remote.dto.PostDTO
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
-import com.example.frontend.presentation.destinations.PostScreenDestination
-import com.example.frontend.presentation.posts.components.PostStringState
-import com.example.frontend.presentation.location.ProfileTopBar
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.example.frontend.presentation.posts.components.PostDeleteState
 import java.util.Base64
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Destination
 @Composable
 fun PostsScreen(
-    locationId : Long,
-    navigator: DestinationsNavigator,
-    viewModel : PostsViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel : PostViewModel = hiltViewModel()
 )
 {
 
@@ -64,12 +52,12 @@ fun PostsScreen(
             .padding(20.dp)
     ) {
         IconButton(onClick = {
-            navigator.popBackStack()
+            navController.popBackStack()
         }) {
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "",
-                tint = Color.DarkGray)
+                tint = Color.Black)
         }
         
         if(state.isLoading){
@@ -79,7 +67,7 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(state.posts, navigator, viewModel, stateDelete)
+            AllPosts(state.posts, navController, viewModel, stateDelete)
         }
     }
 }
@@ -88,12 +76,12 @@ fun PostsScreen(
 @Composable
 fun AllPosts(
     posts : List<Post>?,
-    navigator: DestinationsNavigator,
-    viewModel : PostsViewModel,
-    stateDelete: PostStringState
+    navController: NavController,
+    viewModel : PostViewModel,
+    stateDelete: PostDeleteState
 )
 {
-    if(posts == null || posts.size == 0){
+    if(posts == null){
         Text(
             text = "No posts found!",
             textAlign = TextAlign.Center,
@@ -105,7 +93,7 @@ fun AllPosts(
     else{
         LazyColumn{
             items(posts){
-                post -> PostCard(post, navigator, viewModel, stateDelete)
+                post -> PostCard(post, navController, viewModel, stateDelete)
             }
         }
     }
@@ -116,9 +104,9 @@ fun AllPosts(
 @Composable
 fun PostCard(
     post : Post,
-    navigator : DestinationsNavigator,
-    viewModel : PostsViewModel,
-    stateDelete: PostStringState
+    navController: NavController,
+    viewModel : PostViewModel,
+    stateDelete: PostDeleteState
 )
 {
 
@@ -130,9 +118,7 @@ fun PostCard(
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick ={
-            navigator.navigate(
-                PostScreenDestination(post.postId)
-            )
+            navController.navigate(Screen.ProfileScreen.route)
         }
     ){
         Row {
@@ -150,46 +136,17 @@ fun PostCard(
                 ) {
                     //dodati oblacic sa slikom korisnika
                     Text(
-                        text = "${post.appUserUsername}",
-                        color = Color.DarkGray
+                        text = "${post.appUserUsername}"
                     )
-                    if(viewModel.loginUserId == post.appUserId)
-                        DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+
+                    DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
                 }
 
-                Text(
-                    text = "${post.description}",
-                    color = Color.DarkGray
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                Text(post.description)
                 LazyRow(){
                     items(post.photos){
                         photo->
-                        PhotoCard(photo = photo, navigator)
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
-                        Text(
-                            text = "${post.numberOfLikes} likes",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Row {
-                        Text(
-                            text = "${post.numberOfComments} comments",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        PhotoCard(photo = photo, navController = navController)
                     }
                 }
             }
@@ -201,7 +158,7 @@ fun PostCard(
 @Composable
 fun PhotoCard(
     photo : Photo,
-    navigator: DestinationsNavigator,
+    navController: NavController
 ){
     Row(
         modifier = Modifier
@@ -215,9 +172,7 @@ fun PhotoCard(
             val mapa:Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
             print(mapa.byteCount)
             if(mapa!=null){
-                Image(bitmap = mapa.asImageBitmap(),
-                    contentDescription = ""
-                )
+                Image(bitmap = mapa.asImageBitmap(), contentDescription ="" )
             }
         }
     }
@@ -227,12 +182,12 @@ fun PhotoCard(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DeletePostButton(
-    post: Post,
-    viewModel: PostsViewModel,
-    stateDelete: PostStringState
+    postId: Long,
+    viewModel: PostViewModel,
+    stateDelete: PostDeleteState
 ) {
     IconButton(onClick = {
-        viewModel.deletePostById(post.postId, post.location.id)
+        viewModel.deletePostById(postId)
     }) {
         Icon(
             Icons.Default.Delete,
@@ -247,33 +202,7 @@ fun DeletePostButton(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun LikeOrUnlikePostButton(
-    post : Post,
-    viewModel: PostsViewModel,
-    stateLikeOrUnlike: PostStringState
-) {
-    IconButton(onClick = {
-        viewModel.likeOrUnlikePostById(post.postId)
-        post.isLiked = !post.isLiked
-        if (post.isLiked)
-            post.numberOfLikes += 1;
-        else
-            post.numberOfLikes -= 1;
-    }) {
-        Icon(
-            if(post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = if(post.isLiked) "Unlike" else "Like",
-            tint = if(post.isLiked) Color.Red else Color.DarkGray
-        )
-    }
-    if(stateLikeOrUnlike.isLoading){
-    }
-    else if(stateLikeOrUnlike.error!=""){
-        Text("An error occured while like/unlike post!");
-    }
-}
+
 
 
 

@@ -88,27 +88,12 @@ object MapStyle {
                     },
                     {
                         "lightness": 21
-                    },
-                    {
-                        "visibility": "simplified"
-                    }
-                ]
-            },
-            {
-                "featureType": "poi.business",
-                "elementType": "geometry",
-                "stylers": [
-                    {
-                        "color": "#ded5d5"
-                    },
-                    {
-                        "lightness": 21
                     }
                 ]
             },
             {
                 "featureType": "poi.park",
-                
+                "elementType": "geometry",
                 "stylers": [
                     {
                         "color": "#dedede"
@@ -118,7 +103,6 @@ object MapStyle {
                     }
                 ]
             },
-            
             {
                 "elementType": "labels.text.stroke",
                 "stylers": [

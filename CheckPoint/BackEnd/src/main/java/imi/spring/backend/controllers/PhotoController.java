@@ -38,22 +38,22 @@ public class PhotoController {
         return "uploadPhoto";
     }
 
-    @PostMapping("/add/{postId}/{order}")
-    public @ResponseBody String addPhoto(@PathVariable("postId") Long postId, @PathVariable("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
+    @PostMapping("/add")
+    public String addPhoto(@RequestParam("postId") Long postId, @RequestParam("order") Integer order, @RequestParam("photo") MultipartFile image) throws IOException {
 
 
         File file = multipartToFile(image, image.getOriginalFilename());
 
-        //Integer numberOfFaces = getNumberOfFaces(file);
-        //log.info("Python has found {} faces on received picture. ", numberOfFaces);
+        Integer numberOfFaces = getNumberOfFaces(file);
+        log.info("Python has found {} faces on received picture. ", numberOfFaces);
 
         FileInputStream inputStream = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain", inputStream.readAllBytes());
 
-        String id = photoService.addPhoto(postId, order, multipartFile);
+        String id = photoService.addCompressedPhoto(postId, order, multipartFile);
         log.info("Added compressed image to MongoDB with id {}", id);
 
-        return "Zavrseno";
+        return "redirect:/photos/" + postId;
     }
 
     @GetMapping("/{postId}")

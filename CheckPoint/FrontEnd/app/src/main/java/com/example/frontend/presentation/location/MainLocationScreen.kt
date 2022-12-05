@@ -35,16 +35,10 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
-import com.example.frontend.presentation.destinations.NovPostScreenDestination
-import com.example.frontend.presentation.destinations.PostsScreenDestination
-import com.example.frontend.presentation.destinations.ProfileScreenDestination
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
 @Composable
 fun MainLocationScreen(
-    navigator : DestinationsNavigator,
+    navController: NavController,
     viewModel : LocationViewModel = hiltViewModel()
 )
 {
@@ -58,7 +52,7 @@ fun MainLocationScreen(
             .padding(20.dp)
     )
     {
-        ProfileTopBar(navigator, viewModel)
+        ProfileTopBar(navController, viewModel)
 
         LocationSearchBar(searchText, onChange = {
             searchText = it
@@ -74,7 +68,7 @@ fun MainLocationScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
-            LocationList(locationList = state.locations, navigator)
+            LocationList(locationList = state.locations, navController = navController)
         }
     }
 }
@@ -121,13 +115,14 @@ fun LocationSearchBar(
             disabledIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(20.dp)
-    )
+
+        )
 }
 
 @Composable
 fun LocationList(
     locationList : List<Location>?,
-    navigator : DestinationsNavigator
+    navController: NavController
 )
 {
 
@@ -147,7 +142,7 @@ fun LocationList(
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ){
             items(locationList){
-                    location -> LocationCard(location = location, navigator)
+                    location -> LocationCard(location = location, navController = navController)
             }
         }
     }
@@ -157,7 +152,7 @@ fun LocationList(
 @Composable
 fun LocationCard(
     location : Location,
-    navigator : DestinationsNavigator
+    navController: NavController
 )
 {
     val painter = rememberImagePainter(
@@ -177,9 +172,7 @@ fun LocationCard(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable{
-                    navigator.navigate(
-                        PostsScreenDestination(location.id)
-                    )
+                    navController.navigate(Screen.PostsScreen.withArgs(location.id));
                 }
                 .height(200.dp)
                 .fillMaxWidth()
@@ -195,7 +188,7 @@ fun LocationCard(
 
 @Composable
 fun ProfileTopBar(
-    navigator : DestinationsNavigator,
+    navController: NavController,
     viewModel: LocationViewModel
 )
 {
@@ -208,9 +201,9 @@ fun ProfileTopBar(
     ) {
         Row(){
             IconButton(onClick = {
-                navigator.navigate(
-                    NovPostScreenDestination()
-                )
+                navController.navigate(Screen.NovPostScreen.route)
+//                viewModel.getAllLocations()
+//                navController.navigate(Screen.ProfileScreen.route); //navigate to new post
             }) {
                 Icon(
                     Icons.Default.AddCircle,
@@ -221,10 +214,7 @@ fun ProfileTopBar(
 
             IconButton(onClick = {
                 viewModel.getAllLocations()
-                navigator.navigate(
-                    ProfileScreenDestination(viewModel.loginUserId)
-                );
-
+                navController.navigate(Screen.ProfileScreen.withArgs(viewModel.loginUserId));
             }) {
                 Icon(
                     Icons.Default.Person,
@@ -235,7 +225,7 @@ fun ProfileTopBar(
 
             IconButton(onClick = {
 //                viewModel.getAllLocations()
-//                navigator.navigate() //navigate to messages
+//                navController.navigate(Screen.ProfileScreen.route); //navigate to messages
             }) {
                 Icon(
                     Icons.Default.Send,

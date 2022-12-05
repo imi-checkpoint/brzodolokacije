@@ -47,9 +47,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String addComment(String commentText, Long userId, Long postId, Long parentCommentId) {
-        Comment comment = new Comment();
-        comment.setText(commentText.trim());
+    public String addComment(Comment comment, Long userId, Long postId, Long parentCommentId) {
         comment.setTime(LocalDateTime.now());
         comment.setUser(appUserService.getUserById(userId));
         comment.setPost(postService.getPostById(postId));

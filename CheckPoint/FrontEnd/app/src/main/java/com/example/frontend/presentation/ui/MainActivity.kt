@@ -12,10 +12,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.example.frontend.R
-import com.example.frontend.presentation.NavGraphs
+import com.example.frontend.common.navigation.Navigation
 import com.example.frontend.ui.theme.FrontEndTheme
 import com.google.android.gms.maps.MapsInitializer
-import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,8 +30,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    Navigation()
-                    DestinationsNavHost(navGraph = NavGraphs.root)
+                    Navigation()
                 }
             }
         }

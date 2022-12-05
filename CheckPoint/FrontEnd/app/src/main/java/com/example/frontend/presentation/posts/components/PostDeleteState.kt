@@ -1,7 +1,7 @@
 package com.example.frontend.presentation.posts.components
 
-data class PostStatisticState (
+data class PostDeleteState (
     val isLoading: Boolean = false,
-    val count: Int = 0,
+    val message: String = "",
     val error: String = ""
 )
