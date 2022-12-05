@@ -9,7 +9,9 @@ import com.example.frontend.common.Resource
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.use_case.register_user.RegisterUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.register.components.RegisterState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +31,7 @@ class RegisterViewModel @Inject constructor(
     val state : State<RegisterState> = _state
 
 
-    fun register(mail:String , username:String, password:String, passwordRepeat:String, navController: NavController)
+    fun register(mail:String , username:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
     {
         if(password !== passwordRepeat){
             _state.value = RegisterState(error = "Passwords dont't match!");
@@ -40,12 +42,10 @@ class RegisterViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _state.value = RegisterState(message = result.data ?: "")
-                        navController.navigate(Screen.LoginScreen.route){
-                            popUpTo(Screen.RegisterScreen.route){
-                                inclusive = true;
-                            }
-                        }
 
+                        navigator.navigate(
+                            LoginScreenDestination()
+                        )
                     }
                     is Resource.Error -> {
                         _state.value = RegisterState(error = result.message ?:

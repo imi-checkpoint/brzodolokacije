@@ -1,9 +1,12 @@
 package com.example.frontend.data.repository
 
+import android.util.Log
 import com.example.frontend.data.remote.CheckpointApi
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.repository.CheckpointRepository
+import okhttp3.MultipartBody
 
 class CheckpointRepositoryImpl(
     private val api : CheckpointApi
@@ -114,7 +117,65 @@ class CheckpointRepositoryImpl(
     }
 
     override suspend fun getUserId(token: String): Long {
-        return api.getUserId(token)
+        Log.d("REPO", "Getting user id ");
+        val userIdGot = api.getUserId(token);
+        Log.d("REPO", "Got user id ${userIdGot.toString()}")
+        return userIdGot
+    }
+
+    override suspend fun getUserFromJWT(token: String): UserDTO {
+        return api.getUserFromJWT(token);
+    }
+
+    override suspend fun getPostById(token: String, postId: Long): PostDTO {
+        return api.getPostById(token, postId)
+    }
+
+    override suspend fun savePost(token: String,description:String,locationId:Long): Long{
+        return api.savePost(token,description,locationId)
+    }
+
+    override suspend fun addImage(token: String, postId: Long, order: Int, photo: MultipartBody.Part) : String {
+        return api.addImage(token,postId,order,photo)
+    }
+
+    override suspend fun getNumberOfLikesByPostId(token: String, postId: Long): Int {
+        return api.getNumberOfLikesByPostId(token, postId);
+    }
+
+    override suspend fun getNumberOfCommentsByPostId(token: String, postId: Long): Int {
+        return api.getNumberOfCommentsByPostId(token, postId);
+    }
+
+    override suspend fun likeOrUnlikePostById(token: String, postId: Long): String {
+        return api.likeOrUnlikePostById(token, postId);
+    }
+
+    override suspend fun changeUserEmail(token: String, newEmail: String): String {
+        return api.changeUserEmail(token, newEmail)
+    }
+
+    override suspend fun changeUserPassword(token: String, passwords: Array<String>): String {
+        return api.changeUserPassword(token, passwords)
+    }
+
+    override suspend fun getMyProfilePicture(token: String): String {
+        return api.getMyProfilePicture(token)
+    }
+
+    override suspend fun getUserProfilePicture(token: String, userId: Long): String {
+        Log.d("PICTURE REPO", "Getting picture from repo");
+        val picture =  api.getUserProfilePicture(token, userId);
+        Log.d("PICTURE IS", picture);
+        return picture;
+    }
+
+    override suspend fun changeProfilePicture(token: String, profile_image: MultipartBody.Part): String {
+        return api.changeProfilePicture(token, profile_image)
+    }
+
+    override suspend fun saveLocation(token: String, location: LocationDTO): LocationDTO {
+        return api.saveLocation(token, location)
     }
 
 }

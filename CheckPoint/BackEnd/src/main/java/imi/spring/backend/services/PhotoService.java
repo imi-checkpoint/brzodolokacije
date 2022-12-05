@@ -12,4 +12,5 @@ public interface PhotoService {
     List<Photo> getPhotosByPostId(Long postId);
     List<String> getEncodedPhotos(Long postId);
     Photo getPhotoByPostIdAndOrder(Long postId, Integer order) throws IOException;
+    String deletePhotosByPostId(Long postId);
 }

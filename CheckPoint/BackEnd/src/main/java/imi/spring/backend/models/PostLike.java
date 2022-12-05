@@ -1,5 +1,6 @@
 package imi.spring.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import imi.spring.backend.models.composite_pk_classes.PostLikeId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,5 +25,6 @@ public class PostLike {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private AppUser user;
 
+    @JsonIgnore
     private LocalDateTime time;
 }

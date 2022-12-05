@@ -14,7 +14,10 @@ import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.use_case.login_user.GetLoginUserIdUseCase
 import com.example.frontend.domain.use_case.login_user.LoginUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.login.components.LoginState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,14 +40,14 @@ class LoginViewModel @Inject constructor(
     val context = application.baseContext
 
 
-    fun login(username:String, password:String, navController: NavController)
+    fun login(username:String, password:String, navigator : DestinationsNavigator)
     {
         loginUseCase(username, password).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     _state.value = LoginState(token = result.data ?: null)
                     //sacuvaj token
-                    GlobalScope.launch(Dispatchers.IO) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
 
@@ -53,15 +56,8 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token);
+                        saveUserId(result.data!!.access_token, navigator);
                     }
-
-                    navController.navigate(Screen.MainLocationScreen.route){
-                        popUpTo(Screen.LoginScreen.route){
-                            inclusive = true;
-                        }
-                    };
-
                 }
                 is Resource.Error -> {
                     _state.value = LoginState(error = result.message ?:
@@ -74,14 +70,23 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun saveUserId(access_token: String){
-        getLoginUserIdUseCase(access_token).onEach { result ->
+    fun saveUserId(access_token: String, navigator : DestinationsNavigator){
+        getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                         val userId = result.data
-                    if (userId != null) {
-                        DataStoreManager.saveValue(context, "userId", userId.toInt())
-                    }
+                        Log.d("User id", "Fetched user id ${userId}")
+                        if (userId != null) {
+                            DataStoreManager.saveValue(context, "userId", userId.toInt())
+
+                            navigator.navigate(
+                                MainLocationScreenDestination()
+                            ){
+                                popUpTo(LoginScreenDestination.route){
+                                    inclusive = true;
+                                }
+                            }
+                        }
                 }
                 is Resource.Error -> {
                     DataStoreManager.saveValue(context, "userId", 0)
@@ -90,7 +95,7 @@ class LoginViewModel @Inject constructor(
                     DataStoreManager.saveValue(context, "userId", 0)
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
 }
