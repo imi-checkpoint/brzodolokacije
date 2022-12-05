@@ -83,5 +83,5 @@ interface CheckpointRepository {
 
     suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
 
-    suspend fun authorizeUser(token: String) : Boolean
+    suspend fun authorizeUser(token: String) : LoginDTO
 }

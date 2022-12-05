@@ -60,7 +60,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.LoginScreenDestination
@@ -92,7 +91,7 @@ fun ProfileSettingsScreen(
     val statePasswordChange = viewModel.statePasswordChange.value
 
     if(state.error.contains("403") || stateEmailChange.error.contains("403") || stateGetMyProfilePicture.error.contains("403")
-        || stateChangeMyProfilePicture.error.contains("403") || statePasswordChange.error.contains("403")){
+        || stateChangeProfilePicture.error.contains("403") || statePasswordChange.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
                 inclusive = true;
@@ -104,7 +103,6 @@ fun ProfileSettingsScreen(
         mutableStateOf("")
     }
 
-    var emailFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
     var emailFocusRequester = FocusRequester()
     var oldPasswordFocusRequester = FocusRequester()

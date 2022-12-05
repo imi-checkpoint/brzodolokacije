@@ -47,18 +47,23 @@ class LoginViewModel @Inject constructor(
     private val _authState = mutableStateOf(AuthState())
     val authState : State<AuthState> = _authState
 
+    var savedState = true;
     var access_token  = "";
     var refresh_token = "";
 
     init {
         //proveri da li je ulogovan, ako jeste prosledi ga na mainlocation
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             if(refresh_token != ""){
                 Log.d("Auth user", "Auth user");
-//                authUser();
+                Log.d("SAVED TOKEN", "*${refresh_token.trim()}*");
+                authUser();
+            }
+            else{
+                savedState = false;
             }
         }
     }
@@ -67,7 +72,21 @@ class LoginViewModel @Inject constructor(
         sessionUseCase("Bearer "+refresh_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
-                    _authState.value = AuthState(isAuthorized = result.data ?: false)
+                    Log.d("AUTH SUCCESS", "Success");
+                    GlobalScope.launch(Dispatchers.Main) {
+                        DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
+                        DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
+
+                        val jwtDecode = DataStoreManager.decodeToken(result.data!!.access_token);
+
+                        val username = JSONObject(jwtDecode).getString("sub")
+                        DataStoreManager.saveValue(context, "username", username)
+
+                        saveUserId(result.data!!.access_token);
+
+                        _authState.value = AuthState(isAuthorized = true);
+                    }
+
                 }
                 is Resource.Error -> {
                     _authState.value = AuthState(error = result.message ?:
@@ -80,14 +99,17 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun login(username:String, password:String, navigator : DestinationsNavigator)
+    fun login(username:String, password:String)
     {
+        Log.d("LOGIN", "Username *${username}*, Password *${password}*");
+
         loginUseCase(username, password).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     _state.value = LoginState(token = result.data ?: null)
                     //sacuvaj token
                     GlobalScope.launch(Dispatchers.Main) {
+                        Log.d("STORING", "*${result.data!!.refresh_token}*");
                         DataStoreManager.saveValue(context, "access_token", result.data!!.access_token);
                         DataStoreManager.saveValue(context, "refresh_token", result.data!!.refresh_token);
 
@@ -96,7 +118,7 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token, navigator);
+                        saveUserId(result.data!!.access_token);
                     }
                 }
                 is Resource.Error -> {
@@ -110,7 +132,7 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun saveUserId(access_token: String, navigator : DestinationsNavigator){
+    fun saveUserId(access_token: String){
         getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
@@ -118,15 +140,6 @@ class LoginViewModel @Inject constructor(
                         Log.d("User id", "Fetched user id ${userId}")
                         if (userId != null) {
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
-
-
-                            navigator.navigate(
-                                MainLocationScreenDestination()
-                            ){
-                                popUpTo(LoginScreenDestination.route){
-                                    inclusive = true;
-                                }
-                            }
                         }
                 }
                 is Resource.Error -> {

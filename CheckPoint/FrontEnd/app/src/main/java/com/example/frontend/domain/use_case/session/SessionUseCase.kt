@@ -1,6 +1,9 @@
 package com.example.frontend.domain.use_case.session
 
+import android.util.Log
 import com.example.frontend.common.Resource
+import com.example.frontend.data.remote.dto.toLoginToken
+import com.example.frontend.domain.model.LoginToken
 import com.example.frontend.domain.repository.CheckpointRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,14 +14,18 @@ import javax.inject.Inject
 class SessionUseCase @Inject constructor(
     private val repository : CheckpointRepository
 ){
-    operator fun invoke(token : String) : Flow<Resource<Boolean>> = flow {
+    operator fun invoke(token : String) : Flow<Resource<LoginToken>> = flow {
         try{
             emit(Resource.Loading())
-            val auth = repository.authorizeUser(token)
+            Log.d("SESSION", "Getting");
+            val auth = repository.authorizeUser(token).toLoginToken();
+            Log.d("SESSTON", "Got ${auth.toString()}");
             emit(Resource.Success(auth))
         }catch (e : HttpException){
+            Log.d("SESSION", e.localizedMessage);
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))
         }catch (e : IOException){
+            Log.d("SESSION", e.localizedMessage);
             emit(Resource.Error("Couldn't reach server. Please check your internet connection"))
         }
     }

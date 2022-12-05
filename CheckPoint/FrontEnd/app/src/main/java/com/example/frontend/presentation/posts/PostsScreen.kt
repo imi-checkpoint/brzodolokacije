@@ -182,7 +182,7 @@ fun PostCard(
                        verticalAlignment = Alignment.CenterVertically
                    ){
                        if(viewModel.loginUserId == post.appUserId)
-                           DeletePostButton(postId = post.postId, viewModel = viewModel, stateDelete = stateDelete)
+                           DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
                    }
                 }
 

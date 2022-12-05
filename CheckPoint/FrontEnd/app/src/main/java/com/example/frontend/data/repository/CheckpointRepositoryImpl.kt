@@ -178,8 +178,11 @@ class CheckpointRepositoryImpl(
         return api.saveLocation(token, location)
     }
 
-    override suspend fun authorizeUser(token: String): Boolean {
-        return api.authorizeUser(token);
+    override suspend fun authorizeUser(token: String): LoginDTO {
+        Log.d("SESSION REPO", token);
+        val sess = api.authorizeUser(token);
+        Log.d("SESSION REPO", sess.toString());
+        return sess;
     }
 
 }

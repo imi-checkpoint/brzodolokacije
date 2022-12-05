@@ -40,6 +40,7 @@ class PostViewModel @Inject constructor(
             access_token = DataStoreManager.getStringValue(context, "access_token");
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
+            Log.d("POST VIEW", "*${refresh_token}*");
             getPost(savedStateHandle);
         }
     }
