@@ -6,6 +6,7 @@ import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class AppUserController {
     private final AppUserService appUserService;
     private final JWTService jwtService;
+    private final Environment env;
 
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getAllUsers(){
@@ -74,8 +76,7 @@ public class AppUserController {
             appUser.setImage(profileImage.getBytes());
         }
         else {
-            appUser.setImage(Files.readAllBytes(Path.of("src" + File.separator+ "main" + File.separator+ "resources" + File.separator +
-                    "static" + File.separator+ "images" + File.separator+ "default-user.jpeg")));
+            appUser.setImage(Files.readAllBytes(Path.of(env.getProperty("profile.image.default"))));
         }
 
         try {
