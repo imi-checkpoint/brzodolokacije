@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.login
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
@@ -9,7 +10,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -46,7 +47,8 @@ fun LoginScreen(
             }
         }
     }
-    if(authState.isLoading || viewModel.savedState){
+    if(authState.isLoading){
+        Log.d("LOGIN Scr","Loading ${authState.isLoading}");
         Column (
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -76,7 +78,7 @@ fun LoginScreen(
             )
 
 
-            var usernameValue = "";
+            var usernameValue by remember{ mutableStateOf("") }
             TextInput(
                 inputType = InputType.Name,
                 keyboardActions = KeyboardActions(
@@ -87,7 +89,7 @@ fun LoginScreen(
                 onChange = {usernameValue = it}
             )
 
-            var passwordValue = "";
+            var passwordValue by remember{ mutableStateOf("") }
             TextInput(
                 inputType = InputType.Password,
                 focusRequester = passwordFocusRequester,

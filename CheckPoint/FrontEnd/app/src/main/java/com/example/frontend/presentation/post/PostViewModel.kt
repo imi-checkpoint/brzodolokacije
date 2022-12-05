@@ -37,8 +37,8 @@ class PostViewModel @Inject constructor(
 
     init {
         GlobalScope.launch(Dispatchers.Main){
-            access_token = DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             Log.d("POST VIEW", "*${refresh_token}*");
             getPost(savedStateHandle);

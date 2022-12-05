@@ -33,8 +33,8 @@ class NovPostMapViewModel @Inject constructor(
 
     fun saveLocation(name: String,position: LatLng,navController: DestinationsNavigator){
         GlobalScope.launch(Dispatchers.Main) {
-            var access_token = DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            var access_token = DataStoreManager.getStringValue(context, "access_token").trim();
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             saveLocationUseCase("Bearer " + access_token, LocationDTO(0,name,position.latitude,position.longitude)).map { result ->
                 when (result) {

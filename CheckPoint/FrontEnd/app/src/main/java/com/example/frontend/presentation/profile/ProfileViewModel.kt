@@ -59,10 +59,12 @@ class ProfileViewModel @Inject constructor(
 
     init {
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
+
+            Log.d("PROFILE", "Token is *${refresh_token}*");
 
             getProfileData()
         }
@@ -89,6 +91,7 @@ class ProfileViewModel @Inject constructor(
                     _state.value = ProfileDataState(profileData = result.data ?: null)
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting profile data");
                     _state.value = ProfileDataState(error = result.message ?:
                     "An unexpected error occured")
 
@@ -113,6 +116,7 @@ class ProfileViewModel @Inject constructor(
                     _pictureState.value = ProfilePictureState(profilePicture = result.data ?: "")
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting profile picture");
                     _pictureState.value = ProfilePictureState(error = result.message ?:
                     "An unexpected error occured")
 
@@ -161,6 +165,7 @@ class ProfileViewModel @Inject constructor(
                     _postsState.value = UserPostsState(userPosts = result.data ?: null)
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting user posts");
                     _postsState.value = UserPostsState(error = result.message ?:
                     "An unexpected error occured")
 

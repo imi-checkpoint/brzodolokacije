@@ -81,8 +81,8 @@ class ProfileSettingsViewModel @Inject constructor(
 
     init {
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             loginUserId = DataStoreManager.getLongValue(context, "userId");
 
             getMyData();
@@ -254,7 +254,7 @@ class ProfileSettingsViewModel @Inject constructor(
 
     fun logoutUser(navigator : DestinationsNavigator){
         GlobalScope.launch(Dispatchers.Main){
-//            DataStoreManager.deleteAllPreferences(context)
+            DataStoreManager.deleteAllPreferences(context)
 
 
             navigator.navigate(LoginScreenDestination()){

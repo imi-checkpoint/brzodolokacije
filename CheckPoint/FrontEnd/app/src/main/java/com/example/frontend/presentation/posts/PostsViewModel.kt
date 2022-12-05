@@ -44,6 +44,9 @@ class PostsViewModel @Inject constructor(
     val state : State<PostsState> = _state
     val context = application.baseContext
 
+    var access_token = "";
+    var refresh_token = "";
+
     private val _stateDelete = mutableStateOf(PostStringState())
     val stateDelete : State<PostStringState> = _stateDelete;
 
@@ -63,8 +66,8 @@ class PostsViewModel @Inject constructor(
 
             loginUserId = DataStoreManager.getLongValue(context, "userId");
 
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             getAllPostsForLocationUseCase("Bearer "+access_token, locationId).onEach { result ->
                 when(result){
@@ -92,12 +95,10 @@ class PostsViewModel @Inject constructor(
     fun getPhoto(post: Post): PostCardState {
         val _CardState = mutableStateOf(PostCardState())
         val state : State<PostCardState> = _CardState
-        GlobalScope.launch(Dispatchers.IO){
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            println("test------")
-            if(!post.photos.isEmpty())
-                getPhotoByPostIdAndOrderUseCase("Bearer "+access_token, post.photos[0].postId,post.photos[0].order).map { result ->
+
+        println("test------")
+        if(!post.photos.isEmpty())
+            getPhotoByPostIdAndOrderUseCase("Bearer "+access_token, post.photos[0].postId,post.photos[0].order).map { result ->
                 when(result){
                     is Resource.Success -> {
                         println("--secces")
@@ -121,67 +122,57 @@ class PostsViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
-        }
+
         return _CardState.value;
     }
 
 
     fun deletePostById(postId: Long, locationId: Long)
     {
-        GlobalScope.launch(Dispatchers.IO){
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            deletePostUseCase("Bearer "+access_token, postId).onEach { result ->
-                when(result){
-                    is Resource.Success -> {
-                        _stateDelete.value = PostStringState(message = result.data ?: "")
-                        getAllPostsForLocation(locationId)
-                    }
-                    is Resource.Error -> {
-                        _stateDelete.value = PostStringState(error = result.message ?:
-                        "An unexpected error occured")
-                        if(result.message?.contains("403") == true){
-                            GlobalScope.launch(Dispatchers.Main){
-                                DataStoreManager.deleteAllPreferences(context);
-                            }
+        deletePostUseCase("Bearer "+access_token, postId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateDelete.value = PostStringState(message = result.data ?: "")
+                    getAllPostsForLocation(locationId)
+                }
+                is Resource.Error -> {
+                    _stateDelete.value = PostStringState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
                         }
                     }
-                    is Resource.Loading -> {
-                        _stateDelete.value = PostStringState(isLoading = true)
-                    }
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Loading -> {
+                    _stateDelete.value = PostStringState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun likeOrUnlikePostById(postId: Long)
     {
-        GlobalScope.launch(Dispatchers.IO){
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-
-            likeOrUnlikePostUseCase("Bearer "+access_token, postId).onEach { result ->
-                when(result){
-                    is Resource.Success -> {
-                        _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
-                    }
-                    is Resource.Error -> {
-                        _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
-                        "An unexpected error occured")
-                        if(result.message?.contains("403") == true){
-                            GlobalScope.launch(Dispatchers.Main){
-                                DataStoreManager.deleteAllPreferences(context);
-                            }
-                        }
-
-                    }
-                    is Resource.Loading -> {
-                        _stateLikeOrUnlike.value = PostStringState(isLoading = true)
-                    }
+        likeOrUnlikePostUseCase("Bearer "+access_token, postId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Error -> {
+                    _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+
+                }
+                is Resource.Loading -> {
+                    _stateLikeOrUnlike.value = PostStringState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
 }

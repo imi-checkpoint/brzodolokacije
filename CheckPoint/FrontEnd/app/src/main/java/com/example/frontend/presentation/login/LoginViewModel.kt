@@ -3,14 +3,14 @@ package com.example.frontend.presentation.login
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
+import com.example.frontend.domain.model.LoginToken
 import com.example.frontend.domain.use_case.login_user.GetLoginUserIdUseCase
 import com.example.frontend.domain.use_case.login_user.LoginUseCase
 import com.example.frontend.domain.use_case.session.SessionUseCase
@@ -47,12 +47,12 @@ class LoginViewModel @Inject constructor(
     private val _authState = mutableStateOf(AuthState())
     val authState : State<AuthState> = _authState
 
-    var savedState = true;
     var access_token  = "";
     var refresh_token = "";
 
     init {
         //proveri da li je ulogovan, ako jeste prosledi ga na mainlocation
+        _authState.value = AuthState(isLoading = true);
         GlobalScope.launch(Dispatchers.Main){
             access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
@@ -63,7 +63,8 @@ class LoginViewModel @Inject constructor(
                 authUser();
             }
             else{
-                savedState = false;
+                Log.d("Auth user", "Token is empty");
+                _authState.value = AuthState(isLoading = false);
             }
         }
     }
@@ -82,7 +83,7 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token);
+                        saveUserId(LoginToken(result.data!!.access_token, result.data!!.refresh_token));
 
                         _authState.value = AuthState(isAuthorized = true);
                     }
@@ -106,7 +107,6 @@ class LoginViewModel @Inject constructor(
         loginUseCase(username, password).onEach { result ->
             when(result){
                 is Resource.Success -> {
-                    _state.value = LoginState(token = result.data ?: null)
                     //sacuvaj token
                     GlobalScope.launch(Dispatchers.Main) {
                         Log.d("STORING", "*${result.data!!.refresh_token}*");
@@ -118,7 +118,7 @@ class LoginViewModel @Inject constructor(
                         val username = JSONObject(jwtDecode).getString("sub")
                         DataStoreManager.saveValue(context, "username", username)
 
-                        saveUserId(result.data!!.access_token);
+                        saveUserId(LoginToken(result.data!!.access_token, result.data!!.refresh_token));
                     }
                 }
                 is Resource.Error -> {
@@ -132,15 +132,18 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun saveUserId(access_token: String){
-        getLoginUserIdUseCase("Bearer "+access_token).onEach { result ->
+    fun saveUserId(token : LoginToken){
+        getLoginUserIdUseCase("Bearer "+token.access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                         val userId = result.data
                         Log.d("User id", "Fetched user id ${userId}")
                         if (userId != null) {
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
+
+                            _state.value = LoginState(token = token)
                         }
+
                 }
                 is Resource.Error -> {
                     DataStoreManager.saveValue(context, "userId", 0)

@@ -79,8 +79,8 @@ class NovPostViewModel@Inject constructor(
 
     fun addPhoto(navigator : DestinationsNavigator, postId: Long, order: Int, slikaState: SlikaState) {
         GlobalScope.launch(Dispatchers.IO) {
-            var access_token = DataStoreManager.getStringValue(context, "access_token")
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token")
+            var access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             val path = context.getExternalFilesDir(null)!!.absolutePath
             val tempFile = File(path, "tempFileName${postId}-${order}.jpg")
             val fOut = FileOutputStream(tempFile)
