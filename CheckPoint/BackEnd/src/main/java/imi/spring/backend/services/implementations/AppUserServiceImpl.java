@@ -1,9 +1,9 @@
 package imi.spring.backend.services.implementations;
 
 import imi.spring.backend.models.AppUser;
+import imi.spring.backend.models.UserDTO;
 import imi.spring.backend.repositories.AppUserRepository;
 import imi.spring.backend.services.AppUserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -69,6 +69,30 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUser updateUser(AppUser user) {
         return appUserRepository.save(user);
+    }
+
+    @Override
+    public String changeUserEmail(AppUser appUser, String newEmail) {
+        //regex, provera duzina...
+        appUser.setEmail(newEmail.trim());
+        updateUser(appUser);
+        return "Changed";
+    }
+
+    @Override
+    public String changeUserPassword(AppUser appUser, String[] passwords) {
+        String oldPassword = passwords[0];
+        String newPassword = passwords[1];
+
+        if (bCryptPasswordEncoder.matches(oldPassword, appUser.getPassword())) {
+            appUser.setPassword(bCryptPasswordEncoder.encode(newPassword));
+            log.info("Changing user password for user [{}].", appUser.getUsername());
+            updateUser(appUser);
+            return "Changed";
+        }
+
+        log.error("Incorrect old password.");
+        return "Invalid old password";
     }
 
     @Override

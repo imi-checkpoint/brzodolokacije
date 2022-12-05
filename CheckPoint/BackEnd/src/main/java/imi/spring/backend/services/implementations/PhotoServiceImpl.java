@@ -134,4 +134,10 @@ public class PhotoServiceImpl implements PhotoService {
 
         return actualPhoto;
     }
+
+    @Override
+    public String deletePhotosByPostId(Long postId) {
+        photoRepository.deletePhotosByPostId(postId);
+        return "Deleted";
+    }
 }

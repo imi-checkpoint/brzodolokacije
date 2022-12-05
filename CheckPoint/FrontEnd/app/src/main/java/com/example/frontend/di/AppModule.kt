@@ -13,9 +13,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -25,9 +27,11 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCheckpointApi() : CheckpointApi {
+        var client : OkHttpClient = OkHttpClient().newBuilder().readTimeout(120,TimeUnit.SECONDS).writeTimeout(120,TimeUnit.SECONDS).build()
         return Retrofit
             .Builder()
             .baseUrl(BASE_URL)
+            .client(client)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(
                 Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -35,6 +39,7 @@ object AppModule {
             .build()
             .create(CheckpointApi::class.java)
     }
+
 
     @Provides
     @Singleton

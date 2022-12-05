@@ -1,9 +1,6 @@
 package imi.spring.backend.services.implementations;
 
-import imi.spring.backend.models.AppUser;
-import imi.spring.backend.models.Location;
-import imi.spring.backend.models.Post;
-import imi.spring.backend.models.PostDTO;
+import imi.spring.backend.models.*;
 import imi.spring.backend.repositories.PostRepository;
 import imi.spring.backend.services.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -63,13 +61,13 @@ public class PostServiceImpl implements PostService {
     }
     */
     @Override
-    public String savePost(String description, Long userId, Long locationId) {
+    public Long savePost(String description, Long userId, Long locationId) {
         Location location = locationService.getLocationById(locationId);
         if (location != null) {
-            postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
-            return "Saved";
+            Post p = postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
+            return p.getId();
         }
-        return "Location with that id does not exist!";
+        return -1l;
     }
 
     @Override
@@ -81,6 +79,7 @@ public class PostServiceImpl implements PostService {
             return "This user is not the owner!";
         
         postRepository.deleteById(postId);
+        photoService.deletePhotosByPostId(postId);
         return "Deleted";
     }
 
@@ -120,7 +119,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO convertPostToPostDTO(Post post) throws IOException {
+    public PostDTO convertPostToPostDTO(AppUser userFromJWT, Post post) throws IOException {
         PostDTO postDTO = new PostDTO();
         postDTO.setPostId(post.getId());
         postDTO.setAppUserId(post.getUser().getId());
@@ -128,6 +127,12 @@ public class PostServiceImpl implements PostService {
         postDTO.setLocation(post.getLocation());
         postDTO.setDescription(post.getDescription());
         postDTO.setNumberOfLikes(post.getPostLikeList().size());
+        postDTO.setNumberOfComments(post.getCommentList().size());
+        PostLike like = post.getPostLikeList()
+                .stream()
+                .filter(postLike -> postLike.getUser().equals(userFromJWT))
+                .collect(Collectors.toList()).stream().findFirst().orElse(null);
+        postDTO.setIsLiked(like != null);
 
         postDTO.setPhotos(photoService.getPhotosByPostId(post.getId()));
         postDTO.setVideos(videoService.getVideosByPostId(post.getId()));
@@ -136,11 +141,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> convertListOfPostsToPostDTOs(List<Post> posts) throws IOException {
+    public List<PostDTO> convertListOfPostsToPostDTOs(AppUser userFromJWT, List<Post> posts) throws IOException {
         List<PostDTO> postDTOs = new ArrayList<>();
 
         for(Post post : posts){
-            postDTOs.add(convertPostToPostDTO(post));
+            postDTOs.add(convertPostToPostDTO(userFromJWT, post));
         }
 
         return  postDTOs;
