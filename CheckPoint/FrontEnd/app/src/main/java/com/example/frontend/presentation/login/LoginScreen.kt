@@ -26,17 +26,10 @@ import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
-import com.example.frontend.presentation.destinations.LoginScreenDestination
-import com.example.frontend.presentation.destinations.RegisterScreenDestination
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@RootNavGraph(start = true)
-@Destination
 @Composable
 fun LoginScreen(
-    navigator : DestinationsNavigator,
+    navController : NavController,
     viewModel : LoginViewModel = hiltViewModel()
 )
 {
@@ -86,7 +79,7 @@ fun LoginScreen(
         
         
         Button(onClick = {
-            viewModel.login(usernameValue, passwordValue, navigator);
+            viewModel.login(usernameValue, passwordValue, navController);
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -106,9 +99,8 @@ fun LoginScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Don't have an account?", color = Color.Black)
             TextButton(onClick = {
-
-                navigator.navigate(RegisterScreenDestination()){
-                    popUpTo(LoginScreenDestination.route){
+                navController.navigate(Screen.RegisterScreen.route){
+                    popUpTo(Screen.LoginScreen.route){
                         inclusive = true;
                     }
                 }

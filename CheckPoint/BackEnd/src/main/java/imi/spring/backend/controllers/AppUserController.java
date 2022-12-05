@@ -6,6 +6,7 @@ import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -34,6 +34,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class AppUserController {
     private final AppUserService appUserService;
     private final JWTService jwtService;
+    private final Environment env;
 
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getAllUsers(){
@@ -41,7 +42,7 @@ public class AppUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user) throws IOException {
+    public ResponseEntity<AppUser> saveUser(@RequestBody UserDTO user){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         AppUser appUser = new AppUser(user.getEmail(), user.getUsername(), user.getPassword());
         return ResponseEntity.created(uri).body(appUserService.saveUser(appUser));
@@ -75,8 +76,7 @@ public class AppUserController {
             appUser.setImage(profileImage.getBytes());
         }
         else {
-            appUser.setImage(Files.readAllBytes(Path.of("src" + File.separator+ "main" + File.separator+ "resources" + File.separator +
-                    "static" + File.separator+ "images" + File.separator+ "default-user.jpeg")));
+            appUser.setImage(Files.readAllBytes(Path.of(env.getProperty("profile.image.default"))));
         }
 
         try {
@@ -91,10 +91,9 @@ public class AppUserController {
 
     @GetMapping("/getMyProfilePicture")
     @ResponseBody
-    public String getMyProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    public byte[] getMyProfilePicture(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try{
-            byte[] bytePicture = jwtService.getAppUserFromJWT(request).getImage();
-            return new String(Base64.getEncoder().encode(bytePicture));
+            return jwtService.getAppUserFromJWT(request).getImage();
         } catch (ServletException e) {
             throw new ServletException(e);
         }
@@ -102,21 +101,19 @@ public class AppUserController {
 
     @GetMapping("/getProfilePictureByUserId/{userId}")
     @ResponseBody
-    public String getProfilePictureByUserId(@PathVariable("userId") Long userId) throws IOException {
-        log.info("GET PROFILE PICTURE");
+    public byte[] getProfilePictureByUserId(@PathVariable("userId") Long userId) throws IOException {
         AppUser user = appUserService.getUserById(userId);
 
         if(user != null && user.getImage()!=null){
             log.info("Getting picture for user with id {}", userId);
-            return new String(Base64.getEncoder().encode(user.getImage()));
+            return  user.getImage();
         }
         else{
-            log.error("Error getting picture for user with id {}", userId);
             throw new IOException("Error getting image for that user.");
         }
     }
 
-    @PutMapping("/changeProfilePicture")
+    @GetMapping("/changeProfilePicture")
     @ResponseBody
     public String changeProfilePicture(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "profile_image") MultipartFile profileImage) throws Exception {
         try {
@@ -150,35 +147,5 @@ public class AppUserController {
             log.error("Error finishing request. [{}]", e.getMessage());
             throw new Exception(e.getMessage());
         }
-    }
-
-    @PutMapping("/user/info") //email and username
-    @ResponseBody
-    public String changeUserEmail(HttpServletRequest request, @RequestBody String newEmail) throws ServletException {
-        try {
-            AppUser appUser = jwtService.getAppUserFromJWT(request);
-            return appUserService.changeUserEmail(appUser, newEmail);
-        } catch (ServletException e) {
-            log.error("Error changing user's email, received message [{}]", e.getMessage());
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    @PutMapping("/user/password")
-    @ResponseBody
-    public String changeUserPassword(HttpServletRequest request, @RequestBody String[] passwords) throws ServletException {
-        try {
-            AppUser appUser = jwtService.getAppUserFromJWT(request);
-            return appUserService.changeUserPassword(appUser, passwords);
-        } catch (ServletException e) {
-            log.error("Error changing user password, received message [{}]", e.getMessage());
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    @GetMapping("/user")
-    @ResponseBody
-    public AppUser getUserFromJWT(HttpServletRequest request) throws ServletException {
-        return jwtService.getAppUserFromJWT(request);
     }
 }

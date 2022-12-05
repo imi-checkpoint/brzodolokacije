@@ -26,15 +26,10 @@ import com.example.frontend.R
 import com.example.frontend.common.navigation.Screen
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
-import com.example.frontend.presentation.destinations.LoginScreenDestination
-import com.example.frontend.presentation.destinations.RegisterScreenDestination
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
 @Composable
 fun RegisterScreen(
-    navigator : DestinationsNavigator,
+    navController : NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 )
 {
@@ -110,7 +105,7 @@ fun RegisterScreen(
 
 
         Button(onClick = {
-            viewModel.register(mailValue , usernameValue, passwordValue, passwordRepeatValue, navigator)
+            viewModel.register(mailValue , usernameValue, passwordValue, passwordRepeatValue, navController)
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -131,10 +126,8 @@ fun RegisterScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account?", color = Color.Black)
             TextButton(onClick = {
-                navigator.navigate(
-                    LoginScreenDestination()
-                ){
-                    popUpTo(RegisterScreenDestination.route){
+                navController.navigate(Screen.LoginScreen.route){
+                    popUpTo(Screen.RegisterScreen.route){
                         inclusive = true;
                     }
                 }

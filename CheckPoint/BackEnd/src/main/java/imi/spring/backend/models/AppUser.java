@@ -56,11 +56,4 @@ public class AppUser {
         this.password = password;
     }
 
-    public AppUser(String email, String username, String password, byte[] image) {
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.image = image;
-    }
-
 }

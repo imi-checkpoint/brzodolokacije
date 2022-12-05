@@ -1,9 +1,7 @@
 package com.example.frontend.data.remote
 
 import com.example.frontend.data.remote.dto.*
-import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
-import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface CheckpointApi {
@@ -171,93 +169,5 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
     ) : Long
 
-    @Headers("Content-Type: application/json")
-    @GET("post_likes/count/{postId}")
-    suspend fun getNumberOfLikesByPostId(
-        @Header("Authorization") token : String,
-        @Path("postId") postId:Long
-    ) : Int
 
-    @Headers("Content-Type: application/json")
-    @GET("post/{id}")
-    suspend fun getPostById(
-        @Header("Authorization") token : String,
-        @Path("id") postId : Long
-    ) : PostDTO
-
-
-    @POST("post/save/location/{locationId}")
-    suspend fun savePost(
-        @Header("Authorization") token : String,
-        @Body description: String,
-        @Path("locationId") locationId: Long
-    ) : Long
-
-    @Multipart
-    @POST("photos/add/{postId}/{order}")
-    suspend fun addImage(
-        @Header("Authorization") token : String,
-        @Path("postId") postId:Long,
-        @Path("order") order:Int,
-        @Part photo: MultipartBody.Part
-    ): String
-    @GET("post/{id}/comments/count")
-    suspend fun getNumberOfCommentsByPostId(
-        @Header("Authorization") token : String,
-        @Path("id") postId:Long
-    ) : Int
-
-    @Headers("Content-Type: application/json")
-    @POST("post_likes/save/{postId}")
-    suspend fun likeOrUnlikePostById(
-        @Header("Authorization") token : String,
-        @Path("postId") postId:Long
-    ) : String
-
-    @Headers("Content-Type: application/json")
-    @PUT("api/user/info")
-    suspend fun changeUserEmail(
-        @Header("Authorization") token : String,
-        @Body newEmail: String
-    ) : String
-
-    @Headers("Content-Type: application/json")
-    @PUT("api/user/password")
-    suspend fun changeUserPassword(
-        @Header("Authorization") token : String,
-        @Body passwords: Array<String>
-    ) : String
-
-    //@Headers("Content-Type: application/octet-stream")
-    @Headers("Content-Type: application/json")
-    @GET("api/getMyProfilePicture")
-    suspend fun getMyProfilePicture(
-        @Header("Authorization") token : String
-    ) : String
-
-    @Multipart
-    @PUT("api/changeProfilePicture")
-    suspend fun changeProfilePicture(
-        @Header("Authorization") token : String,
-        @Part profile_image: MultipartBody.Part
-    ) : String
-
-    @Headers("Content-Type: application/json")
-    @GET("api/user")
-    suspend fun getUserFromJWT(
-        @Header("Authorization") token : String
-    ): UserDTO
-
-    @Headers("Content-Type: application/json")
-    @GET("api/getProfilePictureByUserId/{userId}")
-    suspend fun getUserProfilePicture(
-        @Header("Authorization") token : String,
-        @Path("userId") userId: Long
-    ) : String
-    @Headers("Content-Type: application/json")
-    @POST("location/save")
-    suspend fun saveLocation(
-        @Header("Authorization") token : String,
-        @Body location:LocationDTO
-    ) : LocationDTO
 }
