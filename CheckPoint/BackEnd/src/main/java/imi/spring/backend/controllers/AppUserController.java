@@ -185,7 +185,7 @@ public class AppUserController {
 
     @GetMapping("/user/{id}")
     @ResponseBody
-    public AppUser getUserFromJWT(@PathVariable("id") Long id) {
+    public AppUser getUserByUserId(@PathVariable("id") Long id) {
         return appUserService.getUserById(id);
     }
 }
