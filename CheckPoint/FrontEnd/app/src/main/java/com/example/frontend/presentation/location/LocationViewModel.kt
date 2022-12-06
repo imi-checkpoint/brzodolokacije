@@ -13,7 +13,9 @@ import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.DataStoreManager.decodeToken
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.location.components.LocationState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,9 +42,10 @@ class LocationViewModel @Inject constructor(
     var loginUserId = 0L;
 
     init {
+
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
@@ -61,6 +64,12 @@ class LocationViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = LocationState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)
@@ -80,6 +89,12 @@ class LocationViewModel @Inject constructor(
                     _state.value = LocationState(
                         error = result.message ?: "An unexpected error occured"
                     )
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = LocationState(isLoading = true)

@@ -55,15 +55,16 @@ class ProfileViewModel @Inject constructor(
     var access_token  = "";
     var refresh_token = "";
     var username = "";
-    val othUsername = "USERNAME OTHER";
     var loginUserId = 0L;
 
     init {
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
+
+            Log.d("PROFILE", "Token is *${refresh_token}*");
 
             getProfileData()
         }
@@ -90,8 +91,15 @@ class ProfileViewModel @Inject constructor(
                     _state.value = ProfileDataState(profileData = result.data ?: null)
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting profile data");
                     _state.value = ProfileDataState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = ProfileDataState(isLoading = true)
@@ -108,8 +116,15 @@ class ProfileViewModel @Inject constructor(
                     _pictureState.value = ProfilePictureState(profilePicture = result.data ?: "")
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting profile picture");
                     _pictureState.value = ProfilePictureState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _pictureState.value = ProfilePictureState(isLoading = true)
@@ -125,10 +140,17 @@ class ProfileViewModel @Inject constructor(
                     this.getUserProfileData(savedUserId);
                     //da se na prethodnoj strani refreshuje state
                     Constants.refreshFollowUnfollowConstant = savedUserId
+                    Constants.refreshProfileConstant = savedUserId
                 }
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = ProfileDataState(isLoading = true)
@@ -144,8 +166,15 @@ class ProfileViewModel @Inject constructor(
                     _postsState.value = UserPostsState(userPosts = result.data ?: null)
                 }
                 is Resource.Error -> {
+                    Log.d("PROFILE", "Error getting user posts");
                     _postsState.value = UserPostsState(error = result.message ?:
                     "An unexpected error occured")
+
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _postsState.value = UserPostsState(isLoading = true)
@@ -161,9 +190,10 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun proveriConstants(){
-        if(Constants.refreshPhotoConstant != 0L || (this.loginUserId == this.savedUserId && Constants.refreshFollowUnfollowConstant != 0L)){
-            Constants.refreshPhotoConstant = 0L
-            Constants.refreshFollowUnfollowConstant = 0L
+        Log.d("PROFILE", "Proveri constants");
+        if(this.loginUserId == this.savedUserId && Constants.refreshProfileConstant != 0L){
+            Log.d("PROFILE", "Should refresh!");
+            Constants.refreshProfileConstant = 0L
             getProfileData()
         }
     }

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.frontend.common.Resource
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.use_case.register_user.RegisterUseCase
 import com.example.frontend.presentation.destinations.LoginScreenDestination

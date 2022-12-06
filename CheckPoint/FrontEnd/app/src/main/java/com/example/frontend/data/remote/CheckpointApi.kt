@@ -255,6 +255,7 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("userId") userId: Long
     ) : String
+
     @Headers("Content-Type: application/json")
     @POST("location/save")
     suspend fun saveLocation(
@@ -262,6 +263,11 @@ interface CheckpointApi {
         @Body location:LocationDTO
     ) : LocationDTO
 
+    @Headers("Content-Type: application/json")
+    @GET("api/token/refresh")
+    suspend fun authorizeUser(
+        @Header("Authorization") token : String
+    ) : LoginDTO
 
     @Headers("Content-Type: application/json")
     @GET("comments/first/{postId}")

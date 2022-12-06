@@ -24,6 +24,8 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DoorSliding
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
+import com.example.frontend.presentation.destinations.UserListScreenDestination
+import com.example.frontend.presentation.profile.ProfileScreen
+import com.example.frontend.presentation.profile_settings.components.ChangeProfilePictureState
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
@@ -70,6 +80,19 @@ fun ProfileSettingsScreen(
     val stateGetMyProfilePicture = viewModel.stateGetMyProfilePicture.value
     val stateChangeProfilePicture = viewModel.stateChangeProfilePicture.value
     val statePasswordChange = viewModel.statePasswordChange.value
+
+    if(state.error.contains("403") || stateEmailChange.error.contains("403") || stateGetMyProfilePicture.error.contains("403")
+        || stateChangeProfilePicture.error.contains("403") || statePasswordChange.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
+
+    var emailInput = remember {
+        mutableStateOf("")
+    }
 
     val focusManager = LocalFocusManager.current
     var emailFocusRequester = FocusRequester()
@@ -107,15 +130,40 @@ fun ProfileSettingsScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        IconButton(onClick = {
-            //Constants.refreshPhotoConstant = viewModel.loginUserId
-            navigator.popBackStack()
-        }) {
-            androidx.compose.material.Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "",
-                tint = Color.DarkGray
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Row(
+                horizontalArrangement = Arrangement.Start
+            ){
+                IconButton(onClick = {
+                    navigator.popBackStack()
+                }) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "",
+                        tint = Color.DarkGray
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.End
+            ){
+                IconButton(onClick = {
+                    viewModel.logoutUser(navigator);
+                }) {
+                    Icon(
+                        Icons.Default.Logout,
+                        contentDescription = "",
+                        tint = Color.DarkGray
+                    )
+                }
+            }
+
         }
     }
 

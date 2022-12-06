@@ -49,8 +49,8 @@ class UserListViewModel @Inject constructor(
 
     init {
         GlobalScope.launch(Dispatchers.Main){
-            access_token =  DataStoreManager.getStringValue(context, "access_token");
-            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
 
@@ -104,6 +104,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -121,6 +126,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -138,6 +148,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -155,6 +170,11 @@ class UserListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = UserListState(error = result.message ?:
                     "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
                 }
                 is Resource.Loading -> {
                     _state.value = UserListState(isLoading = true)
@@ -167,6 +187,14 @@ class UserListViewModel @Inject constructor(
         refreshPageUseCase().onEach{ result ->
             _isRefreshing.emit(result)
         }.launchIn(viewModelScope)
+    }
+
+    fun proveriConstants(){
+        if(Constants.refreshPhotoConstant != 0L || (this.loginUserId == this.savedUserId && Constants.refreshFollowUnfollowConstant != 0L)){
+            Constants.refreshPhotoConstant = 0L
+            Constants.refreshFollowUnfollowConstant = 0L
+            getAllUsers()
+        }
     }
 
 }

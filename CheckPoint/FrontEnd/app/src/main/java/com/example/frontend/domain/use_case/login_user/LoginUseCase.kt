@@ -1,5 +1,6 @@
 package com.example.frontend.domain.use_case.login_user
 
+import android.util.Log
 import com.example.frontend.common.Resource
 import com.example.frontend.data.remote.dto.toLoginToken
 import com.example.frontend.domain.model.LoginToken
@@ -20,12 +21,16 @@ class LoginUseCase @Inject constructor(
         try {
             emit(Resource.Loading())
             //da je lista, bilo bi .map { it.toLoginToken() }
+            Log.d("LOGIN USE CASE", "Loading");
             val token = repository.login(username, password).toLoginToken()
+            Log.d("LOGIN USE CASE", "Token *${token.toString()}*");
             emit(Resource.Success(token))
 
         }catch (e : HttpException){
+            Log.d("LOGIN USE CASE", "HTTP error ${e.message}");
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))
         }catch (e : IOException){
+            Log.d("LOGIN USE CASE", "IO error ${e.message}");
             emit(Resource.Error("Couldn't reach server. Please check your internet connection"))
         }
     }

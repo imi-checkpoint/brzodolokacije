@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.frontend.common.Resource
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
@@ -80,8 +79,8 @@ class NovPostViewModel@Inject constructor(
 
     fun addPhoto(navigator : DestinationsNavigator, postId: Long, order: Int, slikaState: SlikaState) {
         GlobalScope.launch(Dispatchers.IO) {
-            var access_token = DataStoreManager.getStringValue(context, "access_token")
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token")
+            var access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
+            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
             val path = context.getExternalFilesDir(null)!!.absolutePath
             val tempFile = File(path, "tempFileName${postId}-${order}.jpg")
             val fOut = FileOutputStream(tempFile)
@@ -116,6 +115,12 @@ class NovPostViewModel@Inject constructor(
                         }
                     }
                     is Resource.Error -> {
+                        if(result.message?.contains("403") == true){
+                            GlobalScope.launch(Dispatchers.Main){
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
+
                         println("Greska" + result.message)
                         tempFile.delete()
                     }

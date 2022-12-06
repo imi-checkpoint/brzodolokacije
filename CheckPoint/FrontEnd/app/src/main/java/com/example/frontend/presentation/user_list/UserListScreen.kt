@@ -24,8 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.User
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -44,6 +45,16 @@ fun UserListScreen(
     val state = viewModel.state.value
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchText by remember{ mutableStateOf("") }
+
+    viewModel.proveriConstants();
+
+    if(state.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = isRefreshing),
@@ -190,7 +201,7 @@ fun OneUser(
                     user.id.toString()
                 )
                 navigator.navigate(
-                    ProfileScreenDestination(user.id)
+                    ProfileScreenDestination(user.id, user.username)
                 )
             },
         verticalAlignment = Alignment.CenterVertically,

@@ -16,6 +16,7 @@ class GetUserProfileDataUseCase @Inject constructor(
     operator fun invoke(token:String, userId : Long, loginUserId : Long) : Flow<Resource<ProfileData>> = flow{
         try{
             emit(Resource.Loading())
+            val username = "username korisnika";
             val followersCount = repository.countAllFollowersPerUser(token, userId)
             val followingCount = repository.countAllFollowingByUser(token, userId)
             val postCount = repository.getUserPostsCount(token, userId)
@@ -31,7 +32,7 @@ class GetUserProfileDataUseCase @Inject constructor(
             }
 
 
-            val profileData = ProfileData(followersCount, followingCount, postCount, amFollowing)
+            val profileData = ProfileData(username,followersCount, followingCount, postCount, amFollowing)
             emit(Resource.Success(profileData));
         }catch (e : HttpException){
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))

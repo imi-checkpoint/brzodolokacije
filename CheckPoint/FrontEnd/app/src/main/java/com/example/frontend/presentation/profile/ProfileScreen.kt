@@ -39,11 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Post
-import com.example.frontend.presentation.destinations.PostScreenDestination
-import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
-import com.example.frontend.presentation.destinations.UserListScreenDestination
+import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
 import com.example.frontend.presentation.profile.components.UserPostsState
@@ -60,6 +57,7 @@ import java.util.*
 @Composable
 fun ProfileScreen(
     userId : Long,
+    username : String,
     navigator : DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 )
@@ -72,6 +70,14 @@ fun ProfileScreen(
     viewModel.proveriConstants()
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    if(state.error.contains("403") || pictureState.error.contains("403") || postsState.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = isRefreshing),
@@ -100,7 +106,7 @@ fun ProfileScreen(
                     if(viewModel.savedUserId == viewModel.loginUserId)
                         viewModel.username
                     else
-                        viewModel.othUsername
+                        username
                     ,
                     modifier = Modifier.padding(20.dp),
                     navigator = navigator,
@@ -134,42 +140,69 @@ fun TopBar(
     viewModel: ProfileViewModel
 ){
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
         modifier = modifier
             .fillMaxWidth()
     ){
-        IconButton(onClick = {
-            navigator.popBackStack()
-        }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.Black,
-                modifier = modifier.size(24.dp),
+        Row(
+            horizontalArrangement = Arrangement.Start
+        ){
+            IconButton(onClick = {
+                navigator.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = modifier.size(24.dp),
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = name,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
             )
         }
 
-        Text(
-            text = name,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        if(viewModel.savedUserId == viewModel.loginUserId)
-            IconButton(onClick = {
-                navigator.navigate(
-                    ProfileSettingsScreenDestination()
-                )
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Back",
-                    tint = Color.Black,
-                    modifier = modifier.size(24.dp)
-                )
+        Row(
+            horizontalArrangement = Arrangement.End
+        ){
+            if(viewModel.savedUserId == viewModel.loginUserId)
+            {
+                IconButton(onClick = {
+                    navigator.navigate(
+                        ProfileSettingsScreenDestination()
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Back",
+                        tint = Color.Black,
+                        modifier = modifier.size(24.dp)
+                    )
+                }
             }
+            else{
+                IconButton(onClick = {
+                    /* */
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Back",
+                        tint = Color.Transparent,
+                        modifier = modifier.size(24.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -567,7 +600,7 @@ fun PostCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{
+            .clickable {
                 navigator.navigate(
                     PostScreenDestination(post.postId)
                 )

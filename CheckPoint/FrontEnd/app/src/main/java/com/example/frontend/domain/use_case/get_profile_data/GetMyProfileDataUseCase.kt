@@ -20,7 +20,7 @@ class GetMyProfileDataUseCase @Inject constructor(
             val followingCount = repository.getMyFollowingCount(token)
             val postCount = repository.getMyPostsCount(token)
 
-            val profileData = ProfileData(followersCount, followingCount, postCount, false)
+            val profileData = ProfileData("",followersCount, followingCount, postCount, false)
             emit(Resource.Success(profileData));
         }catch (e : HttpException){
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))

@@ -85,5 +85,7 @@ interface CheckpointRepository {
 
     suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
 
+    suspend fun authorizeUser(token: String) : LoginDTO
+    
     suspend fun getFirstCommentsByPostId(token: String, postId: Long): List<Comment>
 }

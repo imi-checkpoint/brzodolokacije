@@ -33,13 +33,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.domain.model.Location
-import com.example.frontend.presentation.destinations.NovPostScreenDestination
-import com.example.frontend.presentation.destinations.PostsScreenDestination
-import com.example.frontend.presentation.destinations.ProfileScreenDestination
+import com.example.frontend.presentation.destinations.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Destination
 @Composable
@@ -50,6 +50,14 @@ fun MainLocationScreen(
 {
     val state = viewModel.state.value
     var searchText by remember{ mutableStateOf("") }
+
+    if(state.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
 
 
     Column(
@@ -222,7 +230,7 @@ fun ProfileTopBar(
             IconButton(onClick = {
                 viewModel.getAllLocations()
                 navigator.navigate(
-                    ProfileScreenDestination(viewModel.loginUserId)
+                    ProfileScreenDestination(viewModel.loginUserId, "")
                 );
 
             }) {

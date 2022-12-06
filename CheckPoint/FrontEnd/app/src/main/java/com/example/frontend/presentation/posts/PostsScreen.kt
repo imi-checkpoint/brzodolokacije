@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -34,11 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.frontend.common.navigation.Screen
 import com.example.frontend.data.remote.dto.PostDTO
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.PostScreenDestination
+import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.location.ProfileTopBar
 import com.ramcosta.composedestinations.annotation.Destination
@@ -57,6 +62,14 @@ fun PostsScreen(
 
     val state = viewModel.state.value
     val stateDelete = viewModel.stateDelete.value
+
+    if(state.error.contains("403") || stateDelete.error.contains("403")){
+        navigator.navigate(LoginScreenDestination){
+            popUpTo(MainLocationScreenDestination.route){
+                inclusive = true;
+            }
+        }
+    }
     
     Column(
         modifier = Modifier
@@ -148,26 +161,43 @@ fun PostCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    //dodati oblacic sa slikom korisnika
-                    Text(
-                        text = "${post.appUserUsername}",
-                        color = Color.DarkGray
-                    )
-                    if(viewModel.loginUserId == post.appUserId)
-                        DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                    Row(
+                        modifier = Modifier
+                            .clickable{
+                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "",
+                            tint = Color.DarkGray,
+                        )
+                        Text(
+                            text = "${post.appUserUsername}",
+                            color = Color.DarkGray
+                        )
+                    }
+                   Row(
+                       verticalAlignment = Alignment.CenterVertically
+                   ){
+                       if(viewModel.loginUserId == post.appUserId)
+                           DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                   }
                 }
 
+                Row(){
+                    if(post.photos.size > 0){
+                        Spacer(modifier = Modifier.height(5.dp))
+                        PhotoCard(photo = post.photos[0], navigator)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "${post.description}",
                     color = Color.DarkGray
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyRow(){
-                    items(post.photos){
-                        photo->
-                        PhotoCard(photo = photo, navigator)
-                    }
-                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -206,7 +236,7 @@ fun PhotoCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(150.dp)
     ) {
         println(photo.photo.data.toByteArray().size)
         val decoder = Base64.getDecoder()
@@ -215,8 +245,10 @@ fun PhotoCard(
             val mapa:Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
             print(mapa.byteCount)
             if(mapa!=null){
-                Image(bitmap = mapa.asImageBitmap(),
-                    contentDescription = ""
+                Image(
+                    bitmap = mapa.asImageBitmap(),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
                 )
             }
         }

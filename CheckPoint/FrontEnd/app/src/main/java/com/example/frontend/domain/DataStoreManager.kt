@@ -16,6 +16,20 @@ import java.util.*
 val Context.settingsDataStore : DataStore<Preferences> by preferencesDataStore(name = "MyDataStore");
 
 object DataStoreManager {
+
+    suspend fun deleteAllPreferences(context : Context) {
+        context.settingsDataStore.edit {preferences ->
+            preferences.clear()
+        }
+    }
+
+    suspend fun removeValue(context: Context, key : String){
+        val wrappedKey = stringPreferencesKey(key);
+        context.settingsDataStore.edit { preferences ->
+            preferences.remove(wrappedKey)
+        }
+    }
+
     suspend fun saveValue(context: Context, key : String, value : String)
     {
         val wrappedKey = stringPreferencesKey(key);
