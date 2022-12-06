@@ -2,6 +2,7 @@ package com.example.frontend.presentation
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -53,6 +54,13 @@ sealed class InputType(val label:String,
         icon = Icons.Default.Lock,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
+    )
+
+    object NewComment : InputType(
+        label = "",
+        icon = Icons.Default.AddComment,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        visualTransformation = VisualTransformation.None
     )
 
 }

@@ -86,4 +86,6 @@ interface CheckpointRepository {
     suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
 
     suspend fun getFirstCommentsByPostId(token: String, postId: Long): List<Comment>
+
+    suspend fun addComment(token : String, commentText: String, postId:Long, parentCommentId:Long) : String
 }

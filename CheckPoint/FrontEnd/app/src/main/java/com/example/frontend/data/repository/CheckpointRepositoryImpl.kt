@@ -183,4 +183,8 @@ class CheckpointRepositoryImpl(
         return api.getFirstCommentsByPostId(token, postId)
     }
 
+    override suspend fun addComment(token: String, commentText: String, postId: Long, parentCommentId: Long): String {
+        return api.addComment(token, commentText, postId, parentCommentId)
+    }
+
 }

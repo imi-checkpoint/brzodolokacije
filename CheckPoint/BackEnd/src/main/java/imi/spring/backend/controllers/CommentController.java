@@ -40,6 +40,7 @@ public class CommentController {
     @PostMapping("/{postId}/{parentCommentId}/add")
     @ResponseBody
     public String addComment(HttpServletRequest request, @RequestBody String commentText, @PathVariable Long postId, @PathVariable Long parentCommentId) throws ServletException {
+        log.info("usao u cuvanje {} {} {}", commentText, postId, parentCommentId);
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
             return commentService.addComment(commentText, user.getId(), postId, parentCommentId);

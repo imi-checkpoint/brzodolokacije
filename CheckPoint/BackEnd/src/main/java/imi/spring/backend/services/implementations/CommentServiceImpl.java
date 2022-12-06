@@ -66,6 +66,7 @@ public class CommentServiceImpl implements CommentService {
             comment.setParentComment(parentComment);
         }
         commentRepository.save(comment);
+        log.info("Comment saved");
         return "Saved";
     }
 

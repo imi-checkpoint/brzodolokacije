@@ -269,4 +269,13 @@ interface CheckpointApi {
         @Header("Authorization") token: String,
         @Path("postId") postId: Long
     ): List<Comment>
+
+    @Headers("Content-Type: application/json")
+    @POST("comments/{postId}/{parentCommentId}/add")
+    suspend fun addComment(
+        @Header("Authorization") token : String,
+        @Body commentText: String,
+        @Path("postId") postId:Long,
+        @Path("parentCommentId") parentCommentId:Long
+    ) : String
 }
