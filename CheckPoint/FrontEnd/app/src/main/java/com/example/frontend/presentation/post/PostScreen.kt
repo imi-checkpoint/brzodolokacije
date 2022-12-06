@@ -226,7 +226,7 @@ fun ImagePagerSlider(
                             Image(
                                 bitmap = mapa.asImageBitmap(),
                                 contentDescription = "",
-                                contentScale = ContentScale.FillHeight
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }

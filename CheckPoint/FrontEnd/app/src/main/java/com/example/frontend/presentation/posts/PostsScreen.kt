@@ -236,7 +236,9 @@ fun PhotoCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
+            .height(150.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         println(photo.photo.data.toByteArray().size)
         val decoder = Base64.getDecoder()

@@ -53,7 +53,7 @@ class ProfileSettingsViewModel @Inject constructor(
     private val _state = mutableStateOf(ProfileSettingsUserState())
     val state : State<ProfileSettingsUserState> = _state
     val context = application.baseContext
-
+    
     private val _stateGetMyProfilePicture = mutableStateOf(ProfilePictureState())
     val stateGetMyProfilePicture : State<ProfilePictureState> = _stateGetMyProfilePicture
 
@@ -67,7 +67,6 @@ class ProfileSettingsViewModel @Inject constructor(
     var currentPicture: String = "";
     //var flagPictureFirstShow = true;
     var imgbitmap: Bitmap? = null;
-
 
     private val _statePasswordChange = mutableStateOf(UserInfoChangeState())
     val statePasswordChange : State<UserInfoChangeState> = _statePasswordChange
