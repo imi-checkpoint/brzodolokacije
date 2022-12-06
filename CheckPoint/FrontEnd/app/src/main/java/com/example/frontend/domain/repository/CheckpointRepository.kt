@@ -1,12 +1,14 @@
 package com.example.frontend.domain.repository
 
 import com.example.frontend.data.remote.dto.*
+import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.model.RegisterUser
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface CheckpointRepository {
     suspend fun register(appUser : RegisterUser) : String
@@ -84,4 +86,6 @@ interface CheckpointRepository {
     suspend fun saveLocation(token: String, location: LocationDTO) : LocationDTO
 
     suspend fun authorizeUser(token: String) : LoginDTO
+    
+    suspend fun getFirstCommentsByPostId(token: String, postId: Long): List<Comment>
 }

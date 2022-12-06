@@ -12,9 +12,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.IconButton
@@ -23,15 +29,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.LoginScreenDestination
@@ -55,6 +67,7 @@ fun PostScreen(
 )
 {
     val state = viewModel.state.value
+    val stateGetComments = viewModel.stateGetComments.value
 
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
@@ -80,15 +93,17 @@ fun PostScreen(
             )
         }
 
-        if(state.isLoading){
+        if(state.isLoading || stateGetComments.isLoading){
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-        else if(state.post!=null){
-            PostDetails(post = state.post, navigator = navigator)
+        else if (state.error != "" || stateGetComments.error != "") {
+            Text("An error occured while loading this post!");
         }
-
+        else if(state.post!=null){
+            PostDetails(post = state.post, comments = stateGetComments.comments, navigator = navigator)
+        }
     }
 }
 
@@ -97,6 +112,7 @@ fun PostScreen(
 @Composable
 fun PostDetails(
     post: Post,
+    comments: List<Comment>?,
     navigator: DestinationsNavigator
 ){
     Column(
@@ -115,6 +131,8 @@ fun PostDetails(
 
         PostMap(post, navigator)
         Spacer(modifier = Modifier.height(20.dp))
+
+        PostComments(post, comments, navigator)
     }
 
 }
@@ -284,4 +302,177 @@ fun PostMap(
     navigator: DestinationsNavigator
 ){
     Text("POST MAP")
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun PostComments(
+    post : Post,
+    comments: List<Comment>?,
+    navigator: DestinationsNavigator
+){
+
+    Card(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        backgroundColor = Color.White
+    ) {
+        if (comments.isNullOrEmpty()) {
+            //samo forma za dodavanje komentara
+        }
+        else {
+            LazyColumn{
+                items(comments){
+                        comment -> Comment(post, comment, navigator)
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Comment(
+    post : Post,
+    comment: Comment,
+    navigator: DestinationsNavigator
+){
+
+    /*Card(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {*/
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            val painter = rememberImagePainter(
+                data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                builder = {}
+            )
+            Image(
+                painter = painter,
+                contentDescription = "Profile image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(30.dp)
+                    .clip(CircleShape),
+            )
+            Column (
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
+            ) {
+                Text(
+                    text = comment.authorUsername,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = comment.text,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                ClickableText(
+                    text = AnnotatedString(
+                        text = "Reply"
+                    ),
+                    style = TextStyle(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray
+                    ),
+                    onClick = {
+                        println("reply")
+                    }
+                )
+            }
+        }
+    //}
+
+    //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
+
+    comment.subCommentList.forEach {
+        subComment -> SubComment(post = post, comment = comment, subComment = subComment, navigator = navigator)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SubComment(
+    post : Post,
+    comment: Comment,
+    subComment: Comment,
+    navigator: DestinationsNavigator
+){
+    /*Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 70.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+    ) {*/
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 60.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            val painter = rememberImagePainter(
+                data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                builder = {}
+            )
+            Image(
+                painter = painter,
+                contentDescription = "Profile image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(28.dp)
+                    .width(28.dp)
+                    .clip(CircleShape),
+            )
+            Column (
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
+            ) {
+                Text(
+                    text = subComment.authorUsername,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = subComment.text,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                ClickableText(
+                    text = AnnotatedString(
+                        text = "Reply"
+                    ),
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray
+                    ),
+                    onClick = {
+                        println("reply")
+                    }
+                )
+            }
+        }
+    //}
+
+    //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
 }
