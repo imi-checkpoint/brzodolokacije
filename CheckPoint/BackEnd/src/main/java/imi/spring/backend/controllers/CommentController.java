@@ -2,6 +2,7 @@ package imi.spring.backend.controllers;
 
 import imi.spring.backend.models.AppUser;
 import imi.spring.backend.models.Comment;
+import imi.spring.backend.models.CommentDTO;
 import imi.spring.backend.services.CommentService;
 import imi.spring.backend.services.JWTService;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -50,4 +53,14 @@ public class CommentController {
     @DeleteMapping("/delete/{id}")
     @ResponseBody
     public String deleteCommentById(@PathVariable Long id) { return commentService.deleteCommentById(id); }
+
+    @GetMapping("/first/{postId}")
+    @ResponseBody
+    public List<CommentDTO> getFirstCommentsByPostId(HttpServletRequest request, @PathVariable Long postId) throws ServletException, IOException {
+        log.info("Getting all first comments by postId {}.", postId);
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return commentService.convertListOfCommentsToCommentDTOs(user, commentService.getFirstCommentsByPostId(postId));
+        return Collections.emptyList();
+    }
 }
