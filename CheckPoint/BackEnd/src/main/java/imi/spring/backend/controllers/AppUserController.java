@@ -182,4 +182,10 @@ public class AppUserController {
     public AppUser getUserFromJWT(HttpServletRequest request) throws ServletException {
         return jwtService.getAppUserFromJWT(request);
     }
+
+    @GetMapping("/user/{id}")
+    @ResponseBody
+    public AppUser getUserFromJWT(@PathVariable("id") Long id) {
+        return appUserService.getUserById(id);
+    }
 }
