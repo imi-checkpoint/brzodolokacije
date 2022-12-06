@@ -16,10 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -30,12 +28,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +50,9 @@ import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.pager.*
+import com.example.frontend.presentation.InputType
+import com.example.frontend.presentation.TextInput
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
@@ -68,6 +71,7 @@ fun PostScreen(
 {
     val state = viewModel.state.value
     val stateGetComments = viewModel.stateGetComments.value
+    val stateAddComment = viewModel.stateAddComment.value
 
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
@@ -102,7 +106,7 @@ fun PostScreen(
             Text("An error occured while loading this post!");
         }
         else if(state.post!=null){
-            PostDetails(post = state.post, comments = stateGetComments.comments, navigator = navigator)
+            PostDetails(post = state.post, comments = stateGetComments.comments, navigator = navigator, viewModel = viewModel)
         }
     }
 }
@@ -113,7 +117,8 @@ fun PostScreen(
 fun PostDetails(
     post: Post,
     comments: List<Comment>?,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
 ){
     Column(
         modifier = Modifier
@@ -132,7 +137,7 @@ fun PostDetails(
         PostMap(post, navigator)
         Spacer(modifier = Modifier.height(20.dp))
 
-        PostComments(post, comments, navigator)
+        PostComments(post, comments, navigator, viewModel)
     }
 
 }
@@ -310,8 +315,11 @@ fun PostMap(
 fun PostComments(
     post : Post,
     comments: List<Comment>?,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
 ){
+
+    AddCommentField(post, navigator, viewModel)
 
     Card(
         modifier = Modifier
@@ -319,17 +327,91 @@ fun PostComments(
             .fillMaxWidth(),
         backgroundColor = Color.White
     ) {
-        if (comments.isNullOrEmpty()) {
-            //samo forma za dodavanje komentara
-        }
-        else {
+        //AddCommentField(post, navigator, viewModel)
+
+        if (!(comments.isNullOrEmpty()))
             LazyColumn{
                 items(comments){
-                        comment -> Comment(post, comment, navigator)
+                        comment -> Comment(post, comment, navigator, viewModel)
                 }
             }
-        }
+
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun AddCommentField(
+    post : Post,
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
+) {
+    /*Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {*/
+        /*val painterLoginUser = rememberImagePainter(
+            data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+            builder = {}
+        )
+        Image( //loginUser image
+            painter = painterLoginUser,
+            contentDescription = "Profile image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(30.dp)
+                .width(30.dp)
+                .clip(CircleShape),
+        )*/
+        var newCommentText by remember{ mutableStateOf("") }
+        val focusManager = LocalFocusManager.current
+        TextInput(
+            inputType = InputType.NewComment,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }),
+            valuePar = newCommentText,
+            onChange = {newCommentText= it}
+        )
+        /*ClickableText(
+            text = AnnotatedString(
+                text = "Post"
+            ),
+            style = TextStyle(
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Blue
+            ),
+            onClick = {
+                viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
+            }
+        )*/
+        Button(onClick = {
+            println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
+            viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
+            newCommentText = ""
+        },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .height(38.dp)
+                .width(110.dp)
+        ) {
+            Text(
+                text = "Add comment",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+        }
+
+
+    //}
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -338,7 +420,8 @@ fun PostComments(
 fun Comment(
     post : Post,
     comment: Comment,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
 ){
 
     /*Card(
@@ -382,6 +465,7 @@ fun Comment(
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(3.dp))
+
                 ClickableText(
                     text = AnnotatedString(
                         text = "Reply"
@@ -393,6 +477,7 @@ fun Comment(
                     ),
                     onClick = {
                         println("reply")
+                        viewModel.parentCommentId = 0L
                     }
                 )
             }
@@ -402,7 +487,7 @@ fun Comment(
     //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
 
     comment.subCommentList.forEach {
-        subComment -> SubComment(post = post, comment = comment, subComment = subComment, navigator = navigator)
+        subComment -> SubComment(post = post, comment = comment, subComment = subComment, navigator = navigator, viewModel = viewModel)
     }
 }
 
@@ -413,7 +498,8 @@ fun SubComment(
     post : Post,
     comment: Comment,
     subComment: Comment,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
 ){
     /*Card(
         modifier = Modifier
@@ -457,6 +543,7 @@ fun SubComment(
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(3.dp))
+
                 ClickableText(
                     text = AnnotatedString(
                         text = "Reply"
@@ -467,7 +554,7 @@ fun SubComment(
                         color = Color.Gray
                     ),
                     onClick = {
-                        println("reply")
+                        viewModel.parentCommentId = comment.id
                     }
                 )
             }
