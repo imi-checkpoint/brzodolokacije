@@ -60,6 +60,8 @@ fun PostsScreen(
 )
 {
 
+    viewModel.proveriConstants();
+
     val state = viewModel.state.value
     val stateDelete = viewModel.stateDelete.value
 

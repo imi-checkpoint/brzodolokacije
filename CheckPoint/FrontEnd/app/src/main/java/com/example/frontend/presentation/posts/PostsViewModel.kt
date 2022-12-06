@@ -34,7 +34,7 @@ class PostsViewModel @Inject constructor(
     private val getPhotoByPostIdAndOrderUseCase: GetPhotoByPostIdAndOrderUseCase,
     private val deletePostUseCase: DeletePostUseCase,
     private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel(){
 
@@ -43,6 +43,7 @@ class PostsViewModel @Inject constructor(
     private val _state = mutableStateOf(PostsState())
     val state : State<PostsState> = _state
     val context = application.baseContext
+    var locId = 0L;
 
     var access_token = "";
     var refresh_token = "";
@@ -56,6 +57,7 @@ class PostsViewModel @Inject constructor(
     init {
         savedStateHandle.get<Long>(LOCATION_ID)?.let { locationId ->
             Log.d("Location id", locationId.toString())
+            locId = locationId;
             getAllPostsForLocation(locationId)
         }
     }
@@ -173,6 +175,15 @@ class PostsViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun proveriConstants(){
+        if(Constants.refreshComments != 0L){
+            Log.d("REFRESH COMM", "Refresh");
+            Constants.refreshComments = 0L
+            Log.d("Location id", locId.toString())
+            getAllPostsForLocation(locId)
+        }
     }
 
 }

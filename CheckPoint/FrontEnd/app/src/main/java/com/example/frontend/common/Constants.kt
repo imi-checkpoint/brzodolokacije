@@ -15,5 +15,6 @@ public class Constants{
         var refreshPhotoConstant:Long = 0
         var refreshFollowUnfollowConstant:Long = 0
         var refreshProfileConstant:Long = 0
+        var refreshComments:Long = 0
     }
 }

@@ -31,7 +31,7 @@ class PostViewModel @Inject constructor(
     private val getPostUseCase : GetPostUseCase,
     private val getFirstCommentsUseCase: GetFirstCommentsUseCase,
     private val addCommentUseCase: AddCommentUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel() {
 
@@ -56,11 +56,11 @@ class PostViewModel @Inject constructor(
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             Log.d("POST VIEW", "*${refresh_token}*");
-            getPost(savedStateHandle);
+            getPost();
         }
     }
 
-    fun getPost(savedStateHandle : SavedStateHandle){
+    fun getPost(){
         var thisPostId = 0L;
         savedStateHandle.get<Long>(POST_ID)?.let { postId ->
             thisPostId = postId;
@@ -128,6 +128,8 @@ class PostViewModel @Inject constructor(
                         _stateAddComment.value = AddCommentState(message = result.data ?: "")
                         println("SACUVAN KOMENTAR " + result.data)
                         parentCommentId = 0L;
+                        getPost();
+                        Constants.refreshComments = 1L;
                     }
                     is Resource.Error -> {
                         _stateAddComment.value = AddCommentState(error = result.message ?:
