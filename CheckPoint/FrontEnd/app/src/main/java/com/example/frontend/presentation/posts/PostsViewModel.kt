@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.posts
 
+import Constants
 import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -186,4 +187,46 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    fun getPosts():List<Post>{
+        if (Constants.sort == 0){
+            return _state.value.posts!!
+        }
+        else if (Constants.sort == 1){
+            return _state.value.posts!!.reversed()
+        }
+        else if (Constants.sort == 2){
+            return  _state.value.posts!!.sortedBy { it.numberOfLikes }
+        }
+        else if (Constants.sort == 3){
+            return _state.value.posts!!.sortedByDescending { it.numberOfLikes }
+        }
+        else if (Constants.sort == 4){
+            return _state.value.posts!!.sortedBy { it.numberOfComments }
+        }
+        else if (Constants.sort == 5){
+            return _state.value.posts!!.sortedByDescending { it.numberOfComments }
+        }
+         return emptyList()
+    }
+    fun nazivSorta():String{
+        if (Constants.sort == 0){
+            return "Date asc"
+        }
+        else if (Constants.sort == 1){
+            return "Date dsc"
+        }
+        else if (Constants.sort == 2){
+            return  "Likes asc"
+        }
+        else if (Constants.sort == 3){
+            return "Likes dsc"
+        }
+        else if (Constants.sort == 4){
+            return "Comments asc"
+        }
+        else if (Constants.sort == 5){
+            return "Comments dsc"
+        }
+        return ""
+    }
 }

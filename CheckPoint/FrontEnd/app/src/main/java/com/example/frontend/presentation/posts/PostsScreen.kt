@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.posts
 
+import Constants
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -12,9 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -59,9 +58,11 @@ fun PostsScreen(
     viewModel : PostsViewModel = hiltViewModel()
 )
 {
-
+    var sort = remember {
+        mutableStateOf(Constants.sort)
+    }
     viewModel.proveriConstants();
-
+    var expanded = remember { mutableStateOf(false) }
     val state = viewModel.state.value
     val stateDelete = viewModel.stateDelete.value
 
@@ -86,7 +87,32 @@ fun PostsScreen(
                 contentDescription = "",
                 tint = Color.DarkGray)
         }
-        
+        Row(Modifier.fillMaxWidth()){
+            Text(viewModel.nazivSorta()
+                )
+            Spacer(Modifier.weight(1f))
+            Button(onClick = { expanded.value = true },Modifier.wrapContentWidth(),
+                ) {
+                Text("Sort")
+            }
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(300.dp),
+                ) {
+                listOf("Date dsc","Date asc","Likes asc","Likes dsc","Comments asc","Comments dsc").forEachIndexed  { index, item ->
+                    DropdownMenuItem(onClick = {
+                        Constants.sort = index
+                        expanded.value = false
+                    }
+                    ) {
+                        Text(item)
+                    }
+                }
+            }
+        }
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
@@ -94,7 +120,7 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(state.posts, navigator, viewModel, stateDelete)
+            AllPosts(viewModel.getPosts(), navigator, viewModel, stateDelete)
         }
     }
 }
