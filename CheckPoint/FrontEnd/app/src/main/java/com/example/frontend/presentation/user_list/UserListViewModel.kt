@@ -189,4 +189,12 @@ class UserListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun proveriConstants(){
+        if(Constants.refreshPhotoConstant != 0L || (this.loginUserId == this.savedUserId && Constants.refreshFollowUnfollowConstant != 0L)){
+            Constants.refreshPhotoConstant = 0L
+            Constants.refreshFollowUnfollowConstant = 0L
+            getAllUsers()
+        }
+    }
+
 }

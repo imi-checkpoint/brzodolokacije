@@ -164,7 +164,7 @@ fun PostCard(
                     Row(
                         modifier = Modifier
                             .clickable{
-                                navigator.navigate(ProfileScreenDestination(post.appUserId))
+                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ){

@@ -133,27 +133,35 @@ fun ProfileSettingsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
-            IconButton(onClick = {
-                navigator.popBackStack()
-            }) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "",
-                    tint = Color.DarkGray
-                )
+            Row(
+                horizontalArrangement = Arrangement.Start
+            ){
+                IconButton(onClick = {
+                    navigator.popBackStack()
+                }) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "",
+                        tint = Color.DarkGray
+                    )
+                }
             }
 
-            IconButton(onClick = {
-                viewModel.logoutUser(navigator);
-            }) {
-                Icon(
-                    Icons.Default.Logout,
-                    contentDescription = "",
-                    tint = Color.DarkGray
-                )
+            Row(
+                horizontalArrangement = Arrangement.End
+            ){
+                IconButton(onClick = {
+                    viewModel.logoutUser(navigator);
+                }) {
+                    Icon(
+                        Icons.Default.Logout,
+                        contentDescription = "",
+                        tint = Color.DarkGray
+                    )
+                }
             }
 
         }

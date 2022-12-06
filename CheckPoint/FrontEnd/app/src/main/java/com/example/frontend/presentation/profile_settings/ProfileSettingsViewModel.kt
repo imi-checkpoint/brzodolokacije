@@ -2,6 +2,7 @@ package com.example.frontend.presentation.profile_settings
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -257,15 +258,21 @@ class ProfileSettingsViewModel @Inject constructor(
     }
 
     fun logoutUser(navigator : DestinationsNavigator){
+        Log.d("LOGOUT", "Logout user");
         GlobalScope.launch(Dispatchers.Main){
             DataStoreManager.deleteAllPreferences(context)
 
+            Log.d("LOGOUT", "Cleared preferences");
 
             navigator.navigate(LoginScreenDestination()){
                 popUpTo(ProfileSettingsScreenDestination.route){
-                    inclusive = true;
+                    inclusive = true
+                    saveState = false
                 }
             }
+
+            Log.d("Navigator", navigator.toString());
+            Log.d("LOGOUT", "Logged out user");
 
         }
     }

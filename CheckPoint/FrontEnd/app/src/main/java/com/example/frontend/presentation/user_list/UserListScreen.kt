@@ -46,6 +46,8 @@ fun UserListScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchText by remember{ mutableStateOf("") }
 
+    viewModel.proveriConstants();
+
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
@@ -199,7 +201,7 @@ fun OneUser(
                     user.id.toString()
                 )
                 navigator.navigate(
-                    ProfileScreenDestination(user.id)
+                    ProfileScreenDestination(user.id, user.username)
                 )
             },
         verticalAlignment = Alignment.CenterVertically,

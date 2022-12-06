@@ -55,7 +55,6 @@ class ProfileViewModel @Inject constructor(
     var access_token  = "";
     var refresh_token = "";
     var username = "";
-    val othUsername = "USERNAME OTHER";
     var loginUserId = 0L;
 
     init {
@@ -141,6 +140,7 @@ class ProfileViewModel @Inject constructor(
                     this.getUserProfileData(savedUserId);
                     //da se na prethodnoj strani refreshuje state
                     Constants.refreshFollowUnfollowConstant = savedUserId
+                    Constants.refreshProfileConstant = savedUserId
                 }
                 is Resource.Error -> {
                     _state.value = ProfileDataState(error = result.message ?:
@@ -190,9 +190,10 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun proveriConstants(){
-        if(Constants.refreshPhotoConstant != 0L || (this.loginUserId == this.savedUserId && Constants.refreshFollowUnfollowConstant != 0L)){
-            Constants.refreshPhotoConstant = 0L
-            Constants.refreshFollowUnfollowConstant = 0L
+        Log.d("PROFILE", "Proveri constants");
+        if(this.loginUserId == this.savedUserId && Constants.refreshProfileConstant != 0L){
+            Log.d("PROFILE", "Should refresh!");
+            Constants.refreshProfileConstant = 0L
             getProfileData()
         }
     }

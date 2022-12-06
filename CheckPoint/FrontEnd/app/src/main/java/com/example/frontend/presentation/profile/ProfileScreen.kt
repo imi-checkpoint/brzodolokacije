@@ -57,6 +57,7 @@ import java.util.*
 @Composable
 fun ProfileScreen(
     userId : Long,
+    username : String,
     navigator : DestinationsNavigator,
     viewModel: ProfileViewModel = hiltViewModel()
 )
@@ -105,7 +106,7 @@ fun ProfileScreen(
                     if(viewModel.savedUserId == viewModel.loginUserId)
                         viewModel.username
                     else
-                        viewModel.othUsername
+                        username
                     ,
                     modifier = Modifier.padding(20.dp),
                     navigator = navigator,
@@ -139,42 +140,69 @@ fun TopBar(
     viewModel: ProfileViewModel
 ){
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
         modifier = modifier
             .fillMaxWidth()
     ){
-        IconButton(onClick = {
-            navigator.popBackStack()
-        }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.Black,
-                modifier = modifier.size(24.dp),
+        Row(
+            horizontalArrangement = Arrangement.Start
+        ){
+            IconButton(onClick = {
+                navigator.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = modifier.size(24.dp),
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = name,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
             )
         }
 
-        Text(
-            text = name,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        if(viewModel.savedUserId == viewModel.loginUserId)
-            IconButton(onClick = {
-                navigator.navigate(
-                    ProfileSettingsScreenDestination()
-                )
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Back",
-                    tint = Color.Black,
-                    modifier = modifier.size(24.dp)
-                )
+        Row(
+            horizontalArrangement = Arrangement.End
+        ){
+            if(viewModel.savedUserId == viewModel.loginUserId)
+            {
+                IconButton(onClick = {
+                    navigator.navigate(
+                        ProfileSettingsScreenDestination()
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Back",
+                        tint = Color.Black,
+                        modifier = modifier.size(24.dp)
+                    )
+                }
             }
+            else{
+                IconButton(onClick = {
+                    /* */
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Back",
+                        tint = Color.Transparent,
+                        modifier = modifier.size(24.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -572,7 +600,7 @@ fun PostCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{
+            .clickable {
                 navigator.navigate(
                     PostScreenDestination(post.postId)
                 )

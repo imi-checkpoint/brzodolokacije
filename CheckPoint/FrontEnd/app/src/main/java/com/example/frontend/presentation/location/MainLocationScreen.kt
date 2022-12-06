@@ -230,7 +230,7 @@ fun ProfileTopBar(
             IconButton(onClick = {
                 viewModel.getAllLocations()
                 navigator.navigate(
-                    ProfileScreenDestination(viewModel.loginUserId)
+                    ProfileScreenDestination(viewModel.loginUserId, "")
                 );
 
             }) {
