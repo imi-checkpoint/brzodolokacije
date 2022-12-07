@@ -161,6 +161,11 @@ public class PostServiceImpl implements PostService {
             posts.addAll(this.getPostsByUserId(user.getId()));
         }
 
+        Collections.sort(
+                posts,
+                ((o1, o2) -> (int) (o2.getId() - o1.getId()))
+        );
+
         return posts;
     }
 }
