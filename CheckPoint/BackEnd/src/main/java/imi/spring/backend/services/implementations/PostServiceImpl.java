@@ -27,7 +27,7 @@ public class PostServiceImpl implements PostService {
     private final AppUserService appUserService;
     private final PhotoService photoService;
     private final VideoService videoService;
-
+    private final FollowersService followersService;
     @Override
     public List<Post> getAllPosts() {
         return postRepository.findAll();
@@ -149,5 +149,23 @@ public class PostServiceImpl implements PostService {
         }
 
         return  postDTOs;
+    }
+
+    @Override
+    public List<Post> getPostsOfUsersThatIFollow(AppUser userFromJWT) {
+        List<Post> posts = new ArrayList<>();
+
+        List<AppUser> followingUsers = followersService.getMyFollowing(userFromJWT);
+
+        for(AppUser user : followingUsers){
+            posts.addAll(this.getPostsByUserId(user.getId()));
+        }
+
+        Collections.sort(
+                posts,
+                ((o1, o2) -> (int) (o2.getId() - o1.getId()))
+        );
+
+        return posts;
     }
 }
