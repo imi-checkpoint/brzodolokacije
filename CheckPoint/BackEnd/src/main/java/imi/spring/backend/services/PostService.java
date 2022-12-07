@@ -23,4 +23,5 @@ public interface PostService {
     Long getNumberOfPostsByUserId(Long userId);
     PostDTO convertPostToPostDTO(AppUser userFromJWT, Post post) throws IOException;
     List<PostDTO> convertListOfPostsToPostDTOs(AppUser userFromJWT, List<Post> posts) throws IOException;
+    List<Post> getPostsOfUsersThatIFollow(AppUser userFromJWT);
 }
