@@ -16,5 +16,7 @@ public class Constants{
         var refreshFollowUnfollowConstant:Long = 0
         var refreshProfileConstant:Long = 0
         var refreshComments:Long = 0
+
+        var sort: Int = 0
     }
 }
