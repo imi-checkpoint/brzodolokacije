@@ -6,6 +6,7 @@ import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -49,7 +50,8 @@ class PostViewModel @Inject constructor(
     private val _stateAddComment = mutableStateOf(AddCommentState())
     val stateAddComment : State<AddCommentState> = _stateAddComment
     var commentText: String = ""
-    var parentCommentId: Long = 0L;
+    var parentCommentId = mutableStateOf(0L)
+    var replyToUsername = mutableStateOf("")
 
     private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
     val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
@@ -99,6 +101,9 @@ class PostViewModel @Inject constructor(
 
     fun getFirstCommentsByPostId(postId: Long)
     {
+        var parentCommentId = 0L;
+        var replyToUsername = "";
+
         GlobalScope.launch(Dispatchers.Main){
 
             var access_token =  DataStoreManager.getStringValue(context, "access_token");
@@ -134,7 +139,7 @@ class PostViewModel @Inject constructor(
                     is Resource.Success -> {
                         _stateAddComment.value = AddCommentState(message = result.data ?: "")
                         println("SACUVAN KOMENTAR " + result.data)
-                        parentCommentId = 0L;
+                        parentCommentId.value = 0L;
                         //getPost();
                         getFirstCommentsByPostId(postId)
                         Constants.refreshComments = 1L;

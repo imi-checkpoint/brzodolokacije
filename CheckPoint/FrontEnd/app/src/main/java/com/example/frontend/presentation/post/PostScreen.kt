@@ -47,6 +47,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import java.util.*
@@ -64,8 +65,6 @@ fun PostScreen(
     val state = viewModel.state.value
     val stateGetComments = viewModel.stateGetComments.value
     val stateAddComment = viewModel.stateAddComment.value
-
-    val scrollState = rememberScrollState()
 
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
@@ -221,7 +220,8 @@ fun UsernameAndLike(
                     Icon(
                         if (likedBool) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (likedBool) "Unlike" else "Like",
-                        tint = if (likedBool) Color.Red else Color.DarkGray
+                        tint = if (likedBool) Color.Red else Color.DarkGray,
+                        modifier = Modifier.size(30.dp)
                     )
                 }
                 Text(
@@ -428,17 +428,19 @@ fun PostComments(
     viewModel: PostViewModel
 ){
 
-    AddCommentField(post, viewModel)
+    AddFirstCommentCard(post, viewModel)
 
     Row(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
             .fillMaxWidth()
+            .heightIn(0.dp, 500.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         if (!(comments.isNullOrEmpty()))
             Column {
                 comments.forEach{ comment ->
-                    Comment(post, comment, navigator, viewModel)
+                    CommentCard(post, comment, navigator, viewModel)
                 }
             }
     }
@@ -447,23 +449,11 @@ fun PostComments(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AddCommentField(
+fun AddFirstCommentCard(
     post : Post,
     viewModel: PostViewModel
 ) {
-        /*val painterLoginUser = rememberImagePainter(
-            data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-            builder = {}
-        )
-        Image( //loginUser image
-            painter = painterLoginUser,
-            contentDescription = "Profile image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .height(30.dp)
-                .width(30.dp)
-                .clip(CircleShape),
-        )*/
+
     Card(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 0.dp)
@@ -478,55 +468,41 @@ fun AddCommentField(
         ) {
             var newCommentText by remember { mutableStateOf("") }
             val focusManager = LocalFocusManager.current
+
             BasicTextField(
                 modifier = Modifier
-                    //.fillMaxWidth()
-                    //.height(32.dp)
                     .weight(3f)
                     .border(
                         BorderStroke(1.dp, Color.LightGray),
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(6.dp),
-                    value = newCommentText,
-                    onValueChange = { newCommentText = it },
-                    singleLine = true,
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.padding(2.dp)
-                        ) {
-                            if (newCommentText.isEmpty()) {
-                                Text(
-                                    text = "Add a comment...",
-                                    color = Color.Gray,
-                                    fontSize = 14.sp
-                                )
-                            }
-                            innerTextField()
+                    .padding(6.dp)
+                    /*.background(
+                        color = if (viewModel.replyToUsername.value == "") Color.White else Color.LightGray
+                    )*/,
+                value = newCommentText,
+                onValueChange = { newCommentText = it },
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.padding(2.dp)
+                    ) {
+                        if (newCommentText.isEmpty()) {
+                            Text(
+                                text = "Add a comment...",
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
                         }
-                    },
-                    textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 14.sp)
-                )
-            /*ClickableText(
-                text = AnnotatedString(
-                    text = "Post"
-                ),
-                style = TextStyle(
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Blue
-                ),
-                onClick = {
-                    println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
-                    viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
-                    newCommentText = ""
-                }
-            )*/
+                        innerTextField()
+                    }
+                },
+                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 14.sp)
+            )
             Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
-                    println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
-                    viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
+                    viewModel.addComment(post.postId, 0L, newCommentText)
                     newCommentText = ""
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -550,7 +526,102 @@ fun AddCommentField(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Comment(
+fun AddSecondCommentCard(
+    post : Post,
+    viewModel: PostViewModel
+) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RectangleShape
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 60.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val painterLoginUser = rememberImagePainter(
+                data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                builder = {}
+            )
+            Image ( //loginUser image
+                painter = painterLoginUser,
+                contentDescription = "Profile image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(28.dp)
+                    .width(28.dp)
+                    .clip(CircleShape),
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            var newSecondCommentText by remember { mutableStateOf("") }
+            val focusManager = LocalFocusManager.current
+
+            BasicTextField(
+                modifier = Modifier
+                    .weight(3f)
+                    .border(
+                        BorderStroke(1.dp, Color.LightGray),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(2.dp)
+                /*.background(
+                    color = if (viewModel.replyToUsername.value == "") Color.White else Color.LightGray
+                )*/,
+                value = newSecondCommentText,
+                onValueChange = { newSecondCommentText = it },
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.padding(3.dp)
+                    ) {
+                        if (newSecondCommentText.isEmpty()) {
+                            Text(
+                                text = "Replying to ${viewModel.replyToUsername.value}",
+                                color = Color.Gray,
+                                fontSize = 12.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                },
+                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 12.sp)
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+            Button(
+                onClick = {
+                    viewModel.addComment(post.postId, viewModel.parentCommentId.value, newSecondCommentText)
+                    newSecondCommentText = ""
+                    viewModel.replyToUsername.value = ""
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White
+                ),
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(60.dp)
+                    .align(CenterVertically)
+            ) {
+                Text(
+                    text = "Add",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.Blue
+                )
+            }
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun CommentCard(
     post : Post,
     comment: Comment,
     navigator: DestinationsNavigator,
@@ -565,7 +636,7 @@ fun Comment(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 10.dp),
+                .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -600,6 +671,7 @@ fun Comment(
                 )
                 Spacer(modifier = Modifier.height(3.dp))
 
+
                 ClickableText(
                     text = AnnotatedString(
                         text = "Reply"
@@ -610,8 +682,8 @@ fun Comment(
                         color = Color.Gray
                     ),
                     onClick = {
-                        println("reply")
-                        viewModel.parentCommentId = 0L
+                        viewModel.replyToUsername.value = comment.authorUsername
+                        viewModel.parentCommentId.value = comment.id
                     }
                 )
             }
@@ -621,14 +693,18 @@ fun Comment(
     //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
 
     comment.subCommentList.forEach {
-        subComment -> SubComment(post = post, comment = comment, subComment = subComment, navigator = navigator, viewModel = viewModel)
+        subComment -> SubCommentCard(post = post, comment = comment, subComment = subComment, navigator = navigator, viewModel = viewModel)
+    }
+
+    if (viewModel.parentCommentId.value == comment.id) {
+        AddSecondCommentCard(post = post, viewModel = viewModel)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SubComment(
+fun SubCommentCard(
     post : Post,
     comment: Comment,
     subComment: Comment,
@@ -638,13 +714,12 @@ fun SubComment(
     Card(
         modifier = Modifier
             .fillMaxWidth(),
-            //.padding(start = 70.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
         shape = RectangleShape
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 60.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
+                .padding(start = 60.dp, end = 10.dp, top = 0.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -652,6 +727,7 @@ fun SubComment(
                 data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 builder = {}
             )
+
             Image(
                 painter = painterSubcommentProfile,
                 contentDescription = "Profile image",
@@ -689,7 +765,8 @@ fun SubComment(
                         color = Color.Gray
                     ),
                     onClick = {
-                        viewModel.parentCommentId = comment.id
+                        viewModel.parentCommentId.value = comment.id
+                        viewModel.replyToUsername.value = subComment.authorUsername
                     }
                 )
             }
