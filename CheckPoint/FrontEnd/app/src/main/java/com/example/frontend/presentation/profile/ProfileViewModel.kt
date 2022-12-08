@@ -190,9 +190,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun proveriConstants(){
-        Log.d("PROFILE", "Proveri constants");
-        if(this.loginUserId == this.savedUserId && Constants.refreshProfileConstant != 0L){
-            Log.d("PROFILE", "Should refresh!");
+        if(this.loginUserId == this.savedUserId && (Constants.refreshFollowUnfollowConstant != 0L || Constants.refreshProfileConstant != 0L || Constants.refreshPhotoConstant != 0L)){
+            Constants.refreshPhotoConstant = 0L
+            Constants.refreshFollowUnfollowConstant = 0L
             Constants.refreshProfileConstant = 0L
             getProfileData()
         }
