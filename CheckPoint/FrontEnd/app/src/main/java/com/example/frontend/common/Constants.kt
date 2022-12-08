@@ -18,5 +18,6 @@ public class Constants{
         var refreshComments:Long = 0
 
         var sort: Int = 0
+        var postLikeChangedSinglePostPage: Boolean = false
     }
 }

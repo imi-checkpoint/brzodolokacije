@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.post
 
+import Constants
 import Constants.Companion.POST_ID
 import android.app.Application
 import android.util.Log
@@ -14,9 +15,11 @@ import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.use_case.get_post.GetPostUseCase
 import com.example.frontend.domain.use_case.post_comments.AddCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.GetFirstCommentsUseCase
+import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 import com.example.frontend.presentation.post.components.AddCommentState
 import com.example.frontend.presentation.post.components.PostCommentsState
 import com.example.frontend.presentation.post.components.PostState
+import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.posts.components.PostsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +34,7 @@ class PostViewModel @Inject constructor(
     private val getPostUseCase : GetPostUseCase,
     private val getFirstCommentsUseCase: GetFirstCommentsUseCase,
     private val addCommentUseCase: AddCommentUseCase,
+    private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
     private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel() {
@@ -46,6 +50,9 @@ class PostViewModel @Inject constructor(
     val stateAddComment : State<AddCommentState> = _stateAddComment
     var commentText: String = ""
     var parentCommentId: Long = 0L;
+
+    private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
+    val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
 
     var access_token = "";
     var refresh_token = "";
@@ -128,7 +135,8 @@ class PostViewModel @Inject constructor(
                         _stateAddComment.value = AddCommentState(message = result.data ?: "")
                         println("SACUVAN KOMENTAR " + result.data)
                         parentCommentId = 0L;
-                        getPost();
+                        //getPost();
+                        getFirstCommentsByPostId(postId)
                         Constants.refreshComments = 1L;
                     }
                     is Resource.Error -> {
@@ -142,5 +150,29 @@ class PostViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
         }
+    }
+
+    fun likeOrUnlikePostById(postId: Long)
+    {
+        likeOrUnlikePostUseCase("Bearer "+access_token, postId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
+                    Constants.postLikeChangedSinglePostPage = true
+                }
+                is Resource.Error -> {
+                    _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+                }
+                is Resource.Loading -> {
+                    _stateLikeOrUnlike.value = PostStringState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 }

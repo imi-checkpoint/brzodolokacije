@@ -3,13 +3,10 @@ package com.example.frontend.presentation.post
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
-import android.util.Log
-import android.widget.RatingBar
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,9 +15,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
-import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,12 +25,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
@@ -55,8 +51,8 @@ import com.example.frontend.presentation.TextInput
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import java.util.*
 import kotlin.math.absoluteValue
 
@@ -73,6 +69,8 @@ fun PostScreen(
     val stateGetComments = viewModel.stateGetComments.value
     val stateAddComment = viewModel.stateAddComment.value
 
+    val scrollState = rememberScrollState()
+
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
@@ -84,7 +82,7 @@ fun PostScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(start = 10.dp, end = 10.dp, top = 15.dp, bottom = 15.dp)
     ) {
 
         IconButton(onClick = {
@@ -120,28 +118,164 @@ fun PostDetails(
     navigator: DestinationsNavigator,
     viewModel: PostViewModel
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
 
-        //photo slider
-        if(post.photos.size > 0)
-            ImagePagerSlider(post.photos);
+    UsernameAndLike(post, navigator, viewModel)
 
-        Spacer(modifier = Modifier.height(20.dp))
+    //photo slider
+    if(post.photos.size > 0)
+        ImagePagerSlider(post.photos)
 
-        PostDescription(post, navigator);
-        Spacer(modifier = Modifier.height(20.dp))
+    DescriptionOrLocation(post, navigator)
 
-        PostMap(post, navigator)
-        Spacer(modifier = Modifier.height(20.dp))
+    PostDescription(post, navigator);
+    //Spacer(modifier = Modifier.height(20.dp))
 
-        PostComments(post, comments, navigator, viewModel)
-    }
+    PostMap(post, navigator)
+    //Spacer(modifier = Modifier.height(20.dp))
 
+    PostComments(post, comments, navigator, viewModel)
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
+@Composable
+fun UsernameAndLike(
+    post : Post,
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
+){
+    val painterLoginPhoto = rememberImagePainter(
+        data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+        builder = {}
+    )
+
+    Card(
+        modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
+            .fillMaxWidth(),
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Row(
+                modifier = Modifier
+                    .clickable{
+                        navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Image(
+                    painter = painterLoginPhoto,
+                    contentDescription = "Profile image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(25.dp)
+                        .width(25.dp)
+                        .clip(CircleShape),
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                /*
+                val photo = pictureState.profilePicture;
+                val decoder = Base64.getDecoder()
+                val photoBytes = decoder.decode(photo)
+                if(photoBytes.size>1){
+                    val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                    print(mapa.byteCount)
+                    if(mapa!=null){
+                        Image(
+                            bitmap = mapa.asImageBitmap(),
+                            modifier = Modifier
+                                .height(100.dp)
+                                .width(100.dp)
+                                .clip(CircleShape),
+                            contentDescription ="Profile image" ,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                 */
+                Text(
+                    text = post.appUserUsername,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                var likedBool by remember{ mutableStateOf(post.isLiked) }
+                var likeCount by remember{ mutableStateOf(post.numberOfLikes) }
+
+                IconButton(onClick = {
+                    viewModel.likeOrUnlikePostById(post.postId)
+                    likedBool = !likedBool
+                    if (likedBool)
+                        likeCount += 1;
+                    else
+                        likeCount -= 1;
+                }) {
+                    Icon(
+                        if (likedBool) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (likedBool) "Unlike" else "Like",
+                        tint = if (likedBool) Color.Red else Color.DarkGray
+                    )
+                }
+                Text(
+                    text = "${likeCount}",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
+@Composable
+fun DescriptionOrLocation(
+    post : Post,
+    navigator: DestinationsNavigator
+) {
+    Card(
+        modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
+            .fillMaxWidth(),
+        backgroundColor = Color.White,
+        shape = RectangleShape
+    ) {
+
+        //jedno ili drugo if else
+
+        //description
+
+
+        //location
+        /*
+        Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    Icons.Default.LocationOn,
+                    contentDescription = "",
+                    tint = Color(0xff203f1e)
+                )
+                Text(
+                    text = post.location.name,
+                    style = MaterialTheme.typography.bodyMedium
+                );
+            }
+         */
+
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalPagerApi
@@ -167,86 +301,93 @@ fun ImagePagerSlider(
 //        }
 //    }
 
-    Column(
+    Card(
         modifier = Modifier
+            .padding(horizontal = 10.dp, vertical = 0.dp)
             .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-
+        shape = RectangleShape,
+        backgroundColor = Color.White
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp),
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ){
 
-            HorizontalPager(
-                state = pagerState,
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(0.dp, 40.dp, 0.dp, 40.dp)
-            ) {
-                    page->
-                Card(
+                    .fillMaxWidth()
+                    .height(250.dp),
+            ){
+
+                HorizontalPager(
+                    state = pagerState,
                     modifier = Modifier
-                        .graphicsLayer {
-                            val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
-
-                            lerp(
-                                start = 0.85f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            ).also { scale ->
-                                scaleX = scale
-                                scaleY = scale
-                            }
-
-                            alpha = lerp(
-                                start = 0.5f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            )
-                        }
-                        .fillMaxWidth()
-                        .padding(25.dp, 0.dp, 25.dp, 0.dp),
-                    shape = RoundedCornerShape(20.dp)
-                ){
-
-                    val photo = photos[page];
-
-                    Box(
+                        .weight(1f)
+                        .padding(0.dp, 30.dp, 0.dp, 15.dp)
+                ) {
+                        page->
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.LightGray)
-                            .align(Alignment.Center)
-                    )
+                            .graphicsLayer {
+                                val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
 
-                    val decoder = Base64.getDecoder()
-                    val photoBytes = decoder.decode(photo.photo.data)
-                    if(photoBytes.size>1) {
-                        val mapa: Bitmap =
-                            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
-                        print(mapa.byteCount)
-                        if (mapa != null) {
-                            Image(
-                                bitmap = mapa.asImageBitmap(),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop
-                            )
+                                lerp(
+                                    start = 0.85f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                ).also { scale ->
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            }
+                            .fillMaxWidth()
+                            .padding(25.dp, 0.dp, 25.dp, 0.dp),
+                        shape = RoundedCornerShape(15.dp)
+                    ){
+
+                        val photo = photos[page];
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.LightGray)
+                                .align(Alignment.Center)
+                        )
+
+                        val decoder = Base64.getDecoder()
+                        val photoBytes = decoder.decode(photo.photo.data)
+                        if(photoBytes.size>1) {
+                            val mapa: Bitmap =
+                                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
+                            print(mapa.byteCount)
+                            if (mapa != null) {
+                                Image(
+                                    bitmap = mapa.asImageBitmap(),
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
                     }
                 }
             }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 16.dp, bottom = 20.dp)
+            )
         }
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
-        )
     }
 }
-
 
 @Composable
 fun PostDescription(
@@ -254,44 +395,7 @@ fun PostDescription(
     navigator: DestinationsNavigator
 ){
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Row(
-            modifier = Modifier
-                .clickable{
-                    navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                Icons.Default.Person,
-                contentDescription = "",
-                tint = Color.DarkGray,
-            )
-            Text(
-                text = post.appUserUsername,
-                style = MaterialTheme.typography.bodyLarge
-            );
-        }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                Icons.Default.LocationOn,
-                contentDescription = "",
-                tint = Color.DarkGray
-            )
-            Text(
-                text = post.location.name,
-                style = MaterialTheme.typography.bodyLarge
-            );
-        }
-    }
     Spacer(modifier = Modifier.height(10.dp))
 
     Text(
@@ -335,7 +439,6 @@ fun PostComments(
                         comment -> Comment(post, comment, navigator, viewModel)
                 }
             }
-
     }
 }
 
@@ -435,12 +538,12 @@ fun Comment(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val painter = rememberImagePainter(
+            val painterCommentProfile = rememberImagePainter(
                 data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 builder = {}
             )
             Image(
-                painter = painter,
+                painter = painterCommentProfile ,
                 contentDescription = "Profile image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -513,12 +616,12 @@ fun SubComment(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val painter = rememberImagePainter(
+            val painterSubcommentProfile = rememberImagePainter(
                 data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 builder = {}
             )
             Image(
-                painter = painter,
+                painter = painterSubcommentProfile,
                 contentDescription = "Profile image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
