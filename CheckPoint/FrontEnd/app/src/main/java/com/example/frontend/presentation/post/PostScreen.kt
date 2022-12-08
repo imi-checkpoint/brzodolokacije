@@ -5,15 +5,11 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -46,13 +42,13 @@ import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.google.accompanist.pager.*
-import com.example.frontend.presentation.InputType
-import com.example.frontend.presentation.TextInput
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import java.util.*
 import kotlin.math.absoluteValue
 
@@ -81,7 +77,6 @@ fun PostScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .padding(start = 10.dp, end = 10.dp, top = 15.dp, bottom = 15.dp)
     ) {
 
@@ -119,21 +114,23 @@ fun PostDetails(
     viewModel: PostViewModel
 ){
 
-    UsernameAndLike(post, navigator, viewModel)
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
 
-    //photo slider
-    if(post.photos.size > 0)
-        ImagePagerSlider(post.photos)
+        UsernameAndLike(post, navigator, viewModel)
+        //photo slider
+        if(post.photos.size > 0)
+            ImagePagerSlider(post, post.photos)
 
-    DescriptionOrLocation(post, navigator)
+        PostDescription(post)
+        //DescriptionOrLocation(post, navigator)
 
-    PostDescription(post, navigator);
-    //Spacer(modifier = Modifier.height(20.dp))
+        //PostMap(post, navigator)
 
-    PostMap(post, navigator)
-    //Spacer(modifier = Modifier.height(20.dp))
-
-    PostComments(post, comments, navigator, viewModel)
+        PostComments(post, comments, navigator, viewModel)
+    }
 }
 
 
@@ -281,6 +278,7 @@ fun DescriptionOrLocation(
 @ExperimentalPagerApi
 @Composable
 fun ImagePagerSlider(
+    post: Post,
     photos: List<Photo>
 ){
 
@@ -383,7 +381,9 @@ fun ImagePagerSlider(
                 pagerState = pagerState,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(top = 16.dp, bottom = 20.dp)
+                    .padding(top = 10.dp, bottom = 15.dp),
+                activeColor = Color.Blue,
+                inactiveColor = Color.LightGray
             )
         }
     }
@@ -391,18 +391,23 @@ fun ImagePagerSlider(
 
 @Composable
 fun PostDescription(
-    post : Post,
-    navigator: DestinationsNavigator
+    post : Post
 ){
-
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Text(
-        text = post.description,
-        color = Color.Gray,
-        style = MaterialTheme.typography.bodyMedium
-    );
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth(),
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(bottomStart = 5.dp, bottomEnd = 5.dp)
+    ) {
+        Text(
+            text = post.description,
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodyMedium,
+            fontStyle = FontStyle.Italic,
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 15.dp)
+        )
+    }
 }
 
 @Composable
@@ -423,20 +428,17 @@ fun PostComments(
     viewModel: PostViewModel
 ){
 
-    AddCommentField(post, navigator, viewModel)
+    AddCommentField(post, viewModel)
 
-    Card(
+    Row(
         modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth(),
-        backgroundColor = Color.White
+            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
+            .fillMaxWidth()
     ) {
-        //AddCommentField(post, navigator, viewModel)
-
         if (!(comments.isNullOrEmpty()))
-            LazyColumn{
-                items(comments){
-                        comment -> Comment(post, comment, navigator, viewModel)
+            Column {
+                comments.forEach{ comment ->
+                    Comment(post, comment, navigator, viewModel)
                 }
             }
     }
@@ -447,15 +449,8 @@ fun PostComments(
 @Composable
 fun AddCommentField(
     post : Post,
-    navigator: DestinationsNavigator,
     viewModel: PostViewModel
 ) {
-    /*Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {*/
         /*val painterLoginUser = rememberImagePainter(
             data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
             builder = {}
@@ -469,52 +464,87 @@ fun AddCommentField(
                 .width(30.dp)
                 .clip(CircleShape),
         )*/
-        var newCommentText by remember{ mutableStateOf("") }
-        val focusManager = LocalFocusManager.current
-        TextInput(
-            inputType = InputType.NewComment,
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                }),
-            valuePar = newCommentText,
-            onChange = {newCommentText= it}
-        )
-        /*ClickableText(
-            text = AnnotatedString(
-                text = "Post"
-            ),
-            style = TextStyle(
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Blue
-            ),
-            onClick = {
-                viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
-            }
-        )*/
-        Button(onClick = {
-            println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
-            viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
-            newCommentText = ""
-        },
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White
-            ),
+    Card(
+        modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 0.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+    ) {
+        Row(
             modifier = Modifier
-                .height(38.dp)
-                .width(110.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Add comment",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White
-            )
+            var newCommentText by remember { mutableStateOf("") }
+            val focusManager = LocalFocusManager.current
+            BasicTextField(
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    //.height(32.dp)
+                    .weight(3f)
+                    .border(
+                        BorderStroke(1.dp, Color.LightGray),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(6.dp),
+                    value = newCommentText,
+                    onValueChange = { newCommentText = it },
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.padding(2.dp)
+                        ) {
+                            if (newCommentText.isEmpty()) {
+                                Text(
+                                    text = "Add a comment...",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                            }
+                            innerTextField()
+                        }
+                    },
+                    textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 14.sp)
+                )
+            /*ClickableText(
+                text = AnnotatedString(
+                    text = "Post"
+                ),
+                style = TextStyle(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Blue
+                ),
+                onClick = {
+                    println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
+                    viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
+                    newCommentText = ""
+                }
+            )*/
+            Spacer(modifier = Modifier.width(10.dp))
+            Button(
+                onClick = {
+                    println(post.postId.toString() + " " + viewModel.parentCommentId + " " + newCommentText)
+                    viewModel.addComment(post.postId, viewModel.parentCommentId, newCommentText)
+                    newCommentText = ""
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White
+                ),
+                modifier = Modifier
+                    .height(30.dp)
+            ) {
+                Text(
+                    text = "Add",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.Blue
+                )
+            }
         }
-
-
-    //}
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -527,10 +557,11 @@ fun Comment(
     viewModel: PostViewModel
 ){
 
-    /*Card(
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-    ) {*/
+            .fillMaxWidth(),
+        shape = RectangleShape
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -585,7 +616,7 @@ fun Comment(
                 )
             }
         }
-    //}
+    }
 
     //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
 
@@ -604,11 +635,12 @@ fun SubComment(
     navigator: DestinationsNavigator,
     viewModel: PostViewModel
 ){
-    /*Card(
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 70.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-    ) {*/
+            .fillMaxWidth(),
+            //.padding(start = 70.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+        shape = RectangleShape
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -662,7 +694,7 @@ fun SubComment(
                 )
             }
         }
-    //}
+    }
 
     //Divider(color = Color.LightGray, modifier = Modifier.fillMaxWidth().width(1.dp))
 }
