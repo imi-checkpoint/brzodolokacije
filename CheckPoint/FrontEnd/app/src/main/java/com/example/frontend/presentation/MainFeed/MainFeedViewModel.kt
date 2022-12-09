@@ -126,4 +126,13 @@ class MainFeedViewModel @Inject constructor (
             }
         }.launchIn(viewModelScope)
     }
+
+    fun proveriConstants()
+    {
+        if(Constants.refreshComments != 0L || Constants.postLikeChangedSinglePostPage){
+            Constants.refreshComments = 0L
+            Constants.postLikeChangedSinglePostPage = false
+            getPostsIFollow()
+        }
+    }
 }

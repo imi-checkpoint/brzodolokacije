@@ -49,9 +49,13 @@ fun MainFeedScreen(
     navigator: DestinationsNavigator,
     viewModel : MainFeedViewModel = hiltViewModel()
 ) {
+
     var sort = remember {
         mutableStateOf(Constants.sort)
     }
+
+    viewModel.proveriConstants()
+
     val state = viewModel.state.value
     Column(
         modifier = Modifier
