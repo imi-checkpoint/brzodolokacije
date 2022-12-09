@@ -198,4 +198,7 @@ class CheckpointRepositoryImpl(
         return api.deleteCommentById(token, commentId);
     }
 
+    override suspend fun getPostsOfUsersThatIFollow(token: String): List<PostDTO> {
+        return api.getPostsOfUsersThatIFollow(token)
+    }
 }

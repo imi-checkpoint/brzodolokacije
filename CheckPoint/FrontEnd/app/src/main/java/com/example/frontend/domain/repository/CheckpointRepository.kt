@@ -92,4 +92,6 @@ interface CheckpointRepository {
     suspend fun addComment(token : String, commentText: String, postId:Long, parentCommentId:Long) : String
 
     suspend fun deleteCommentById(token: String, commentId: Long): String
+
+    suspend fun getPostsOfUsersThatIFollow(token: String): List<PostDTO>
 }

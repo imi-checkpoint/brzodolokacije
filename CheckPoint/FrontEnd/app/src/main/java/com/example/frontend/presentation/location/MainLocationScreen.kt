@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Location
+import com.example.frontend.presentation.MainFeed.MainFeedScreen
 import com.example.frontend.presentation.destinations.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -215,6 +216,15 @@ fun ProfileTopBar(
         horizontalAlignment = Alignment.End
     ) {
         Row(){
+            IconButton(onClick = {
+                navigator.navigate(MainFeedScreenDestination())
+            }){
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+            }
             IconButton(onClick = {
                 navigator.navigate(
                     NovPostScreenDestination()
