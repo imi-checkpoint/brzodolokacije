@@ -7,8 +7,10 @@ import lombok.Data;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class PostDTO {
 
     private Long appUserId;
@@ -25,4 +27,6 @@ public class PostDTO {
     private List<Photo> photos;
     @JsonIgnore
     private List<Video> videos;
+
+    private String image;
 }

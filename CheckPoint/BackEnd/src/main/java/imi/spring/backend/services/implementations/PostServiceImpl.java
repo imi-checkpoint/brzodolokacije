@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,6 +137,16 @@ public class PostServiceImpl implements PostService {
 
         postDTO.setPhotos(photoService.getPhotosByPostId(post.getId()));
         postDTO.setVideos(videoService.getVideosByPostId(post.getId()));
+
+        postDTO.setImage(
+                new String(
+                        Base64.getEncoder().encode(
+                            appUserService.getUserById(
+                                    userFromJWT.getId()
+                            ).getImage()
+                        )
+                )
+        );
 
         return  postDTO;
     }

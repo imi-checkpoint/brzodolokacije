@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -103,6 +100,13 @@ public class CommentServiceImpl implements CommentService {
             commentDTO.setCanDelete(true);
         else
             commentDTO.setCanDelete(false);
+
+        commentDTO.setImage(
+                new String(Base64.getEncoder().encode(
+                        appUserService.getUserById(userFromJWT.getId()).getImage()
+                    )
+                )
+        );
 
         /*CommentLike like = comment.getCommentLikeList()
                 .stream()
