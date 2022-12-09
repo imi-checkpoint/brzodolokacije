@@ -55,6 +55,7 @@ fun MainFeedScreen(
     }
 
     viewModel.proveriConstants()
+    var expanded = remember { mutableStateOf(false) }
 
     val state = viewModel.state.value
     Column(
@@ -63,12 +64,48 @@ fun MainFeedScreen(
             .padding(20.dp)
     ) {
         ProfileMTopBar(navigator,viewModel)
-
         if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else if (state.error != "") {
             Text("An error occured while loading posts!");
         } else {
+            if(viewModel.getPosts().isNotEmpty()) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(
+                        viewModel.nazivSorta()
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Button(
+                        onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
+                    ) {
+                        Text("Sort")
+                    }
+                    DropdownMenu(
+                        expanded = expanded.value,
+                        onDismissRequest = { expanded.value = false },
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .height(300.dp),
+                    ) {
+                        listOf(
+                            "Date dsc",
+                            "Date asc",
+                            "Likes asc",
+                            "Likes dsc",
+                            "Comments asc",
+                            "Comments dsc"
+                        ).forEachIndexed { index, item ->
+                            DropdownMenuItem(onClick = {
+                                Constants.sort = index
+                                expanded.value = false
+                            }
+                            ) {
+                                Text(item)
+                            }
+                        }
+                    }
+                }
+            }
             AllMPosts(viewModel.getPosts(), navigator, viewModel)
         }
     }
@@ -81,44 +118,6 @@ fun AllMPosts(
     viewModel : MainFeedViewModel,
 )
 {
-    var expanded = remember { mutableStateOf(false) }
-
-    Row(Modifier.fillMaxWidth()) {
-        Text(
-            viewModel.nazivSorta()
-        )
-        Spacer(Modifier.weight(1f))
-        Button(
-            onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
-        ) {
-            Text("Sort")
-        }
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false },
-            modifier = Modifier
-                .wrapContentWidth()
-                .height(300.dp),
-        ) {
-            listOf(
-                "Date dsc",
-                "Date asc",
-                "Likes asc",
-                "Likes dsc",
-                "Comments asc",
-                "Comments dsc"
-            ).forEachIndexed { index, item ->
-                DropdownMenuItem(onClick = {
-                    Constants.sort = index
-                    expanded.value = false
-                }
-                ) {
-                    Text(item)
-                }
-            }
-        }
-    }
-
     if(posts == null || posts.size == 0){
         Text(
             text = "No posts found!",
