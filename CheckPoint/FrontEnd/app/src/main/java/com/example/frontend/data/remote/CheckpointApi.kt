@@ -284,4 +284,11 @@ interface CheckpointApi {
         @Path("postId") postId:Long,
         @Path("parentCommentId") parentCommentId:Long
     ) : String
+
+    @Headers("Content-Type: application/json")
+    @DELETE("comments/delete/{id}")
+    suspend fun deleteCommentById(
+        @Header("Authorization") token: String,
+        @Path("id") commentId: Long
+    ): String
 }

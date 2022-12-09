@@ -26,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final AppUserService appUserService;
     private final PostService postService;
 
+
     @Override
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
@@ -71,12 +72,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String deleteCommentById(Long id) {
-        if (commentRepository.existsById(id)) {
+    public String deleteCommentById(AppUser userFromJWT, Long id) {
+        Comment comment = getCommentById(id);
+        if (comment == null)
+            return "Comment with that id does not exist!";
+
+        if (userFromJWT.equals(comment.getUser()) || userFromJWT.equals(comment.getPost().getUser())) { //sme da obrise ako je on autor komentara ili posta ciji je komentar
             commentRepository.deleteById(id);
+            log.info("Deleted a comment with id {}.", id);
             return "Deleted.";
         }
-        return "Comment with that id does not exist!";
+        return "This user is not the owner!";
     }
 
 
@@ -93,6 +99,10 @@ public class CommentServiceImpl implements CommentService {
                 .sorted(Comparator.comparing(Comment::getTime))
                 .collect(Collectors.toList());
         commentDTO.setSubCommentList(convertListOfCommentsToCommentDTOs(userFromJWT, sortedChildren));
+        if (userFromJWT.equals(comment.getUser()) || userFromJWT.equals(comment.getPost().getUser()))
+            commentDTO.setCanDelete(true);
+        else
+            commentDTO.setCanDelete(false);
 
         /*CommentLike like = comment.getCommentLikeList()
                 .stream()

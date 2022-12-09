@@ -40,7 +40,6 @@ public class CommentController {
     @PostMapping("/{postId}/{parentCommentId}/add")
     @ResponseBody
     public String addComment(HttpServletRequest request, @RequestBody String commentText, @PathVariable Long postId, @PathVariable Long parentCommentId) throws ServletException {
-        log.info("usao u cuvanje {} {} {}", commentText, postId, parentCommentId);
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
             return commentService.addComment(commentText, user.getId(), postId, parentCommentId);
@@ -53,7 +52,12 @@ public class CommentController {
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public String deleteCommentById(@PathVariable Long id) { return commentService.deleteCommentById(id); }
+    public String deleteCommentById(HttpServletRequest request, @PathVariable Long id) throws ServletException {
+        AppUser user = jwtService.getAppUserFromJWT(request);
+        if (user != null)
+            return commentService.deleteCommentById(user, id);
+        return "Invalid user!";
+    }
 
     @GetMapping("/first/{postId}")
     @ResponseBody
