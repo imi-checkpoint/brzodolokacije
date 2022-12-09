@@ -52,7 +52,6 @@ fun MainFeedScreen(
     var sort = remember {
         mutableStateOf(Constants.sort)
     }
-    var expanded = remember { mutableStateOf(false) }
     val state = viewModel.state.value
     Column(
         modifier = Modifier
@@ -60,41 +59,7 @@ fun MainFeedScreen(
             .padding(20.dp)
     ) {
         ProfileMTopBar(navigator,viewModel)
-        Row(Modifier.fillMaxWidth()) {
-            Text(
-                viewModel.nazivSorta()
-            )
-            Spacer(Modifier.weight(1f))
-            Button(
-                onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
-            ) {
-                Text("Sort")
-            }
-            DropdownMenu(
-                expanded = expanded.value,
-                onDismissRequest = { expanded.value = false },
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .height(300.dp),
-            ) {
-                listOf(
-                    "Date dsc",
-                    "Date asc",
-                    "Likes asc",
-                    "Likes dsc",
-                    "Comments asc",
-                    "Comments dsc"
-                ).forEachIndexed { index, item ->
-                    DropdownMenuItem(onClick = {
-                        Constants.sort = index
-                        expanded.value = false
-                    }
-                    ) {
-                        Text(item)
-                    }
-                }
-            }
-        }
+
         if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else if (state.error != "") {
@@ -112,6 +77,44 @@ fun AllMPosts(
     viewModel : MainFeedViewModel,
 )
 {
+    var expanded = remember { mutableStateOf(false) }
+
+    Row(Modifier.fillMaxWidth()) {
+        Text(
+            viewModel.nazivSorta()
+        )
+        Spacer(Modifier.weight(1f))
+        Button(
+            onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
+        ) {
+            Text("Sort")
+        }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+            modifier = Modifier
+                .wrapContentWidth()
+                .height(300.dp),
+        ) {
+            listOf(
+                "Date dsc",
+                "Date asc",
+                "Likes asc",
+                "Likes dsc",
+                "Comments asc",
+                "Comments dsc"
+            ).forEachIndexed { index, item ->
+                DropdownMenuItem(onClick = {
+                    Constants.sort = index
+                    expanded.value = false
+                }
+                ) {
+                    Text(item)
+                }
+            }
+        }
+    }
+
     if(posts == null || posts.size == 0){
         Text(
             text = "No posts found!",
