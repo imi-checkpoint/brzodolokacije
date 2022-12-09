@@ -6,5 +6,6 @@ data class Comment (
     val authorUsername: String,
     val postId: Long,
     val text: String,
-    val subCommentList: List<Comment>
+    val subCommentList: List<Comment>,
+    val canDelete: Boolean
 )

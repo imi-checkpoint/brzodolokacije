@@ -15,9 +15,11 @@ import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.use_case.get_post.GetPostUseCase
 import com.example.frontend.domain.use_case.post_comments.AddCommentUseCase
+import com.example.frontend.domain.use_case.post_comments.DeleteCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.GetFirstCommentsUseCase
 import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 import com.example.frontend.presentation.post.components.AddCommentState
+import com.example.frontend.presentation.post.components.DeleteCommentState
 import com.example.frontend.presentation.post.components.PostCommentsState
 import com.example.frontend.presentation.post.components.PostState
 import com.example.frontend.presentation.posts.components.PostStringState
@@ -36,6 +38,7 @@ class PostViewModel @Inject constructor(
     private val getFirstCommentsUseCase: GetFirstCommentsUseCase,
     private val addCommentUseCase: AddCommentUseCase,
     private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
+    private val deleteCommentUseCase: DeleteCommentUseCase,
     private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel() {
@@ -55,6 +58,9 @@ class PostViewModel @Inject constructor(
 
     private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
     val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
+
+    private val _stateDeleteComment = mutableStateOf(DeleteCommentState())
+    val stateDeleteComment : State<DeleteCommentState> = _stateDeleteComment
 
     var access_token = "";
     var refresh_token = "";
@@ -106,8 +112,8 @@ class PostViewModel @Inject constructor(
 
         GlobalScope.launch(Dispatchers.Main){
 
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
+            access_token =  DataStoreManager.getStringValue(context, "access_token");
+            refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
             getFirstCommentsUseCase("Bearer "+access_token, postId).onEach { result ->
                 when(result){
@@ -130,9 +136,6 @@ class PostViewModel @Inject constructor(
     fun addComment(postId: Long, parentCommId: Long, commentText: String)
     {
         GlobalScope.launch(Dispatchers.Main){
-
-            var access_token =  DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
 
             addCommentUseCase("Bearer "+access_token, commentText.trim(), postId, parentCommId).onEach { result ->
                 when(result){
@@ -179,5 +182,31 @@ class PostViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun deleteCommentById(commentId: Long, postId: Long)
+    {
+        GlobalScope.launch(Dispatchers.Main){
+
+            deleteCommentUseCase("Bearer "+access_token, commentId).onEach { result ->
+                when(result){
+                    is Resource.Success -> {
+                        _stateDeleteComment.value = DeleteCommentState(message = result.data ?: "")
+                        println("OBRISAN KOMENTAR " + result.data)
+                        //getPost();
+                        getFirstCommentsByPostId(postId)
+                        Constants.refreshComments = 1L;
+                    }
+                    is Resource.Error -> {
+                        _stateDeleteComment.value = DeleteCommentState(error = result.message ?:
+                        "An unexpected error occured")
+                        println("GRESKA U BRISANJU KOMENTARA " + result.message)
+                    }
+                    is Resource.Loading -> {
+                        _stateDeleteComment.value = DeleteCommentState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 }

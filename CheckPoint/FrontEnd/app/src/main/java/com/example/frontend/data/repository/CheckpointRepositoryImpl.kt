@@ -194,4 +194,8 @@ class CheckpointRepositoryImpl(
         return api.addComment(token, commentText, postId, parentCommentId)
     }
 
+    override suspend fun deleteCommentById(token: String, commentId: Long): String {
+        return api.deleteCommentById(token, commentId);
+    }
+
 }

@@ -9,7 +9,7 @@ public interface CommentService {
     List<Comment> getAllComments();
     Comment getCommentById(Long id);
     String addComment(String commentText, Long userId, Long postId, Long parentCommentId);
-    String deleteCommentById(Long id);
+    String deleteCommentById(AppUser userFromJWT, Long id);
     List<Comment> getAllCommentsByPostId(Long postId);
     List<Comment> getAllSubcommentsByCommentId(Long id);
     CommentDTO convertCommentToCommentDTO(AppUser userFromJWT, Comment comment) throws IOException;

@@ -13,6 +13,7 @@ public class CommentDTO {
     private Long postId;
     private List<CommentDTO> subCommentList;
     private String text;
+    private Boolean canDelete;
     //private LocalDateTime time;
     //private Boolean isLiked; //da li je logovani user lajkovao ovaj komentar
 }
