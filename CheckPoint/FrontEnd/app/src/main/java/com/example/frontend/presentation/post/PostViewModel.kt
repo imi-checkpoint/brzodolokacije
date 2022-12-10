@@ -14,6 +14,7 @@ import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.use_case.get_post.GetPostUseCase
+import com.example.frontend.domain.use_case.get_user.GetMyProfilePictureUseCase
 import com.example.frontend.domain.use_case.post_comments.AddCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.DeleteCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.GetFirstCommentsUseCase
@@ -24,6 +25,7 @@ import com.example.frontend.presentation.post.components.PostCommentsState
 import com.example.frontend.presentation.post.components.PostState
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.posts.components.PostsState
+import com.example.frontend.presentation.profile.components.ProfilePictureState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -39,6 +41,7 @@ class PostViewModel @Inject constructor(
     private val addCommentUseCase: AddCommentUseCase,
     private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
+    private val getMyProfilePictureUseCase: GetMyProfilePictureUseCase,
     private val savedStateHandle: SavedStateHandle,
     application: Application
 ) : ViewModel() {
@@ -62,6 +65,10 @@ class PostViewModel @Inject constructor(
     private val _stateDeleteComment = mutableStateOf(DeleteCommentState())
     val stateDeleteComment : State<DeleteCommentState> = _stateDeleteComment
 
+    private val _stateGetProfilePicture = mutableStateOf(ProfilePictureState())
+    val stateGetProfilePicture : State<ProfilePictureState> = _stateGetProfilePicture
+    var currentPicture = ""
+
     var access_token = "";
     var refresh_token = "";
 
@@ -71,7 +78,8 @@ class PostViewModel @Inject constructor(
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
             Log.d("POST VIEW", "*${refresh_token}*");
-            getPost();
+            getPost()
+            getMyProfilePicture()
         }
     }
 
@@ -131,6 +139,29 @@ class PostViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
         }
+    }
+
+    private fun getMyProfilePicture(){
+        getMyProfilePictureUseCase("Bearer "+refresh_token).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateGetProfilePicture.value = ProfilePictureState(profilePicture = result.data ?: "")
+                    currentPicture = result.data!!
+                }
+                is Resource.Error -> {
+                    _stateGetProfilePicture.value = ProfilePictureState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+                }
+                is Resource.Loading -> {
+                    _stateGetProfilePicture.value = ProfilePictureState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun addComment(postId: Long, parentCommId: Long, commentText: String)

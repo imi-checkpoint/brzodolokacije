@@ -23,9 +23,9 @@ interface CheckpointRepository {
 
     suspend fun getPostsByUserId(token : String, userId : Long) : List<PostDTO>
 
-    suspend fun getMyFollowers(token: String): List<UserDTO>
+    suspend fun getMyFollowers(token: String): List<UserDetailedDTO>
 
-    suspend fun getMyFollowing(token: String): List<UserDTO>
+    suspend fun getMyFollowing(token: String): List<UserDetailedDTO>
 
     suspend fun getMyFollowersCount(token: String): Int
 
@@ -33,9 +33,9 @@ interface CheckpointRepository {
 
     suspend fun getMyPostsCount(token: String): Int
 
-    suspend fun getAllFollowingByUser(token: String, userId : Long): List<UserDTO>
+    suspend fun getAllFollowingByUser(token: String, userId : Long): List<UserDetailedDTO>
 
-    suspend fun getAllFollowersPerUser(token: String, userId : Long): List<UserDTO>
+    suspend fun getAllFollowersPerUser(token: String, userId : Long): List<UserDetailedDTO>
 
     suspend fun followOrUnfollowUser(token: String, userId: Long): String
 
@@ -45,13 +45,13 @@ interface CheckpointRepository {
 
     suspend fun getUserPostsCount(token: String, userId : Long): Int
 
-    suspend fun getFollowingByUsername(token: String, userId: Long, username: String): List<UserDTO>
+    suspend fun getFollowingByUsername(token: String, userId: Long, username: String): List<UserDetailedDTO>
 
-    suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDTO>
+    suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDetailedDTO>
 
-    suspend fun getMyFollowersByUsername(token: String, username: String): List<UserDTO>
+    suspend fun getMyFollowersByUsername(token: String, username: String): List<UserDetailedDTO>
 
-    suspend fun getMyFollowingByUsername(token: String, username: String): List<UserDTO>
+    suspend fun getMyFollowingByUsername(token: String, username: String): List<UserDetailedDTO>
 
     suspend fun getPhotoByPostIdAndOrder(token: String, postid: Long, order: Int): BinaryPhoto
 

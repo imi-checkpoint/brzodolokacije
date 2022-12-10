@@ -1,11 +1,17 @@
 package com.example.frontend.presentation.user_list
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
@@ -19,11 +25,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.data.remote.dto.UserDetailedDTO
 import com.example.frontend.domain.model.User
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
@@ -32,7 +42,9 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Destination
 @Composable
 fun UserListScreen(
@@ -153,9 +165,10 @@ fun UserListSearchBar(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserList(
-    userList : List<User>?,
+    userList : List<UserDetailedDTO>?,
     navigator: DestinationsNavigator
 ){
     if(userList == null || userList.isEmpty()){
@@ -180,16 +193,17 @@ fun UserList(
 
         ){
             items(userList){
-                user -> OneUser(user, navigator = navigator)
+                user -> OneUser(user = user, navigator = navigator)
             }
         }
 
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OneUser(
-    user : User,
+    user : UserDetailedDTO,
     navigator: DestinationsNavigator
 ){
     Row(
@@ -207,6 +221,25 @@ fun OneUser(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
+
+        val photo = user.image
+        val decoder = Base64.getDecoder()
+        val photoBytes = decoder.decode(photo)
+        if(photoBytes.size>1){
+            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+            print(mapa.byteCount)
+            if(mapa!=null){
+                Image(
+                    bitmap = mapa.asImageBitmap(),
+                    contentDescription = "Profile image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(25.dp)
+                        .width(25.dp)
+                        .clip(CircleShape),
+                )
+            }
+        }
 
         Text(
             text = user.username,

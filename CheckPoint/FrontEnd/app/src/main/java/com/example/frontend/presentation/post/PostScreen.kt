@@ -63,7 +63,6 @@ fun PostScreen(
 {
     val state = viewModel.state.value
     val stateGetComments = viewModel.stateGetComments.value
-    val stateAddComment = viewModel.stateAddComment.value
 
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
@@ -166,18 +165,7 @@ fun UsernameAndLike(
                     },
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Image(
-                    painter = painterLoginPhoto,
-                    contentDescription = "Profile image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(25.dp)
-                        .width(25.dp)
-                        .clip(CircleShape),
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                /*
-                val photo = pictureState.profilePicture;
+                val photo = post.image
                 val decoder = Base64.getDecoder()
                 val photoBytes = decoder.decode(photo)
                 if(photoBytes.size>1){
@@ -186,16 +174,16 @@ fun UsernameAndLike(
                     if(mapa!=null){
                         Image(
                             bitmap = mapa.asImageBitmap(),
+                            contentDescription = "Profile image",
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .height(100.dp)
-                                .width(100.dp)
+                                .height(25.dp)
+                                .width(25.dp)
                                 .clip(CircleShape),
-                            contentDescription ="Profile image" ,
-                            contentScale = ContentScale.Crop
                         )
                     }
                 }
-                 */
+                Spacer(modifier = Modifier.width(5.dp))
                 Text(
                     text = post.appUserUsername,
                     style = MaterialTheme.typography.bodyLarge
@@ -541,19 +529,24 @@ fun AddSecondCommentCard(
                 .padding(start = 60.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val painterLoginUser = rememberImagePainter(
-                data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                builder = {}
-            )
-            Image ( //loginUser image
-                painter = painterLoginUser,
-                contentDescription = "Profile image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(28.dp)
-                    .width(28.dp)
-                    .clip(CircleShape),
-            )
+            val photo = viewModel.currentPicture
+            val decoder = Base64.getDecoder()
+            val photoBytes = decoder.decode(photo)
+            if(photoBytes.size>1){
+                val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                print(mapa.byteCount)
+                if(mapa!=null){
+                    Image(
+                        bitmap = mapa.asImageBitmap(),
+                        contentDescription = "Profile image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(28.dp)
+                            .width(28.dp)
+                            .clip(CircleShape)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.width(10.dp))
             var newSecondCommentText by remember { mutableStateOf("") }
             val focusManager = LocalFocusManager.current
@@ -642,19 +635,24 @@ fun CommentCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val painterCommentProfile = rememberImagePainter(
-                    data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                    builder = {}
-                )
-                Image(
-                    painter = painterCommentProfile ,
-                    contentDescription = "Profile image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(30.dp)
-                        .width(30.dp)
-                        .clip(CircleShape),
-                )
+                val photo = comment.image
+                val decoder = Base64.getDecoder()
+                val photoBytes = decoder.decode(photo)
+                if(photoBytes.size>1){
+                    val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                    print(mapa.byteCount)
+                    if(mapa!=null){
+                        Image(
+                            bitmap = mapa.asImageBitmap(),
+                            contentDescription = "Profile image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .height(30.dp)
+                                .width(30.dp)
+                                .clip(CircleShape)
+                        )
+                    }
+                }
                 Column (
                     modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
                 ) {
@@ -747,19 +745,24 @@ fun SubCommentCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val painterSubcommentProfile = rememberImagePainter(
-                    data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                    builder = {}
-                )
-                Image(
-                    painter = painterSubcommentProfile,
-                    contentDescription = "Profile image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(28.dp)
-                        .width(28.dp)
-                        .clip(CircleShape),
-                )
+                val photo = subComment.image
+                val decoder = Base64.getDecoder()
+                val photoBytes = decoder.decode(photo)
+                if(photoBytes.size>1){
+                    val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                    print(mapa.byteCount)
+                    if(mapa!=null){
+                        Image(
+                            bitmap = mapa.asImageBitmap(),
+                            contentDescription = "Profile image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .height(28.dp)
+                                .width(28.dp)
+                                .clip(CircleShape)
+                        )
+                    }
+                }
                 Column (
                     modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
                 ) {

@@ -11,4 +11,5 @@ data class Post(
     var isLiked:Boolean,
     val photos:List<Photo>,
     //val videos:List<Video>
+    val image: String
 )

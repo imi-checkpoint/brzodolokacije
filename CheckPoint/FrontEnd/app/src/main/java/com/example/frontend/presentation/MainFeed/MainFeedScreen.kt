@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -179,11 +181,24 @@ fun PostMCard(
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "",
-                            tint = Color.DarkGray,
-                        )
+                        val photo = post.image
+                        val decoder = Base64.getDecoder()
+                        val photoBytes = decoder.decode(photo)
+                        if(photoBytes.size>1){
+                            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                            print(mapa.byteCount)
+                            if(mapa!=null){
+                                Image(
+                                    bitmap = mapa.asImageBitmap(),
+                                    contentDescription = "Profile image",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .height(25.dp)
+                                        .width(25.dp)
+                                        .clip(CircleShape),
+                                )
+                            }
+                        }
                         Text(
                             text = "${post.appUserUsername}",
                             color = Color.DarkGray
