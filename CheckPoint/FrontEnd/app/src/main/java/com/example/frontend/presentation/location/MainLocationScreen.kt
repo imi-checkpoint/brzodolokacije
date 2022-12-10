@@ -24,7 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,10 @@ import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.MainFeed.MainFeedScreen
 import com.example.frontend.presentation.destinations.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +58,19 @@ fun MainLocationScreen(
     val state = viewModel.state.value
     var searchText by remember{ mutableStateOf("") }
 
+    val context = LocalContext.current
+    val uiSettings = remember {
+        MapUiSettings(zoomControlsEnabled = false)
+    }
+    val localDensity = LocalDensity.current
+
+    var mapWidth by remember {
+        mutableStateOf(44)
+    }
+
+    var mapHeight by remember {
+        mutableStateOf(20)
+    }
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
@@ -83,7 +102,31 @@ fun MainLocationScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
-            LocationList(locationList = state.locations, navigator)
+            //LocationList(locationList = state.locations, navigator)
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .onGloballyPositioned { coords ->
+                        mapWidth = with(localDensity) { coords.size.width }
+                        mapHeight = with(localDensity) { coords.size.height }
+                    },
+                uiSettings = uiSettings,
+                onMapLoaded = {
+                }
+            ) {
+                state.locations.forEach{ location->
+                    Marker(
+                        position = LatLng(location.lat, location.lng),
+                        title = location.name,
+                        onInfoWindowClick = {
+                            navigator.navigate(PostsScreenDestination(location.id))
+                        }
+                    )
+                }
+            }
+
+
         }
     }
 }
@@ -185,7 +228,7 @@ fun LocationCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .clickable{
+                .clickable {
                     navigator.navigate(
                         PostsScreenDestination(location.id)
                     )
