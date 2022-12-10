@@ -10,7 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,14 +114,22 @@ public class CommentServiceImpl implements CommentService {
                 )
         );
 
-        for (CommentDTO subcomment : commentDTO.getSubCommentList())
+        for (CommentDTO subcommentDTO : commentDTO.getSubCommentList())
         {
-            subcomment.setImage(
+            subcommentDTO.setImage(
                     new String(Base64.getEncoder().encode(
-                            appUserService.getUserById(subcomment.getAuthorId()).getImage()
+                            appUserService.getUserById(subcommentDTO.getAuthorId()).getImage()
                     )
             ));
+
+            LocalDate onlyDateSub = getCommentById(subcommentDTO.getId()).getTime().toLocalDate();
+            String formattedDateSub = onlyDateSub.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+            subcommentDTO.setDate(formattedDateSub);
         }
+
+        LocalDate onlyDate = comment.getTime().toLocalDate();
+        String formattedDate = onlyDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+        commentDTO.setDate(formattedDate);
 
         /*CommentLike like = comment.getCommentLikeList()
                 .stream()

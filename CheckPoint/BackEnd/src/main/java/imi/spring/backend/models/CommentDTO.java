@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,4 +20,6 @@ public class CommentDTO {
     //private LocalDateTime time;
     //private Boolean isLiked; //da li je logovani user lajkovao ovaj komentar
     private String image;
+
+    private String date;
 }
