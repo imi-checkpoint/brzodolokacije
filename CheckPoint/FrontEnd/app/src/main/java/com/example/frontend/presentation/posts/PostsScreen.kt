@@ -5,11 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
@@ -19,8 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,13 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.frontend.data.remote.dto.PostDTO
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.LoginScreenDestination
@@ -45,7 +41,6 @@ import com.example.frontend.presentation.destinations.MainLocationScreenDestinat
 import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
 import com.example.frontend.presentation.posts.components.PostStringState
-import com.example.frontend.presentation.location.ProfileTopBar
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.Base64
@@ -163,24 +158,19 @@ fun PostCard(
     stateDelete: PostStringState
 )
 {
-
     Card(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(corner = CornerSize(6.dp)),
         elevation = 2.dp,
-        backgroundColor = Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        backgroundColor = MaterialTheme.colorScheme.surface,
         onClick ={
-            navigator.navigate(
-                PostScreenDestination(post.postId)
-            )
+            navigator.navigate(PostScreenDestination(post.postId))
         }
     ){
         Row {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
@@ -209,23 +199,32 @@ fun PostCard(
                                     contentDescription = "Profile image",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .height(25.dp)
-                                        .width(25.dp)
+                                        .height(35.dp)
+                                        .width(35.dp)
                                         .clip(CircleShape)
                                 )
                             }
                         }
-                        Text(
-                            text = "${post.appUserUsername}",
-                            color = Color.DarkGray
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = post.appUserUsername,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = post.date,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     }
-                   Row(
-                       verticalAlignment = Alignment.CenterVertically
-                   ){
-                       if(viewModel.loginUserId == post.appUserId)
-                           DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
-                   }
+                    if(viewModel.loginUserId == post.appUserId) {
+                       DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                    }
                 }
 
                 Row(){
@@ -237,8 +236,9 @@ fun PostCard(
 
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = "${post.description}",
-                    color = Color.DarkGray
+                    text = post.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 Row(
@@ -252,15 +252,13 @@ fun PostCard(
                         LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
                         Text(
                             text = "${post.numberOfLikes} likes",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                     Row {
                         Text(
                             text = "${post.numberOfComments} comments",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
@@ -307,19 +305,21 @@ fun DeletePostButton(
     viewModel: PostsViewModel,
     stateDelete: PostStringState
 ) {
-    IconButton(onClick = {
-        viewModel.deletePostById(post.postId, post.location.id)
-    }) {
+
+    IconButton(
+        onClick = {
+            viewModel.deletePostById(post.postId, post.location.id)
+        },
+        modifier = Modifier
+            .clip(RectangleShape)
+            .border(BorderStroke(1.dp, Color.LightGray))
+            .size(30.dp)
+    ) {
         Icon(
-            Icons.Default.Delete,
+            imageVector = Icons.Default.Delete,
             contentDescription = "Delete post",
-            tint = Color(0xfff44336)
+            tint = MaterialTheme.colorScheme.outline
         )
-    }
-    if(stateDelete.isLoading){
-    }
-    else if(stateDelete.error!=""){
-        Text("An error occured while deleting post!");
     }
 }
 
