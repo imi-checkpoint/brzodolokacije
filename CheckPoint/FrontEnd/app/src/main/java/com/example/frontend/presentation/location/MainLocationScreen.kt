@@ -38,10 +38,11 @@ import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.MainFeed.MainFeedScreen
 import com.example.frontend.presentation.destinations.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,9 @@ fun MainLocationScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
-            //LocationList(locationList = state.locations, navigator)
+            if(state.locations.isEmpty()){
+                Text("No posts from searched location")
+            }
             GoogleMap(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,20 +116,23 @@ fun MainLocationScreen(
                     },
                 uiSettings = uiSettings,
                 onMapLoaded = {
-                }
+                    },
             ) {
                 state.locations.forEach{ location->
                     Marker(
                         position = LatLng(location.lat, location.lng),
                         title = location.name,
-                        onInfoWindowClick = {
+                        /*onInfoWindowClick = {
+                            it.hideInfoWindow()
+                            navigator.navigate(PostsScreenDestination(location.id))
+                        }*/
+                        onInfoWindowLongClick = {
+                            it.hideInfoWindow()
                             navigator.navigate(PostsScreenDestination(location.id))
                         }
                     )
                 }
             }
-
-
         }
     }
 }
