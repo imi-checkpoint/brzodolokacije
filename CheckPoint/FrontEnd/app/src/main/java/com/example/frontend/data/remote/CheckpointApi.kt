@@ -57,13 +57,13 @@ interface CheckpointApi {
     @GET("follow_list/my/following")
     suspend fun getMyFollowing(
         @Header("Authorization") token : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/my/followers")
     suspend fun getMyFollowers(
         @Header("Authorization") token : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/my/following/count")
@@ -97,14 +97,14 @@ interface CheckpointApi {
     suspend fun getAllFollowingByUser(
         @Header("Authorization") token : String,
         @Path("userId") userId:Long
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/{userId}/followers")
     suspend fun getAllFollowersPerUser(
         @Header("Authorization") token : String,
         @Path("userId") userId:Long
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @POST("follow_list/follow_or_unfollow/{userId}")
@@ -140,7 +140,7 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("userId") userId:Long,
         @Path("username") username : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/{userId}/followers/keyword/{username}")
@@ -148,21 +148,21 @@ interface CheckpointApi {
         @Header("Authorization") token : String,
         @Path("userId") userId:Long,
         @Path("username") username : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/my/following/keyword/{username}")
     suspend fun getMyFollowingByUsername(
         @Header("Authorization") token : String,
         @Path("username") username : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/json")
     @GET("follow_list/my/followers/keyword/{username}")
     suspend fun getMyFollowersByUsername(
         @Header("Authorization") token : String,
         @Path("username") username : String
-    ) : List<UserDTO>
+    ) : List<UserDetailedDTO>
 
     @Headers("Content-Type: application/octet-stream")
     @GET("photos/photoByPostIdAndOrder/{postId}/{order}")

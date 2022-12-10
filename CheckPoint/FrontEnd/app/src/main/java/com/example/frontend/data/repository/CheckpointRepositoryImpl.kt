@@ -37,11 +37,11 @@ class CheckpointRepositoryImpl(
         return api.getPostsByUserId(token, userId)
     }
 
-    override suspend fun getMyFollowers(token: String): List<UserDTO> {
+    override suspend fun getMyFollowers(token: String): List<UserDetailedDTO> {
         return api.getMyFollowers(token)
     }
 
-    override suspend fun getMyFollowing(token: String): List<UserDTO> {
+    override suspend fun getMyFollowing(token: String): List<UserDetailedDTO> {
         return api.getMyFollowing(token)
     }
 
@@ -59,11 +59,11 @@ class CheckpointRepositoryImpl(
 
     ////
 
-    override suspend fun getAllFollowingByUser(token: String, userId: Long): List<UserDTO> {
+    override suspend fun getAllFollowingByUser(token: String, userId: Long): List<UserDetailedDTO> {
         return api.getAllFollowingByUser(token,userId)
     }
 
-    override suspend fun getAllFollowersPerUser(token: String, userId: Long): List<UserDTO> {
+    override suspend fun getAllFollowersPerUser(token: String, userId: Long): List<UserDetailedDTO> {
         return api.getAllFollowersPerUser(token,userId)
     }
 
@@ -83,25 +83,25 @@ class CheckpointRepositoryImpl(
         return api.getUserPostsCount(token, userId);
     }
 
-    override suspend fun getFollowingByUsername(token: String, userId: Long, username: String): List<UserDTO> {
+    override suspend fun getFollowingByUsername(token: String, userId: Long, username: String): List<UserDetailedDTO> {
         return api.getFollowingByUsername(token,userId, username)
     }
 
-    override suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDTO> {
+    override suspend fun getFollowersByUsername(token: String, userId: Long, username: String): List<UserDetailedDTO> {
         return api.getFollowersByUsername(token,userId, username)
     }
 
     override suspend fun getMyFollowersByUsername(
         token: String,
         username: String
-    ): List<UserDTO> {
+    ): List<UserDetailedDTO> {
         return api.getMyFollowersByUsername(token, username);
     }
 
     override suspend fun getMyFollowingByUsername(
         token: String,
         username: String
-    ): List<UserDTO> {
+    ): List<UserDetailedDTO> {
         return api.getMyFollowingByUsername(token, username);
     }
 

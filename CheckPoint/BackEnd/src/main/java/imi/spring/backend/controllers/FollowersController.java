@@ -1,6 +1,8 @@
 package imi.spring.backend.controllers;
 
 import imi.spring.backend.models.AppUser;
+import imi.spring.backend.models.UserDetailedDTO;
+import imi.spring.backend.services.AppUserService;
 import imi.spring.backend.services.FollowersService;
 import imi.spring.backend.services.JWTService;
 import lombok.AllArgsConstructor;
@@ -21,18 +23,20 @@ public class FollowersController {
     private final FollowersService followersService;
     private final JWTService jwtService;
 
+    private final AppUserService appUserService;
+
     /* Koga sve dati korisnik prati? */
     @GetMapping("/{userId}/following")
     @ResponseBody
-    public List<AppUser> getAllFollowingByUser(@PathVariable Long userId) {
-        return followersService.getAllFollowingByUser(userId);
+    public List<UserDetailedDTO> getAllFollowingByUser(@PathVariable Long userId) {
+        return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getAllFollowingByUser(userId));
     }
 
     /* Ko sve prati datog korisnika? */
     @GetMapping("/{userId}/followers")
     @ResponseBody
-    public List<AppUser> getAllFollowersPerUser(@PathVariable Long userId) {
-        return followersService.getAllFollowersPerUser(userId);
+    public List<UserDetailedDTO> getAllFollowersPerUser(@PathVariable Long userId) {
+        return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getAllFollowersPerUser(userId));
     }
 
     @PostMapping("/follow_or_unfollow/{userId}")
@@ -58,29 +62,33 @@ public class FollowersController {
 
     @GetMapping("/{userId}/following/keyword/{username}")
     @ResponseBody
-    public List<AppUser> getFollowingByUsername(@PathVariable Long userId, @PathVariable String username) { return followersService.getFollowingByUsername(userId, username); }
+    public List<UserDetailedDTO> getFollowingByUsername(@PathVariable Long userId, @PathVariable String username) {
+        return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getFollowingByUsername(userId, username));
+    }
 
     @GetMapping("/{userId}/followers/keyword/{username}")
     @ResponseBody
-    public List<AppUser> getFollowersByUsername(@PathVariable Long userId, @PathVariable String username) { return followersService.getFollowersByUsername(userId, username); }
+    public List<UserDetailedDTO> getFollowersByUsername(@PathVariable Long userId, @PathVariable String username) {
+        return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getFollowersByUsername(userId, username));
+    }
 
     /* Koga sve ja kao korisnik pratim? */
     @GetMapping("/my/following")
     @ResponseBody
-    public List<AppUser> getMyFollowing(HttpServletRequest request) throws ServletException {
+    public List<UserDetailedDTO> getMyFollowing(HttpServletRequest request) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
-            return followersService.getMyFollowing(user);
+            return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getMyFollowing(user));
         return Collections.emptyList();
     }
 
     /* Koga sve mene prati? */
     @GetMapping("/my/followers")
     @ResponseBody
-    public List<AppUser> getMyFollowers(HttpServletRequest request) throws ServletException {
+    public List<UserDetailedDTO> getMyFollowers(HttpServletRequest request) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
-            return followersService.getMyFollowers(user);
+            return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getMyFollowers(user));
         return Collections.emptyList();
     }
 
@@ -104,19 +112,19 @@ public class FollowersController {
 
     @GetMapping("/my/following/keyword/{username}")
     @ResponseBody
-    public List<AppUser> getMyFollowingByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
+    public List<UserDetailedDTO> getMyFollowingByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
-            return followersService.getMyFollowingByUsername(user, username);
+            return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getMyFollowingByUsername(user, username));
         return Collections.emptyList();
     }
 
     @GetMapping("/my/followers/keyword/{username}")
     @ResponseBody
-    public List<AppUser> getMyFollowersByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
+    public List<UserDetailedDTO> getMyFollowersByUsername(HttpServletRequest request, @PathVariable String username) throws ServletException {
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null)
-            return followersService.getMyFollowersByUsername(user, username);
+            return appUserService.convertListOfAppUsersToUserDetailedDTOs(followersService.getMyFollowersByUsername(user, username));
         return Collections.emptyList();
     }
 
