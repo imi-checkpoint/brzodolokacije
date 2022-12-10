@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -145,6 +148,10 @@ public class PostServiceImpl implements PostService {
                         )
                 )
         );
+
+        LocalDate onlyDate = post.getTime().toLocalDate();
+        String formattedDate = onlyDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+        postDTO.setDate(formattedDate);
 
         return  postDTO;
     }

@@ -8,5 +8,6 @@ data class Comment (
     val text: String,
     val subCommentList: List<Comment>,
     val canDelete: Boolean,
-    val image: String
+    val image: String,
+    val date: String
 )

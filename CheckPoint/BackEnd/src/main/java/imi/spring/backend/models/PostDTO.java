@@ -29,4 +29,6 @@ public class PostDTO {
     private List<Video> videos;
 
     private String image;
+
+    private String date;
 }

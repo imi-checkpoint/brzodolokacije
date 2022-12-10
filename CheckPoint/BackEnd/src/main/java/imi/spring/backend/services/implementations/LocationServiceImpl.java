@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -21,7 +22,21 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location saveLocation(Location location) {
-        return locationRepository.save(location);
+
+        List<Location> locations = locationRepository.findByNameLike(location.getName());
+
+        Optional<Location> savedLocation = locations.stream().filter(l ->
+                                                    l.getName().equals(location.getName()) &&
+                                                    l.getCoordinateX().equals(location.getCoordinateX()) &&
+                                                    l.getCoordinateY().equals(location.getCoordinateY())
+                                            ).findFirst();
+
+        if(savedLocation.isEmpty()){
+            return locationRepository.save(location);
+        }
+        else{
+            return savedLocation.get();
+        }
     }
 
     @Override

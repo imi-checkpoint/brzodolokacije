@@ -16,7 +16,8 @@ data class PostDTO(
     val isLiked:Boolean,
     val photos:List<Photo>,
     //val videos:List<Video>
-    val image: String
+    val image: String,
+    val date: String
 )
 
 fun PostDTO.toPost() : Post{
@@ -31,6 +32,7 @@ fun PostDTO.toPost() : Post{
         photos = photos,
         //videos = videos,
         location = location.toLocation(),
-        image = image
+        image = image,
+        date = date
     )
 }
