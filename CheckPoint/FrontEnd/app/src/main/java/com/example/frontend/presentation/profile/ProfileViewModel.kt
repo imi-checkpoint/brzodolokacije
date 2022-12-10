@@ -10,12 +10,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
 import com.example.frontend.domain.DataStoreManager
+import com.example.frontend.domain.use_case.delete_post.DeletePostUseCase
 import com.example.frontend.domain.use_case.follow_or_unfollow.FollowUnfollowUseCase
 import com.example.frontend.domain.use_case.get_profile_data.GetUserProfileDataUseCase
 import com.example.frontend.domain.use_case.get_profile_data.GetUserProfilePhotoUseCase
 import com.example.frontend.domain.use_case.get_user_posts.GetUserPostsUseCase
+import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 import com.example.frontend.domain.use_case.refresh_page.RefreshPageUseCase
 import com.example.frontend.presentation.newpost.components.NovPostState
+import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
@@ -31,7 +34,9 @@ class ProfileViewModel @Inject constructor(
     private val getUserProfileDataUseCase: GetUserProfileDataUseCase,
     private val getUserProfilePhotoUseCase: GetUserProfilePhotoUseCase,
     private val getUserPostsUseCase: GetUserPostsUseCase,
+    private val deletePostUseCase: DeletePostUseCase,
     private val followUnfollowUseCase : FollowUnfollowUseCase,
+    private val likeOrUnlikePostUseCase: LikeOrUnlikePostUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val refreshPageUseCase : RefreshPageUseCase,
     private var application: Application
@@ -47,6 +52,12 @@ class ProfileViewModel @Inject constructor(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing : StateFlow<Boolean> get() = _isRefreshing.asStateFlow()
+
+    private val _stateDelete = mutableStateOf(PostStringState())
+    val stateDelete : State<PostStringState> = _stateDelete;
+
+    private val _stateLikeOrUnlike = mutableStateOf(PostStringState())
+    val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
 
 
     val context = application.baseContext
@@ -118,14 +129,13 @@ class ProfileViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     Log.d("PROFILE", "Error getting profile picture");
-                    _pictureState.value = ProfilePictureState(error = result.message ?:
-                    "An unexpected error occured")
+                    _pictureState.value = ProfilePictureState(error = "Picture error")
 
-                    if(result.message?.contains("403") == true){
-                        GlobalScope.launch(Dispatchers.Main){
-                            DataStoreManager.deleteAllPreferences(context);
-                        }
-                    }
+//                    if(result.message?.contains("403") == true){
+//                        GlobalScope.launch(Dispatchers.Main){
+//                            DataStoreManager.deleteAllPreferences(context);
+//                        }
+//                    }
                 }
                 is Resource.Loading -> {
                     _pictureState.value = ProfilePictureState(isLoading = true)
@@ -197,5 +207,53 @@ class ProfileViewModel @Inject constructor(
             Constants.refreshProfileConstant = 0L
             getProfileData()
         }
+    }
+
+    fun deletePostById(postId: Long, locationId: Long)
+    {
+        deletePostUseCase("Bearer "+access_token, postId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateDelete.value = PostStringState(message = result.data ?: "")
+                    getUserPosts(savedUserId)
+                }
+                is Resource.Error -> {
+                    _stateDelete.value = PostStringState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+                }
+                is Resource.Loading -> {
+                    _stateDelete.value = PostStringState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun likeOrUnlikePostById(postId: Long)
+    {
+        likeOrUnlikePostUseCase("Bearer "+access_token, postId).onEach { result ->
+            when(result){
+                is Resource.Success -> {
+                    _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
+                }
+                is Resource.Error -> {
+                    _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
+                    "An unexpected error occured")
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+
+                }
+                is Resource.Loading -> {
+                    _stateLikeOrUnlike.value = PostStringState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 }

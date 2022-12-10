@@ -13,13 +13,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +49,11 @@ import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
+import com.example.frontend.presentation.posts.DeletePostButton
+import com.example.frontend.presentation.posts.LikeOrUnlikePostButton
+import com.example.frontend.presentation.posts.PhotoCard
+import com.example.frontend.presentation.posts.PostsViewModel
+import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
@@ -124,7 +135,7 @@ fun ProfileScreen(
                 }
 
                 if(viewModel.savedUserId != 0L){
-                    UserPostsSection(postsState, viewModel.savedUserId, navigator);
+                    UserPostsSection(postsState, viewModel.savedUserId, viewModel, navigator);
                 }
             }
         }
@@ -453,15 +464,19 @@ fun ActionButton(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserPostsSection(
     postsState : UserPostsState,
     userId: Long,
+    viewModel : ProfileViewModel,
     navigator : DestinationsNavigator
 )
 {
     var list by remember{ mutableStateOf(true) }
     var map by remember{ mutableStateOf(false) }
+
+    val stateDelete = viewModel.stateDelete.value
 
     Row(
         modifier = Modifier
@@ -499,7 +514,7 @@ fun UserPostsSection(
     ){
         if(postsState.userPosts!=null){
             if(list){
-                PostsSection(userId = userId, postsState.userPosts, navigator);
+                PostsSection(userId = userId, postsState.userPosts, viewModel, stateDelete, navigator);
             }
             if(map){
                 MapSection(userId = userId, postsState.userPosts,navigator);
@@ -511,10 +526,13 @@ fun UserPostsSection(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostsSection(
     userId : Long,
     posts: List<Post>,
+    viewModel : ProfileViewModel,
+    stateDelete : PostStringState,
     navigator : DestinationsNavigator
 ){
     Column(
@@ -578,36 +596,129 @@ fun PostsSection(
                 shape = RoundedCornerShape(20.dp)
             )
 
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(15.dp),
-            ){
+            LazyColumn{
                 items(searchPosts){
-                        post -> PostCard(post = post, navigator = navigator)
+                        post -> PostCard(post = post, navigator = navigator, viewModel, stateDelete)
                 }
             }
-
-
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostCard(
     post : Post,
-    navigator : DestinationsNavigator
+    navigator : DestinationsNavigator,
+    viewModel : ProfileViewModel,
+    stateDelete: PostStringState
 ){
-    Column(
+
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navigator.navigate(
-                    PostScreenDestination(post.postId)
-                )
-            }
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .fillMaxWidth(),
+        elevation = 2.dp,
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        onClick ={
+            navigator.navigate(
+                PostScreenDestination(post.postId)
+            )
+        }
     ){
-        Text(post.location.name);
+        Row {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
+            ) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .clickable{
+                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        val photo = post.image
+                        val decoder = Base64.getDecoder()
+                        val photoBytes = decoder.decode(photo)
+                        if(photoBytes.size>1){
+                            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                            print(mapa.byteCount)
+                            if(mapa!=null){
+                                Image(
+                                    bitmap = mapa.asImageBitmap(),
+                                    contentDescription = "Profile image",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .height(25.dp)
+                                        .width(25.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
+                        }
+                        Text(
+                            text = "${post.appUserUsername}",
+                            color = Color.DarkGray
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        if(viewModel.loginUserId == post.appUserId)
+                            DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                    }
+                }
+
+                Row(){
+                    if(post.photos.size > 0){
+                        Spacer(modifier = Modifier.height(5.dp))
+                        PhotoCard(photo = post.photos[0], navigator)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = "${post.description}",
+                    color = Color.DarkGray
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
+                        Text(
+                            text = "${post.numberOfLikes} likes",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "${post.numberOfComments} comments",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        }
     }
+
 }
 
 @Composable
@@ -630,5 +741,56 @@ fun MapSection(
             )
     ) {
         MapWindow(userId, posts)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DeletePostButton(
+    post: Post,
+    viewModel: ProfileViewModel,
+    stateDelete: PostStringState
+) {
+    IconButton(onClick = {
+        viewModel.deletePostById(post.postId, post.location.id)
+    }) {
+        Icon(
+            Icons.Default.Delete,
+            contentDescription = "Delete post",
+            tint = Color(0xfff44336)
+        )
+    }
+    if(stateDelete.isLoading){
+    }
+    else if(stateDelete.error!=""){
+        Text("An error occured while deleting post!");
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun LikeOrUnlikePostButton(
+    post : Post,
+    viewModel: ProfileViewModel,
+    stateLikeOrUnlike: PostStringState
+) {
+    IconButton(onClick = {
+        viewModel.likeOrUnlikePostById(post.postId)
+        post.isLiked = !post.isLiked
+        if (post.isLiked)
+            post.numberOfLikes += 1;
+        else
+            post.numberOfLikes -= 1;
+    }) {
+        Icon(
+            if(post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = if(post.isLiked) "Unlike" else "Like",
+            tint = if(post.isLiked) Color.Red else Color.DarkGray
+        )
+    }
+    if(stateLikeOrUnlike.isLoading){
+    }
+    else if(stateLikeOrUnlike.error!=""){
+        Text("An error occured while like/unlike post!");
     }
 }
