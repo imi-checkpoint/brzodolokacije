@@ -89,13 +89,26 @@ fun PostsScreen(
                 tint = Color.DarkGray)
         }
         Row(Modifier.fillMaxWidth()){
-            Text(viewModel.nazivSorta()
-                )
-            Spacer(Modifier.weight(1f))
-            Button(onClick = { expanded.value = true },Modifier.wrapContentWidth(),
-                ) {
-                Text("Sort")
-            }
+            OutlinedTextField(
+                value = viewModel.nazivSorta(),
+                onValueChange = {},
+                Modifier.wrapContentWidth(),
+                readOnly = true,
+                label = {
+                    Text(text = "Sort")
+                },
+                trailingIcon = {
+                    Icon(
+                        if(expanded.value == false) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                        contentDescription = null,
+                        Modifier.clickable  {
+                            Log.d("DROP", "CLICK");
+                            expanded.value = true
+                        }
+                    )
+                }
+            );
+            
             DropdownMenu(
                 expanded = expanded.value,
                 onDismissRequest = { expanded.value = false },

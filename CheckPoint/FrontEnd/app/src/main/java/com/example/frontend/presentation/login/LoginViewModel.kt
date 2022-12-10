@@ -85,13 +85,14 @@ class LoginViewModel @Inject constructor(
 
                         saveUserId(LoginToken(result.data!!.access_token, result.data!!.refresh_token));
 
-                        _authState.value = AuthState(isAuthorized = true);
+                        _authState.value = AuthState(isAuthorized = true, isLoading = false);
                     }
 
                 }
                 is Resource.Error -> {
+                    Log.d("Auth", "Error is ${result.message}");
                     _authState.value = AuthState(error = result.message ?:
-                    "An unexpected error occured")
+                    "An unexpected error occured", isLoading = false);
                 }
                 is Resource.Loading -> {
                     _authState.value = AuthState(isLoading = true)
@@ -122,6 +123,7 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
+                    result.message?.let { Log.d("LOGIN ERROR", it) };
                     _state.value = LoginState(error = result.message ?:
                     "An unexpected error occured")
                 }
