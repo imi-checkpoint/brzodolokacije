@@ -141,9 +141,7 @@ public class PostServiceImpl implements PostService {
         postDTO.setImage(
                 new String(
                         Base64.getEncoder().encode(
-                            appUserService.getUserById(
-                                    userFromJWT.getId()
-                            ).getImage()
+                                post.getUser().getImage()
                         )
                 )
         );

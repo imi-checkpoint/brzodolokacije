@@ -103,10 +103,19 @@ public class CommentServiceImpl implements CommentService {
 
         commentDTO.setImage(
                 new String(Base64.getEncoder().encode(
-                        appUserService.getUserById(userFromJWT.getId()).getImage()
+                        comment.getUser().getImage()
                     )
                 )
         );
+
+        for (CommentDTO subcomment : commentDTO.getSubCommentList())
+        {
+            subcomment.setImage(
+                    new String(Base64.getEncoder().encode(
+                            appUserService.getUserById(subcomment.getAuthorId()).getImage()
+                    )
+            ));
+        }
 
         /*CommentLike like = comment.getCommentLikeList()
                 .stream()
