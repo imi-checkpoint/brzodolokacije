@@ -19,6 +19,9 @@ import com.example.frontend.domain.use_case.post_comments.AddCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.DeleteCommentUseCase
 import com.example.frontend.domain.use_case.post_comments.GetFirstCommentsUseCase
 import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
+import com.example.frontend.presentation.map.MapEvent
+import com.example.frontend.presentation.map.MapStyle
+import com.example.frontend.presentation.map.components.MapState
 import com.example.frontend.presentation.post.components.AddCommentState
 import com.example.frontend.presentation.post.components.DeleteCommentState
 import com.example.frontend.presentation.post.components.PostCommentsState
@@ -26,6 +29,7 @@ import com.example.frontend.presentation.post.components.PostState
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.posts.components.PostsState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.google.android.gms.maps.model.MapStyleOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -68,6 +72,11 @@ class PostViewModel @Inject constructor(
     private val _stateGetProfilePicture = mutableStateOf(ProfilePictureState())
     val stateGetProfilePicture : State<ProfilePictureState> = _stateGetProfilePicture
     var currentPicture = ""
+
+    private val _stateMap = mutableStateOf(MapState())
+    val stateMap : State<MapState> = _stateMap
+    var showLocationBool = mutableStateOf(false)
+
 
     var access_token = "";
     var refresh_token = "";
@@ -240,4 +249,27 @@ class PostViewModel @Inject constructor(
             }.launchIn(viewModelScope)
         }
     }
+
+    fun onEvent(event : MapEvent)
+    {
+        when(event){
+            is MapEvent.ToggleLightMap -> {
+                _stateMap.value = _stateMap.value.copy(
+                    properties = _stateMap.value.properties.copy(
+                        mapStyleOptions = if(_stateMap.value.isLightMap) {
+                            null
+                        } else MapStyleOptions(MapStyle.json),
+                    ),
+                    isLightMap = !_stateMap.value.isLightMap
+                )
+            }
+            is MapEvent.OnMapLongClick -> {
+
+            }
+            is MapEvent.OnInfoWindowLongClick -> {
+
+            }
+        }
+    }
+
 }

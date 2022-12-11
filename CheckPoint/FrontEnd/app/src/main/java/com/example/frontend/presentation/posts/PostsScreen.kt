@@ -219,8 +219,8 @@ fun PostCard(
                                     contentDescription = "Profile image",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .height(35.dp)
-                                        .width(35.dp)
+                                        .height(32.dp)
+                                        .width(32.dp)
                                         .clip(CircleShape)
                                 )
                             }
@@ -400,8 +400,6 @@ fun DeletePostButton(
             viewModel.deletePostById(post.postId, post.location.id)
         },
         modifier = Modifier
-            .clip(RectangleShape)
-            .border(BorderStroke(1.dp, Color.LightGray))
             .size(30.dp)
     ) {
         Icon(
