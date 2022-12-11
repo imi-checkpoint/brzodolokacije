@@ -121,7 +121,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun getUserPhoto(userId: Long){
-        getUserProfilePhotoUseCase("Bearer "+refresh_token, userId).onEach { result ->
+        getUserProfilePhotoUseCase("Bearer "+access_token, userId).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     Log.d("PROF PICTURE", "got");
@@ -145,7 +145,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun followUnfollowUser(){
-        followUnfollowUseCase("Bearer "+refresh_token, savedUserId).onEach { result ->
+        followUnfollowUseCase("Bearer "+access_token, savedUserId).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     this.getUserProfileData(savedUserId);
@@ -171,7 +171,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun getUserPosts(userId : Long){
-        getUserPostsUseCase("Bearer "+refresh_token, userId).onEach { result ->
+        getUserPostsUseCase("Bearer "+access_token, userId).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     _postsState.value = UserPostsState(userPosts = result.data ?: null)
