@@ -50,6 +50,7 @@ class LocationViewModel @Inject constructor(
 
             username = DataStoreManager.getStringValue(context, "username");
             loginUserId = DataStoreManager.getLongValue(context, "userId");
+            Log.d("LOGGED IN USER VALUE:", loginUserId.toString());
 
             getAllLocations()
         }

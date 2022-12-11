@@ -266,7 +266,7 @@ class ProfileSettingsViewModel @Inject constructor(
                             GlobalScope.launch(Dispatchers.Main){
                                 DataStoreManager.deleteAllPreferences(context);
                             }
-                        }1
+                        }
                         _statePasswordChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
                     }
                     is Resource.Loading -> {

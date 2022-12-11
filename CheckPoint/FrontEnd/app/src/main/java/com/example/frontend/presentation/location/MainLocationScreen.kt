@@ -98,6 +98,8 @@ fun MainLocationScreen(
                 viewModel.searchLocations(searchText)
             }
         })
+        
+        Spacer(Modifier.height(10.dp));
 
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -108,10 +110,9 @@ fun MainLocationScreen(
             }
             GoogleMap(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(500.dp)
+                    .fillMaxSize()
                     .onGloballyPositioned { coords ->
-                        mapWidth = with(localDensity) { coords.size.width }
+                            mapWidth = with(localDensity) { coords.size.width }
                         mapHeight = with(localDensity) { coords.size.height }
                     },
                 uiSettings = uiSettings,

@@ -135,12 +135,14 @@ class LoginViewModel @Inject constructor(
     }
 
     fun saveUserId(token : LoginToken){
+        Log.d("SAVE USER ID", "Saving user id");
         getLoginUserIdUseCase("Bearer "+token.access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                         val userId = result.data
                         Log.d("User id", "Fetched user id ${userId}")
                         if (userId != null) {
+                            Log.d("Saving user id", "User id is ${userId.toInt()}");
                             DataStoreManager.saveValue(context, "userId", userId.toInt())
 
                             _state.value = LoginState(token = token)
@@ -148,9 +150,11 @@ class LoginViewModel @Inject constructor(
 
                 }
                 is Resource.Error -> {
+                    Log.d("SAVE USER ID ERROR",result.message.toString());
                     DataStoreManager.saveValue(context, "userId", 0)
                 }
                 is Resource.Loading -> {
+                    Log.d("SAVE USER ID ERROR",result.message.toString());
                     DataStoreManager.saveValue(context, "userId", 0)
                 }
             }

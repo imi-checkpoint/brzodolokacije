@@ -41,14 +41,14 @@ fun LoginScreen(
     val state = viewModel.state.value
     val authState = viewModel.authState.value
 
-    if(authState.isAuthorized == true){
-        Log.d("AUTH", "Navigate to main");
-        navigator.navigate(MainLocationScreenDestination){
-            popUpTo(LoginScreenDestination.route){
-                inclusive = true;
-            }
-        }
-    }
+//    if(authState.isAuthorized == true){
+//        Log.d("AUTH", "Navigate to main");
+//        navigator.navigate(MainLocationScreenDestination){
+//            popUpTo(LoginScreenDestination.route){
+//                inclusive = true;
+//            }
+//        }
+//    }
     
     Log.d("AUTH STATE", authState.toString());
 
