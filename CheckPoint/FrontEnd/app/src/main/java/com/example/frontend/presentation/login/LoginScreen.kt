@@ -42,12 +42,16 @@ fun LoginScreen(
     val authState = viewModel.authState.value
 
     if(authState.isAuthorized == true){
-        navigator.navigate(MainFeedScreenDestination){
+        Log.d("AUTH", "Navigate to main");
+        navigator.navigate(MainLocationScreenDestination){
             popUpTo(LoginScreenDestination.route){
                 inclusive = true;
             }
         }
     }
+    
+    Log.d("AUTH STATE", authState.toString());
+
     if(authState.isLoading){
         Log.d("LOGIN Scr","Loading ${authState.isLoading}");
         Column (

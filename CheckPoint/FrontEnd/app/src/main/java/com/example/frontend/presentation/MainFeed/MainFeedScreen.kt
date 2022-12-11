@@ -4,6 +4,7 @@ import Constants
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -75,15 +76,33 @@ fun MainFeedScreen(
         } else {
             if(viewModel.getPosts().isNotEmpty()) {
                 Row(Modifier.fillMaxWidth()) {
-                    Text(
-                        viewModel.nazivSorta()
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Button(
-                        onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
-                    ) {
-                        Text("Sort")
-                    }
+//                    Text(
+//                        text = viewModel.nazivSorta(),
+//                        modifier = Modifier.clickable{
+//                            expanded.value = true
+//                        }
+//                    )
+
+                    OutlinedTextField(
+                        value = viewModel.nazivSorta(),
+                        onValueChange = {},
+                        Modifier.wrapContentWidth(),
+                        readOnly = true,
+                        label = {
+                            Text(text = "Sort")
+                        },
+                        trailingIcon = {
+                            Icon(
+                                if(expanded.value == false) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                                contentDescription = null,
+                                Modifier.clickable  {
+                                    Log.d("DROP", "CLICK");
+                                    expanded.value = true
+                                }
+                            )
+                        }
+                    );
+
                     DropdownMenu(
                         expanded = expanded.value,
                         onDismissRequest = { expanded.value = false },

@@ -5,31 +5,36 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toLowerCase
@@ -43,9 +48,12 @@ import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
+import com.example.frontend.presentation.posts.*
+import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -72,6 +80,10 @@ fun ProfileScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     if(state.error.contains("403") || pictureState.error.contains("403") || postsState.error.contains("403")){
+        if(state.error.contains("403")) Log.d("STATE", "ERROR 403");
+        if(pictureState.error.contains("403")) Log.d("PICTURE STATE", "ERROR 403");
+        if(postsState.error.contains("403")) Log.d("POSTS STATE", "ERROR 403");
+
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
                 inclusive = true;
@@ -124,7 +136,7 @@ fun ProfileScreen(
                 }
 
                 if(viewModel.savedUserId != 0L){
-                    UserPostsSection(postsState, viewModel.savedUserId, navigator);
+                    UserPostsSection(postsState, viewModel.savedUserId, viewModel, navigator);
                 }
             }
         }
@@ -453,10 +465,12 @@ fun ActionButton(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserPostsSection(
     postsState : UserPostsState,
     userId: Long,
+    viewModel : ProfileViewModel,
     navigator : DestinationsNavigator
 )
 {
@@ -499,7 +513,7 @@ fun UserPostsSection(
     ){
         if(postsState.userPosts!=null){
             if(list){
-                PostsSection(userId = userId, postsState.userPosts, navigator);
+                PostsSection(userId = userId, postsState.userPosts, viewModel, navigator);
             }
             if(map){
                 MapSection(userId = userId, postsState.userPosts,navigator);
@@ -511,10 +525,12 @@ fun UserPostsSection(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostsSection(
     userId : Long,
     posts: List<Post>,
+    viewModel : ProfileViewModel,
     navigator : DestinationsNavigator
 ){
     Column(
@@ -578,36 +594,140 @@ fun PostsSection(
                 shape = RoundedCornerShape(20.dp)
             )
 
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(15.dp),
-            ){
+            LazyColumn{
                 items(searchPosts){
-                        post -> PostCard(post = post, navigator = navigator)
+                        post -> PostCard(post = post, navigator = navigator, viewModel)
                 }
             }
-
-
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun PostCard(
     post : Post,
-    navigator : DestinationsNavigator
+    navigator : DestinationsNavigator,
+    viewModel : ProfileViewModel
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navigator.navigate(
-                    PostScreenDestination(post.postId)
-                )
-            }
+
+    Card(
+        modifier = Modifier.padding(vertical = 8.dp),
+        elevation = 1.dp,
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        onClick = {
+            navigator.navigate(PostScreenDestination(post.postId))
+        }
     ){
-        Text(post.location.name);
+        Row {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
+            ) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .clickable{
+                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        val photo = post.image
+                        val decoder = Base64.getDecoder()
+                        val photoBytes = decoder.decode(photo)
+                        if(photoBytes.size>1){
+                            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
+                            print(mapa.byteCount)
+                            if(mapa!=null){
+                                Image(
+                                    bitmap = mapa.asImageBitmap(),
+                                    contentDescription = "Profile image",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .height(35.dp)
+                                        .width(35.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+
+                            Text(
+                                text = post.appUserUsername,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = post.location.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                    if(viewModel.loginUserId == post.appUserId) {
+                        DeletePostButton(post = post, viewModel = viewModel)
+                    }
+                }
+
+                Row(){
+                    if(post.photos.size > 0)
+                        ImagePagerSliderPostCard(post, post.photos)
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = post.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 10.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = if (post.description.length < 90) post.description else "${post.description.substring(0, 85)} ...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        LikeOrUnlikePostButton(
+                            post = post,
+                            viewModel = viewModel,
+                            stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value
+                        )
+                        Text(
+                            text = "${post.numberOfLikes} likes",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    Row {
+                        Text(
+                            text = "${post.numberOfComments} comments",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+        }
     }
+
 }
 
 @Composable
@@ -630,5 +750,56 @@ fun MapSection(
             )
     ) {
         MapWindow(userId, posts)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DeletePostButton(
+    post: Post,
+    viewModel: ProfileViewModel
+) {
+    IconButton(
+        onClick = {
+            viewModel.deletePostById(post.postId, post.location.id)
+        },
+        modifier = Modifier
+            .clip(RectangleShape)
+            .border(BorderStroke(1.dp, Color.LightGray))
+            .size(30.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = "Delete post",
+            tint = MaterialTheme.colorScheme.outline
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun LikeOrUnlikePostButton(
+    post : Post,
+    viewModel: ProfileViewModel,
+    stateLikeOrUnlike: PostStringState
+) {
+    IconButton(onClick = {
+        viewModel.likeOrUnlikePostById(post.postId)
+        post.isLiked = !post.isLiked
+        if (post.isLiked)
+            post.numberOfLikes += 1;
+        else
+            post.numberOfLikes -= 1;
+    }) {
+        Icon(
+            if(post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = if(post.isLiked) "Unlike" else "Like",
+            tint = if(post.isLiked) Color.Red else Color.DarkGray
+        )
+    }
+    if(stateLikeOrUnlike.isLoading){
+    }
+    else if(stateLikeOrUnlike.error!=""){
+        Text("An error occured while like/unlike post!");
     }
 }

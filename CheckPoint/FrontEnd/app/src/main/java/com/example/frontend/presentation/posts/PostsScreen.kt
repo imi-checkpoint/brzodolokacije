@@ -4,6 +4,7 @@ import Constants
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
@@ -91,13 +94,26 @@ fun PostsScreen(
                 tint = Color.DarkGray)
         }
         Row(Modifier.fillMaxWidth()){
-            Text(viewModel.nazivSorta()
-                )
-            Spacer(Modifier.weight(1f))
-            Button(onClick = { expanded.value = true },Modifier.wrapContentWidth(),
-                ) {
-                Text("Sort")
-            }
+            OutlinedTextField(
+                value = viewModel.nazivSorta(),
+                onValueChange = {},
+                Modifier.wrapContentWidth(),
+                readOnly = true,
+                label = {
+                    Text(text = "Sort")
+                },
+                trailingIcon = {
+                    Icon(
+                        if(expanded.value == false) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                        contentDescription = null,
+                        Modifier.clickable  {
+                            Log.d("DROP", "CLICK");
+                            expanded.value = true
+                        }
+                    )
+                }
+            );
+
             DropdownMenu(
                 expanded = expanded.value,
                 onDismissRequest = { expanded.value = false },
