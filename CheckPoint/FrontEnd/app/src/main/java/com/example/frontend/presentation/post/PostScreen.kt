@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import com.example.frontend.presentation.posts.LikeOrUnlikePostButton
 import java.util.*
 import kotlin.math.absoluteValue
 
@@ -74,7 +75,7 @@ fun PostScreen(
 
     Column(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 15.dp, bottom = 15.dp)
+            .padding(horizontal = 20.dp, vertical = 15.dp)
     ) {
 
         IconButton(onClick = {
@@ -116,13 +117,12 @@ fun PostDetails(
             .verticalScroll(rememberScrollState())
     ) {
 
-        UsernameAndLike(post, navigator, viewModel)
+        CardHeader(post, navigator, viewModel)
         //photo slider
         if(post.photos.size > 0)
             ImagePagerSlider(post, post.photos)
 
-        PostDescription(post)
-        //DescriptionOrLocation(post, navigator)
+        PostDescriptionAndLikes(post, viewModel)
 
         //PostMap(post, navigator)
 
@@ -134,27 +134,22 @@ fun PostDetails(
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalPagerApi
 @Composable
-fun UsernameAndLike(
+fun CardHeader(
     post : Post,
     navigator: DestinationsNavigator,
     viewModel: PostViewModel
 ){
-    val painterLoginPhoto = rememberImagePainter(
-        data = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-        builder = {}
-    )
 
     Card(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
             .fillMaxWidth(),
-        backgroundColor = Color.White,
+        elevation = 1.dp,
         shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -177,87 +172,50 @@ fun UsernameAndLike(
                             contentDescription = "Profile image",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .height(25.dp)
-                                .width(25.dp)
+                                .height(30.dp)
+                                .width(30.dp)
                                 .clip(CircleShape),
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                    text = post.appUserUsername,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var likedBool by remember{ mutableStateOf(post.isLiked) }
-                var likeCount by remember{ mutableStateOf(post.numberOfLikes) }
-
-                IconButton(onClick = {
-                    viewModel.likeOrUnlikePostById(post.postId)
-                    likedBool = !likedBool
-                    if (likedBool)
-                        likeCount += 1;
-                    else
-                        likeCount -= 1;
-                }) {
-                    Icon(
-                        if (likedBool) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (likedBool) "Unlike" else "Like",
-                        tint = if (likedBool) Color.Red else Color.DarkGray,
-                        modifier = Modifier.size(30.dp)
+                    Text(
+                        text = post.appUserUsername,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = post.location.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = post.date,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 10.sp,
+                        fontStyle = FontStyle.Italic,
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
-                Text(
-                    text = "${likeCount}",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
+            ClickableText(
+                text = AnnotatedString(
+                    text = "See location"
+                ),
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray
+                ),
+                onClick = {
+                    //prikazi lokaciju umesto slajdera
+                }
+            )
         }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalPagerApi
-@Composable
-fun DescriptionOrLocation(
-    post : Post,
-    navigator: DestinationsNavigator
-) {
-    Card(
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
-            .fillMaxWidth(),
-        backgroundColor = Color.White,
-        shape = RectangleShape
-    ) {
-
-        //jedno ili drugo if else
-
-        //description
-
-
-        //location
-        /*
-        Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(
-                    Icons.Default.LocationOn,
-                    contentDescription = "",
-                    tint = Color(0xff203f1e)
-                )
-                Text(
-                    text = post.location.name,
-                    style = MaterialTheme.typography.bodyMedium
-                );
-            }
-         */
-
     }
 }
 
@@ -268,34 +226,20 @@ fun ImagePagerSlider(
     post: Post,
     photos: List<Photo>
 ){
-
     val pagerState = rememberPagerState(
         pageCount = photos.size,
         initialPage = 0
     )
-
-//    ako zelimo da se menjaju slike i same
-//    LaunchedEffect(Unit){
-//        while(true){
-//            yield()
-//            delay(2000)
-//            pagerState.animateScrollToPage(
-//                page = (pagerState.currentPage + 1) % pagerState.pageCount,
-//                animationSpec = tween(600)
-//            )
-//        }
-//    }
-
     Card(
         modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 0.dp)
             .fillMaxWidth(),
-        shape = RectangleShape,
-        backgroundColor = Color.White
+        elevation = 1.dp,
+        shape = RectangleShape
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
@@ -310,7 +254,7 @@ fun ImagePagerSlider(
                     state = pagerState,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(0.dp, 30.dp, 0.dp, 15.dp)
+                        .padding(0.dp, 15.dp, 0.dp, 15.dp)
                 ) {
                         page->
                     Card(
@@ -334,19 +278,9 @@ fun ImagePagerSlider(
                                 )
                             }
                             .fillMaxWidth()
-                            .padding(25.dp, 0.dp, 25.dp, 0.dp),
-                        shape = RoundedCornerShape(15.dp)
                     ){
 
-                        val photo = photos[page];
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.LightGray)
-                                .align(Alignment.Center)
-                        )
-
+                        val photo = photos[page]
                         val decoder = Base64.getDecoder()
                         val photoBytes = decoder.decode(photo.photo.data)
                         if(photoBytes.size>1) {
@@ -367,8 +301,9 @@ fun ImagePagerSlider(
             HorizontalPagerIndicator(
                 pagerState = pagerState,
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 10.dp, bottom = 15.dp),
+                    .align(Alignment.CenterHorizontally),
+                indicatorWidth = 6.dp,
+                indicatorHeight = 6.dp,
                 activeColor = Color.Blue,
                 inactiveColor = Color.LightGray
             )
@@ -377,23 +312,65 @@ fun ImagePagerSlider(
 }
 
 @Composable
-fun PostDescription(
-    post : Post
+fun PostDescriptionAndLikes(
+    post : Post,
+    viewModel: PostViewModel
 ){
     Card(
         modifier = Modifier
-            .padding(horizontal = 10.dp)
             .fillMaxWidth(),
-        backgroundColor = Color.White,
+        elevation = 1.dp,
         shape = RoundedCornerShape(bottomStart = 5.dp, bottomEnd = 5.dp)
     ) {
-        Text(
-            text = post.description,
-            color = Color.Gray,
-            style = MaterialTheme.typography.bodyMedium,
-            fontStyle = FontStyle.Italic,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 15.dp)
-        )
+        Column(
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 15.dp)
+        ) {
+            Text(
+                text = post.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    var likedBool by remember{ mutableStateOf(post.isLiked) }
+                    var likeCount by remember{ mutableStateOf(post.numberOfLikes) }
+
+                    IconButton(onClick = {
+                        viewModel.likeOrUnlikePostById(post.postId)
+                        likedBool = !likedBool
+                        if (likedBool)
+                            likeCount += 1;
+                        else
+                            likeCount -= 1;
+                    }) {
+                        Icon(
+                            if (likedBool) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = if (likedBool) "Unlike" else "Like",
+                            tint = if (likedBool) Color.Red else Color.DarkGray,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Text(
+                        text = "${post.numberOfLikes} likes",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                Row {
+                    Text(
+                        text = "${post.numberOfComments} comments",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -419,7 +396,6 @@ fun PostComments(
 
     Row(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 0.dp)
             .fillMaxWidth()
             .heightIn(0.dp, 500.dp)
             .verticalScroll(rememberScrollState())
@@ -443,8 +419,9 @@ fun AddFirstCommentCard(
 
     Card(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 0.dp)
+            .padding(top = 20.dp)
             .fillMaxWidth(),
+        elevation = 1.dp,
         shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
     ) {
         Row(
@@ -695,7 +672,9 @@ fun CommentCard(
                 if (comment.canDelete) {
                     IconButton(onClick = {
                         viewModel.deleteCommentById(comment.id, post.postId)
-                    }, modifier = Modifier.size(20.dp).padding(end = 5.dp)
+                    }, modifier = Modifier
+                        .size(20.dp)
+                        .padding(end = 5.dp)
                     ) {
                         Icon(
                             Icons.Default.Clear,
@@ -804,7 +783,9 @@ fun SubCommentCard(
                 if (subComment.canDelete) {
                     IconButton(onClick = {
                         viewModel.deleteCommentById(subComment.id, post.postId)
-                    }, modifier = Modifier.size(19.dp).padding(end = 5.dp)
+                    }, modifier = Modifier
+                        .size(19.dp)
+                        .padding(end = 5.dp)
                     ) {
                         Icon(
                             Icons.Default.Clear,
