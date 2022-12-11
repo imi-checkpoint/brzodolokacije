@@ -12,6 +12,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -44,6 +46,11 @@ fun RegisterScreen(
     var passwordRepeatFocusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
 
+    var usernameValue = remember{ mutableStateOf("")};
+    var mailValue = remember { mutableStateOf("")};
+    var passwordValue = remember { mutableStateOf("")};
+    var passwordRepeatValue = remember { mutableStateOf("")};
+
     Column(
         Modifier
             .padding(24.dp)
@@ -60,18 +67,18 @@ fun RegisterScreen(
         )
 
 
-        var usernameValue = "";
+
         TextInput(
             inputType = InputType.Name,
             keyboardActions = KeyboardActions(
                 onNext = {
                     emailFocusRequester.requestFocus()
                 }),
-            valuePar = usernameValue,
-            onChange = {usernameValue = it}
+            valuePar = usernameValue.value,
+            onChange = {usernameValue.value = it}
         )
 
-        var mailValue = "";
+
         TextInput(
             inputType = InputType.Mail,
             focusRequester = emailFocusRequester,
@@ -79,11 +86,10 @@ fun RegisterScreen(
                 onNext = {
                     passwordFocusRequester.requestFocus()
                 }),
-            valuePar = mailValue,
-            onChange = {mailValue = it}
+            valuePar = mailValue.value,
+            onChange = {mailValue.value = it}
         )
 
-        var passwordValue = "";
         TextInput(
             inputType = InputType.Password,
             focusRequester = passwordFocusRequester,
@@ -91,11 +97,10 @@ fun RegisterScreen(
                 onNext = {
                     passwordRepeatFocusRequester.requestFocus()
                 }),
-            valuePar = passwordValue,
-            onChange = {passwordValue = it}
+            valuePar = passwordValue.value,
+            onChange = {passwordValue.value = it}
         )
 
-        var passwordRepeatValue = "";
         TextInput(
             inputType = InputType.Password,
             focusRequester = passwordRepeatFocusRequester,
@@ -103,13 +108,13 @@ fun RegisterScreen(
                 onDone = {
                     focusManager.clearFocus()
                 }),
-            valuePar = passwordRepeatValue,
-            onChange = {passwordRepeatValue = it}
+            valuePar = passwordRepeatValue.value,
+            onChange = {passwordRepeatValue.value = it}
         )
 
 
         Button(onClick = {
-            viewModel.register(mailValue , usernameValue, passwordValue, passwordRepeatValue, navigator)
+            viewModel.register(mailValue.value , usernameValue.value, passwordValue.value, passwordRepeatValue.value, navigator)
         },
             modifier =Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -144,7 +149,7 @@ fun RegisterScreen(
 
 
         if(state.error.isNotBlank()){//doslo je do greske tokom logina
-            Text("Error! Please, try again!");
+            Text(state.error);
         }
 
         if(state.isLoading){

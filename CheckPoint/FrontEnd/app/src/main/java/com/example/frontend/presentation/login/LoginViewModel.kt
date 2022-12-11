@@ -57,9 +57,9 @@ class LoginViewModel @Inject constructor(
             access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
-            if(refresh_token != ""){
+            if(access_token != ""){
                 Log.d("Auth user", "Auth user");
-                Log.d("SAVED TOKEN", "*${refresh_token.trim()}*");
+                Log.d("SAVED TOKEN", "*${access_token.trim()}*");
                 authUser();
             }
             else{
@@ -70,7 +70,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun authUser(){
-        sessionUseCase("Bearer "+refresh_token).onEach { result ->
+        sessionUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     Log.d("AUTH SUCCESS", "Success");

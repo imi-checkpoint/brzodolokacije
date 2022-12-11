@@ -142,7 +142,7 @@ class PostViewModel @Inject constructor(
     }
 
     private fun getMyProfilePicture(){
-        getMyProfilePictureUseCase("Bearer "+refresh_token).onEach { result ->
+        getMyProfilePictureUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     _stateGetProfilePicture.value = ProfilePictureState(profilePicture = result.data ?: "")
