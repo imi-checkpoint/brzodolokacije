@@ -94,8 +94,8 @@ class ProfileViewModel @Inject constructor(
 
     private fun getUserProfileData(userId : Long)
     {
-        Log.d("REFRESH TOKEN ", "*${refresh_token}*");
-        getUserProfileDataUseCase("Bearer "+refresh_token, userId, loginUserId).onEach { result ->
+        Log.d("REFRESH TOKEN ", "*${access_token}*");
+        getUserProfileDataUseCase("Bearer "+access_token, userId, loginUserId).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     Log.d("PROFILE", "Recieved profile data for userId ${userId.toString()}");

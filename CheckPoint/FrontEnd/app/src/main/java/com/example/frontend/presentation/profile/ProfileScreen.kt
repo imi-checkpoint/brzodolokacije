@@ -5,10 +5,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,11 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toLowerCase
@@ -49,14 +48,12 @@ import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.location.LocationCard
 import com.example.frontend.presentation.map.MapWindow
-import com.example.frontend.presentation.posts.DeletePostButton
-import com.example.frontend.presentation.posts.LikeOrUnlikePostButton
-import com.example.frontend.presentation.posts.PhotoCard
-import com.example.frontend.presentation.posts.PostsViewModel
+import com.example.frontend.presentation.posts.*
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -83,6 +80,10 @@ fun ProfileScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     if(state.error.contains("403") || pictureState.error.contains("403") || postsState.error.contains("403")){
+        if(state.error.contains("403")) Log.d("STATE", "ERROR 403");
+        if(pictureState.error.contains("403")) Log.d("PICTURE STATE", "ERROR 403");
+        if(postsState.error.contains("403")) Log.d("POSTS STATE", "ERROR 403");
+
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
                 inclusive = true;
@@ -476,8 +477,6 @@ fun UserPostsSection(
     var list by remember{ mutableStateOf(true) }
     var map by remember{ mutableStateOf(false) }
 
-    val stateDelete = viewModel.stateDelete.value
-
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -514,7 +513,7 @@ fun UserPostsSection(
     ){
         if(postsState.userPosts!=null){
             if(list){
-                PostsSection(userId = userId, postsState.userPosts, viewModel, stateDelete, navigator);
+                PostsSection(userId = userId, postsState.userPosts, viewModel, navigator);
             }
             if(map){
                 MapSection(userId = userId, postsState.userPosts,navigator);
@@ -532,7 +531,6 @@ fun PostsSection(
     userId : Long,
     posts: List<Post>,
     viewModel : ProfileViewModel,
-    stateDelete : PostStringState,
     navigator : DestinationsNavigator
 ){
     Column(
@@ -598,7 +596,7 @@ fun PostsSection(
 
             LazyColumn{
                 items(searchPosts){
-                        post -> PostCard(post = post, navigator = navigator, viewModel, stateDelete)
+                        post -> PostCard(post = post, navigator = navigator, viewModel)
                 }
             }
         }
@@ -606,32 +604,26 @@ fun PostsSection(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun PostCard(
     post : Post,
     navigator : DestinationsNavigator,
-    viewModel : ProfileViewModel,
-    stateDelete: PostStringState
+    viewModel : ProfileViewModel
 ){
 
     Card(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        elevation = 2.dp,
-        backgroundColor = Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        onClick ={
-            navigator.navigate(
-                PostScreenDestination(post.postId)
-            )
+        modifier = Modifier.padding(vertical = 8.dp),
+        elevation = 1.dp,
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        onClick = {
+            navigator.navigate(PostScreenDestination(post.postId))
         }
     ){
         Row {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
@@ -660,58 +652,75 @@ fun PostCard(
                                     contentDescription = "Profile image",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .height(25.dp)
-                                        .width(25.dp)
+                                        .height(35.dp)
+                                        .width(35.dp)
                                         .clip(CircleShape)
                                 )
                             }
                         }
-                        Text(
-                            text = "${post.appUserUsername}",
-                            color = Color.DarkGray
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+
+                            Text(
+                                text = post.appUserUsername,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = post.location.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        if(viewModel.loginUserId == post.appUserId)
-                            DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                    if(viewModel.loginUserId == post.appUserId) {
+                        DeletePostButton(post = post, viewModel = viewModel)
                     }
                 }
 
                 Row(){
-                    if(post.photos.size > 0){
-                        Spacer(modifier = Modifier.height(5.dp))
-                        PhotoCard(photo = post.photos[0], navigator)
-                    }
+                    if(post.photos.size > 0)
+                        ImagePagerSliderPostCard(post, post.photos)
                 }
-
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${post.description}",
-                    color = Color.DarkGray
+                    text = post.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 10.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.outline
                 )
+                Text(
+                    text = if (post.description.length < 90) post.description else "${post.description.substring(0, 85)} ...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row (
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
+                        LikeOrUnlikePostButton(
+                            post = post,
+                            viewModel = viewModel,
+                            stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value
+                        )
                         Text(
                             text = "${post.numberOfLikes} likes",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                     Row {
                         Text(
                             text = "${post.numberOfComments} comments",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
@@ -748,22 +757,22 @@ fun MapSection(
 @Composable
 fun DeletePostButton(
     post: Post,
-    viewModel: ProfileViewModel,
-    stateDelete: PostStringState
+    viewModel: ProfileViewModel
 ) {
-    IconButton(onClick = {
-        viewModel.deletePostById(post.postId, post.location.id)
-    }) {
+    IconButton(
+        onClick = {
+            viewModel.deletePostById(post.postId, post.location.id)
+        },
+        modifier = Modifier
+            .clip(RectangleShape)
+            .border(BorderStroke(1.dp, Color.LightGray))
+            .size(30.dp)
+    ) {
         Icon(
-            Icons.Default.Delete,
+            imageVector = Icons.Default.Delete,
             contentDescription = "Delete post",
-            tint = Color(0xfff44336)
+            tint = MaterialTheme.colorScheme.outline
         )
-    }
-    if(stateDelete.isLoading){
-    }
-    else if(stateDelete.error!=""){
-        Text("An error occured while deleting post!");
     }
 }
 
