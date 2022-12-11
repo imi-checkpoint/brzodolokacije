@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.post
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -37,7 +38,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Comment
 import com.example.frontend.domain.model.Photo
-import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.ProfileScreenDestination
@@ -47,11 +47,40 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import com.example.frontend.presentation.map.MapEvent
 import com.example.frontend.presentation.posts.LikeOrUnlikePostButton
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.rememberCameraPositionState
 import java.util.*
 import kotlin.math.absoluteValue
+
+import android.graphics.Camera
+import android.util.Log
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.filled.ToggleOff
+import androidx.compose.material.icons.filled.ToggleOn
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.*
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.frontend.domain.model.Post
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.CameraUpdateFactory.zoomTo
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Destination
@@ -118,13 +147,15 @@ fun PostDetails(
     ) {
 
         CardHeader(post, navigator, viewModel)
-        //photo slider
-        if(post.photos.size > 0)
-            ImagePagerSlider(post, post.photos)
+
+        if (viewModel.showLocationBool.value)
+            PostMap(post, navigator, viewModel)
+        else {
+            if(post.photos.size > 0)
+                ImagePagerSlider(post, post.photos) //photo slider
+        }
 
         PostDescriptionAndLikes(post, viewModel)
-
-        //PostMap(post, navigator)
 
         PostComments(post, comments, navigator, viewModel)
     }
@@ -205,7 +236,7 @@ fun CardHeader(
             }
             ClickableText(
                 text = AnnotatedString(
-                    text = "See location"
+                    text = if (viewModel.showLocationBool.value) "Show photos" else "Show location"
                 ),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
@@ -213,6 +244,7 @@ fun CardHeader(
                 ),
                 onClick = {
                     //prikazi lokaciju umesto slajdera
+                    viewModel.showLocationBool.value = !viewModel.showLocationBool.value
                 }
             )
         }
@@ -311,6 +343,143 @@ fun ImagePagerSlider(
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
+@Composable
+fun PostMap(
+    post : Post,
+    navigator: DestinationsNavigator,
+    viewModel: PostViewModel
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = 1.dp,
+        shape = RectangleShape
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(256.dp),
+            ){
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(0.dp, 15.dp, 0.dp, 15.dp)
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ){
+                        MapView(post, viewModel)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun MapView(
+    post: Post,
+    viewModel: PostViewModel
+)
+{
+    val scaffoldState = rememberScaffoldState()
+    val uiSettings = remember{
+        MapUiSettings(zoomControlsEnabled = false)
+    }
+
+    val camPosState = rememberCameraPositionState{
+    }
+    val builder = LatLngBounds.Builder()
+
+    val localDensity = LocalDensity.current
+    var mapWidth by remember{
+        mutableStateOf(0)
+    }
+
+    var mapHeight by remember{
+        mutableStateOf(0)
+    }
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                viewModel.onEvent(MapEvent.ToggleLightMap)
+            }) {
+                Icon(imageVector = if(viewModel.stateMap.value.isLightMap){
+                    Icons.Default.ToggleOff
+                } else Icons.Default.ToggleOn,
+                    contentDescription = "Toggle fallout map"
+                )
+            }
+        }
+    ) {
+        GoogleMap (
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coords ->
+                    mapWidth = with(localDensity){coords.size.width}
+                    mapHeight = with(localDensity){coords.size.height}
+                },
+            properties = viewModel.stateMap.value.properties,
+            uiSettings = uiSettings,
+            onMapLoaded = {
+
+            },
+            onMapLongClick = {
+                Log.d("Long click", "Map long click");
+                Log.d("LATLNG", it.toString());
+            },
+            cameraPositionState = camPosState
+        ){
+
+            val postLocation = LatLng(post.location.lat, post.location.lng)
+            builder.include(postLocation)
+
+            Marker(
+                position = postLocation,
+                title = post.location.name,
+                snippet = "User post location",
+                onInfoWindowClick = {},
+                onInfoWindowLongClick = {},
+                icon = BitmapDescriptorFactory.defaultMarker(
+                    BitmapDescriptorFactory.HUE_AZURE
+                )
+            )
+
+            updateMapCamera(camPosState, builder, mapWidth, mapHeight, postLocation)
+        }
+    }
+}
+
+fun updateMapCamera(
+    cameraPositionState: CameraPositionState,
+    builder : LatLngBounds.Builder,
+    width: Int,
+    height : Int,
+    postLocation: LatLng
+){
+    val padding = (width * 0.20).toInt();
+    cameraPositionState.move(
+        update = CameraUpdateFactory.newLatLngBounds(builder.build(), width, height, padding)
+    )
+}
+
+
 @Composable
 fun PostDescriptionAndLikes(
     post : Post,
@@ -374,13 +543,6 @@ fun PostDescriptionAndLikes(
     }
 }
 
-@Composable
-fun PostMap(
-    post : Post,
-    navigator: DestinationsNavigator
-){
-    Text("POST MAP")
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
