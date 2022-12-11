@@ -23,6 +23,7 @@ import com.example.frontend.R
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainFeedScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
