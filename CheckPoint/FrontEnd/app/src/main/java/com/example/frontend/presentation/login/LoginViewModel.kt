@@ -57,9 +57,9 @@ class LoginViewModel @Inject constructor(
             access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
 
-            if(refresh_token != ""){
+            if(access_token != ""){
                 Log.d("Auth user", "Auth user");
-                Log.d("SAVED TOKEN", "*${refresh_token.trim()}*");
+                Log.d("SAVED TOKEN", "*${access_token.trim()}*");
                 authUser();
             }
             else{
@@ -70,7 +70,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun authUser(){
-        sessionUseCase("Bearer "+refresh_token).onEach { result ->
+        sessionUseCase("Bearer "+access_token).onEach { result ->
             when(result){
                 is Resource.Success -> {
                     Log.d("AUTH SUCCESS", "Success");
@@ -85,13 +85,14 @@ class LoginViewModel @Inject constructor(
 
                         saveUserId(LoginToken(result.data!!.access_token, result.data!!.refresh_token));
 
-                        _authState.value = AuthState(isAuthorized = true);
+                        _authState.value = AuthState(isAuthorized = true, isLoading = false);
                     }
 
                 }
                 is Resource.Error -> {
+                    Log.d("Auth", "Error is ${result.message}");
                     _authState.value = AuthState(error = result.message ?:
-                    "An unexpected error occured")
+                    "An unexpected error occured", isLoading = false);
                 }
                 is Resource.Loading -> {
                     _authState.value = AuthState(isLoading = true)
@@ -122,6 +123,7 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
+                    result.message?.let { Log.d("LOGIN ERROR", it) };
                     _state.value = LoginState(error = result.message ?:
                     "An unexpected error occured")
                 }

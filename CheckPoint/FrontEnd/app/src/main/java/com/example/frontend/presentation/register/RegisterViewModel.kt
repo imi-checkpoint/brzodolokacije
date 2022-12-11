@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.register
 
+import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.example.frontend.common.Resource
 import com.example.frontend.domain.model.RegisterUser
 import com.example.frontend.domain.use_case.register_user.RegisterUseCase
 import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainFeedScreenDestination
 import com.example.frontend.presentation.register.components.RegisterState
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.assisted.Assisted
@@ -32,8 +34,20 @@ class RegisterViewModel @Inject constructor(
 
     fun register(mail:String , username:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
     {
-        if(password !== passwordRepeat){
+        if(!username.length.equals("")){
+            _state.value = RegisterState(error = "Username cant be empty");
+        }
+        else if(password.length<7){
+            println("kratka sifra")
+            _state.value = RegisterState(error = "Password must be at least 7 characters");
+        }
+        else if(password != passwordRepeat){
+            println("sifre nisu iste")
             _state.value = RegisterState(error = "Passwords dont't match!");
+        }
+        else if(!Patterns.EMAIL_ADDRESS.matcher(mail).matches()){
+            println("email nije dobar")
+            _state.value = RegisterState(error = "Email not valid");
         }
         else{
             var user = RegisterUser(mail, username, password );
@@ -43,7 +57,7 @@ class RegisterViewModel @Inject constructor(
                         _state.value = RegisterState(message = result.data ?: "")
 
                         navigator.navigate(
-                            LoginScreenDestination()
+                            MainFeedScreenDestination()
                         )
                     }
                     is Resource.Error -> {

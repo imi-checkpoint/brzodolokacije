@@ -87,10 +87,14 @@ fun MapWindow(
             cameraPositionState = camPosState
         ){
 
+            if(posts!=null && posts.size > 0){
+                val postLocation = LatLng(posts[0].location.lat, posts[0].location.lng)
+                builder.include(postLocation)
+            }
+
             posts.forEach { post ->
 
-                val postLocation = LatLng(post.location.lat, post.location.lng)
-                builder.include(postLocation)
+                val postLocation = LatLng(post.location.lat, post.location.lng);
 
                 Marker(
                     position = postLocation,

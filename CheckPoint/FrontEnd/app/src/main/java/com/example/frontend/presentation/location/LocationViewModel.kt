@@ -43,6 +43,7 @@ class LocationViewModel @Inject constructor(
 
     init {
 
+        Log.d("LOCATION","Initialize location screen");
         GlobalScope.launch(Dispatchers.Main){
             access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
             refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();

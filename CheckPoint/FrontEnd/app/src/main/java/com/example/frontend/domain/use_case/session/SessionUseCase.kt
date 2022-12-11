@@ -22,10 +22,10 @@ class SessionUseCase @Inject constructor(
             Log.d("SESSTON", "Got ${auth.toString()}");
             emit(Resource.Success(auth))
         }catch (e : HttpException){
-            Log.d("SESSION", e.localizedMessage);
+            e.message?.let { Log.d("SESSION HTTP", it) };
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occured"))
         }catch (e : IOException){
-            Log.d("SESSION", e.localizedMessage);
+            e.message?.let { Log.d("SESSION IO", it) };
             emit(Resource.Error("Couldn't reach server. Please check your internet connection"))
         }
     }

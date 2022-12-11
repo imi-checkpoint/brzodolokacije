@@ -23,6 +23,7 @@ import com.example.frontend.R
 import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.MainFeedScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -41,12 +42,16 @@ fun LoginScreen(
     val authState = viewModel.authState.value
 
     if(authState.isAuthorized == true){
+        Log.d("AUTH", "Navigate to main");
         navigator.navigate(MainLocationScreenDestination){
             popUpTo(LoginScreenDestination.route){
                 inclusive = true;
             }
         }
     }
+    
+    Log.d("AUTH STATE", authState.toString());
+
     if(authState.isLoading){
         Log.d("LOGIN Scr","Loading ${authState.isLoading}");
         Column (

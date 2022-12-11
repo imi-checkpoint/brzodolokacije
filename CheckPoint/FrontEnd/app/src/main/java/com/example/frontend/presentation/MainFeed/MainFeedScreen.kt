@@ -1,11 +1,12 @@
 package com.example.frontend.presentation.MainFeed
 
+import Constants
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,29 +21,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
-import com.example.frontend.presentation.location.LocationViewModel
-import com.example.frontend.presentation.posts.AllPosts
-import com.example.frontend.presentation.posts.PostCard
-import com.example.frontend.presentation.posts.PostsViewModel
 import com.example.frontend.presentation.posts.components.PostStringState
+import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import java.util.*
+import java.util.Base64
+import kotlin.math.absoluteValue
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Destination
@@ -73,15 +76,33 @@ fun MainFeedScreen(
         } else {
             if(viewModel.getPosts().isNotEmpty()) {
                 Row(Modifier.fillMaxWidth()) {
-                    Text(
-                        viewModel.nazivSorta()
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Button(
-                        onClick = { expanded.value = true }, Modifier.wrapContentWidth(),
-                    ) {
-                        Text("Sort")
-                    }
+//                    Text(
+//                        text = viewModel.nazivSorta(),
+//                        modifier = Modifier.clickable{
+//                            expanded.value = true
+//                        }
+//                    )
+
+                    OutlinedTextField(
+                        value = viewModel.nazivSorta(),
+                        onValueChange = {},
+                        Modifier.wrapContentWidth(),
+                        readOnly = true,
+                        label = {
+                            Text(text = "Sort")
+                        },
+                        trailingIcon = {
+                            Icon(
+                                if(expanded.value == false) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                                contentDescription = null,
+                                Modifier.clickable  {
+                                    Log.d("DROP", "CLICK");
+                                    expanded.value = true
+                                }
+                            )
+                        }
+                    );
+
                     DropdownMenu(
                         expanded = expanded.value,
                         onDismissRequest = { expanded.value = false },
@@ -139,7 +160,7 @@ fun AllMPosts(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun PostMCard(
     post : Post,
@@ -147,24 +168,18 @@ fun PostMCard(
     viewModel : MainFeedViewModel,
 )
 {
-
     Card(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        elevation = 2.dp,
-        backgroundColor = Color.White,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        onClick ={
-            navigator.navigate(
-                PostScreenDestination(post.postId)
-            )
+        modifier = Modifier.padding(vertical = 8.dp),
+        elevation = 1.dp,
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        onClick = {
+            navigator.navigate(PostScreenDestination(post.postId))
         }
     ){
         Row {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
@@ -193,52 +208,71 @@ fun PostMCard(
                                     contentDescription = "Profile image",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .height(25.dp)
-                                        .width(25.dp)
-                                        .clip(CircleShape),
+                                        .height(35.dp)
+                                        .width(35.dp)
+                                        .clip(CircleShape)
                                 )
                             }
                         }
-                        Text(
-                            text = "${post.appUserUsername}",
-                            color = Color.DarkGray
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+
+                            Text(
+                                text = post.appUserUsername,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = post.location.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     }
                 }
 
                 Row(){
-                    if(post.photos.size > 0){
-                        Spacer(modifier = Modifier.height(5.dp))
-                        PhotoCard(photo = post.photos[0], navigator)
-                    }
+                    if(post.photos.size > 0)
+                        ImagePagerSliderPostCard(post, post.photos)
                 }
-
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${post.description}",
-                    color = Color.DarkGray
+                    text = post.date,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 10.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.outline
                 )
-
+                Text(
+                    text = if (post.description.length < 90) post.description else "${post.description.substring(0, 85)} ...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row (
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        LikeOrUnlikePostButton(post = post, viewModel = viewModel, stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value)
+                        LikeOrUnlikePostButton(
+                            post = post,
+                            viewModel = viewModel,
+                            stateLikeOrUnlike = viewModel.stateLikeOrUnlike.value
+                        )
                         Text(
                             text = "${post.numberOfLikes} likes",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                     Row {
                         Text(
                             text = "${post.numberOfComments} comments",
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
@@ -247,36 +281,90 @@ fun PostMCard(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
 @Composable
-fun PhotoCard(
-    photo : Photo,
-    navigator: DestinationsNavigator,
+fun ImagePagerSliderPostCard(
+    post: Post,
+    photos: List<Photo>
 ){
-    Row(
+    val pagerState = rememberPagerState(
+        pageCount = photos.size,
+        initialPage = 0
+    )
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        println(photo.photo.data.toByteArray().size)
-        val decoder = Base64.getDecoder()
-        val photoBytes = decoder.decode(photo.photo.data)
-        if(photoBytes.size>1){
-            val mapa: Bitmap = BitmapFactory.decodeByteArray(photoBytes,0,photoBytes.size)
-            print(mapa.byteCount)
-            if(mapa!=null){
-                Image(
-                    bitmap = mapa.asImageBitmap(),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                )
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+        ){
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(0.dp, 15.dp, 0.dp, 15.dp)
+            ) {
+                    page->
+                Card(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
+                            }
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            )
+                        }
+                        .fillMaxWidth()
+                ){
+
+                    val photo = photos[page]
+                    val decoder = Base64.getDecoder()
+                    val photoBytes = decoder.decode(photo.photo.data)
+                    if(photoBytes.size>1) {
+                        val mapa: Bitmap =
+                            BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
+                        print(mapa.byteCount)
+                        if (mapa != null) {
+                            Image(
+                                bitmap = mapa.asImageBitmap(),
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
             }
         }
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally),
+            indicatorWidth = 6.dp,
+            indicatorHeight = 6.dp,
+            activeColor = Color.Blue,
+            inactiveColor = Color.LightGray
+        )
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

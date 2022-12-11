@@ -1,6 +1,7 @@
 public class Constants{
     companion object {
-        const val BASE_URL = "http://147.91.204.115:10060/";
+//        const val BASE_URL = "http://147.91.204.115:10060/"; //server
+        const val BASE_URL = "http://192.168.8.101:8080/";
 
         const val LOCATION_ID = "locationId"
 
