@@ -123,7 +123,7 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(viewModel.getPosts(), navigator, viewModel, stateDelete)
+            AllPosts(viewModel.getPosts(), navigator, viewModel)
         }
     }
 }
@@ -133,8 +133,7 @@ fun PostsScreen(
 fun AllPosts(
     posts : List<Post>?,
     navigator: DestinationsNavigator,
-    viewModel : PostsViewModel,
-    stateDelete: PostStringState
+    viewModel : PostsViewModel
 )
 {
     if(posts == null || posts.size == 0){
@@ -149,7 +148,7 @@ fun AllPosts(
     else{
         LazyColumn{
             items(posts){
-                post -> PostCard(post, navigator, viewModel, stateDelete)
+                post -> PostCard(post, navigator, viewModel)
             }
         }
     }
@@ -161,8 +160,7 @@ fun AllPosts(
 fun PostCard(
     post : Post,
     navigator : DestinationsNavigator,
-    viewModel : PostsViewModel,
-    stateDelete: PostStringState
+    viewModel : PostsViewModel
 )
 {
     Card(
@@ -229,7 +227,7 @@ fun PostCard(
                         }
                     }
                     if(viewModel.loginUserId == post.appUserId) {
-                       DeletePostButton(post = post, viewModel = viewModel, stateDelete = stateDelete)
+                       DeletePostButton(post = post, viewModel = viewModel)
                     }
                 }
 
@@ -378,8 +376,7 @@ fun ImagePagerSliderPostCard(
 @Composable
 fun DeletePostButton(
     post: Post,
-    viewModel: PostsViewModel,
-    stateDelete: PostStringState
+    viewModel: PostsViewModel
 ) {
 
     IconButton(
