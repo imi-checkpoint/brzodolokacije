@@ -280,7 +280,9 @@ fun UsernameAndEmail(
             valuePar = viewModel.currentEmail,
             onChange = {viewModel.currentEmail = it}
         );
-
+        if(viewModel.stateEmailChange.value.error!=""){
+            Text(viewModel.stateEmailChange.value.error)
+        }
         Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = {
@@ -358,6 +360,9 @@ fun Passwords(
             onChange = {viewModel.currentNewPass2InputValue = it}
         )
 
+        if(viewModel.statePasswordChange.value.error != ""){
+            Text(viewModel.statePasswordChange.value.error)
+        }
         Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = {

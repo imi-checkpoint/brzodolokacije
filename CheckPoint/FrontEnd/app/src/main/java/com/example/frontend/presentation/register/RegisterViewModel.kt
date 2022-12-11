@@ -34,9 +34,12 @@ class RegisterViewModel @Inject constructor(
 
     fun register(mail:String , username:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
     {
-        if(password.length<8){
+        if(!username.length.equals("")){
+            _state.value = RegisterState(error = "Username cant be empty");
+        }
+        else if(password.length<7){
             println("kratka sifra")
-            _state.value = RegisterState(error = "Password must be at least 8 characters");
+            _state.value = RegisterState(error = "Password must be at least 7 characters");
         }
         else if(password != passwordRepeat){
             println("sifre nisu iste")

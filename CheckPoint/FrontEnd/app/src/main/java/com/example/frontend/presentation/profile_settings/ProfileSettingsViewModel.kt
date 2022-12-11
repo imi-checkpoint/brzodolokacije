@@ -3,6 +3,7 @@ package com.example.frontend.presentation.profile_settings
 import android.app.Application
 import android.graphics.Bitmap
 import android.util.Log
+import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -202,6 +203,10 @@ class ProfileSettingsViewModel @Inject constructor(
 
     fun changeEmail(navigator: DestinationsNavigator)
     {
+        if(!Patterns.EMAIL_ADDRESS.matcher(currentEmail).matches()){
+            _stateEmailChange.value = UserInfoChangeState(error = "Email not valid")
+            return
+        }
         GlobalScope.launch(Dispatchers.Main){
             changeEmailUseCase("Bearer "+ access_token, currentEmail).onEach { result ->
                 when(result){
@@ -228,8 +233,20 @@ class ProfileSettingsViewModel @Inject constructor(
     {
         if (currentOldPassInputValue == "" || currentNewPass1InputValue == "" || currentNewPass2InputValue == "")
             return;
+        if (currentNewPass1InputValue.length < 7){
+            _statePasswordChange.value = UserInfoChangeState(error = "Password needs to be at least 7 charactes")
+            return
+        }
         if (currentNewPass1InputValue != currentNewPass2InputValue)
-            return;
+        {
+            _statePasswordChange.value = UserInfoChangeState(error = "Passwords are not matching")
+            return
+        }
+        if(currentOldPassInputValue == currentNewPass1InputValue){
+            _statePasswordChange.value = UserInfoChangeState(error = "New password cant be same as old password")
+            return
+        }
+
 
         val passwordArray =  arrayOf(currentOldPassInputValue, currentNewPass1InputValue);
 
@@ -238,14 +255,18 @@ class ProfileSettingsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _statePasswordChange.value = UserInfoChangeState(message = result.data ?: "")
+                        currentOldPassInputValue = ""
+                        currentNewPass1InputValue = ""
+                        currentNewPass2InputValue = ""
                     }
                     is Resource.Error -> {
+                        println(result.message!!)
+                        println(result.data!!)
                         if(result.message?.contains("403") == true){
                             GlobalScope.launch(Dispatchers.Main){
                                 DataStoreManager.deleteAllPreferences(context);
                             }
-                        }
-
+                        }1
                         _statePasswordChange.value = UserInfoChangeState(error = result.message ?:"An unexpected error occured")
                     }
                     is Resource.Loading -> {
