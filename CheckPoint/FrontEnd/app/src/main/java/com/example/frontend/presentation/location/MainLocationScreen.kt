@@ -1,6 +1,7 @@
 package com.example.frontend.presentation.location
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,6 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,6 +41,7 @@ import coil.compose.rememberImagePainter
 import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.MainFeed.MainFeedScreen
 import com.example.frontend.presentation.destinations.*
+import com.example.frontend.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -48,6 +52,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Destination
 @Composable
@@ -274,56 +279,90 @@ fun ProfileTopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(vertical = 15.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.End
     ) {
-        Row(){
-            IconButton(onClick = {
-                navigator.navigate(MainFeedScreenDestination())
-            }){
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
-            }
-            IconButton(onClick = {
-                navigator.navigate(
-                    NovPostScreenDestination()
-                )
-            }) {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
-            }
-
-            IconButton(onClick = {
-                viewModel.getAllLocations()
-                navigator.navigate(
-                    ProfileScreenDestination(viewModel.loginUserId, "")
-                );
-
-            }) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    navigator.navigate(MainFeedScreenDestination())
+                },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    contentPadding = PaddingValues(start = 8.dp, end = 15.dp),
+                    border = BorderStroke(1.2.dp, MyColorTopBarBlue)
+                ){
+                    Icon(
+                        Icons.Default.Home,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = "Feed",
+                        color = MyColorTopBarBlue,
+                        fontFamily = FontFamily.SansSerif
+                    )
+                }
             }
 
-            IconButton(onClick = {
-//                viewModel.getAllLocations()
-//                navigator.navigate() //navigate to messages
-            }) {
-                Icon(
-                    Icons.Default.Send,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    navigator.navigate(MainLocationScreenDestination())
+                },
+                    contentPadding = PaddingValues(start = 5.dp, end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBarBlue),
+                ){
+                    Icon(
+                        Icons.Default.Explore,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = "Explore",
+                        fontFamily = FontFamily.SansSerif
+                    )
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    navigator.navigate(
+                        NovPostScreenDestination()
+                    )
+                }) {
+                    Icon(
+                        Icons.Default.AddCircle,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                }
+
+                IconButton(onClick = {
+                    viewModel.getAllLocations()
+                    navigator.navigate(
+                        ProfileScreenDestination(viewModel.loginUserId, "")
+                    );
+
+                }) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                }
             }
         }
+
     }
 }

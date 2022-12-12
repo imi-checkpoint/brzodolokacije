@@ -17,6 +17,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +43,7 @@ import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.posts.components.PostStringState
+import com.example.frontend.ui.theme.MyColorTopBarBlue
 import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -406,56 +409,92 @@ fun ProfileMTopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(vertical = 15.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.End
     ) {
-        Row(){
-            IconButton(onClick = {
-                navigator.navigate(
-                    MainLocationScreenDestination()
-                )
-            }){
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
-            }
-            IconButton(onClick = {
-                navigator.navigate(
-                    NovPostScreenDestination()
-                )
-            }) {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
-            }
-
-            IconButton(onClick = {
-                navigator.navigate(
-                    ProfileScreenDestination(viewModel.loginUserId, "")
-                );
-            }) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.Button(
+                    onClick = {
+                        navigator.navigate(MainFeedScreenDestination())
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBarBlue),
+                    contentPadding = PaddingValues(start = 8.dp, end = 15.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Home,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = "Feed",
+                        fontFamily = FontFamily.SansSerif
+                    )
+                }
             }
 
-            IconButton(onClick = {
-//                viewModel.getAllLocations()
-//                navigator.navigate() //navigate to messages
-            }) {
-                Icon(
-                    Icons.Default.Send,
-                    contentDescription = "",
-                    tint = Color.Black
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.Button(
+                    onClick = {
+                        navigator.navigate(MainLocationScreenDestination())
+                    },
+                    contentPadding = PaddingValues(start = 5.dp, end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    border = BorderStroke(1.2.dp, MyColorTopBarBlue)
+                ) {
+                    Icon(
+                        Icons.Default.Explore,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = "Explore",
+                        color = MyColorTopBarBlue,
+                        fontFamily = FontFamily.SansSerif
+                    )
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    navigator.navigate(
+                        NovPostScreenDestination()
+                    )
+                }) {
+                    Icon(
+                        Icons.Default.AddCircle,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                }
+
+                IconButton(onClick = {
+                    navigator.navigate(
+                        ProfileScreenDestination(viewModel.loginUserId, "")
+                    );
+
+                }) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "",
+                        tint = MyColorTopBarBlue
+                    )
+                }
             }
         }
+
     }
+
 }

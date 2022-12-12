@@ -186,7 +186,8 @@ fun TopBar(
         }
 
         Row(
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
         ){
             if(viewModel.savedUserId == viewModel.loginUserId)
             {
@@ -200,6 +201,15 @@ fun TopBar(
                         contentDescription = "Back",
                         tint = Color.Black,
                         modifier = modifier.size(24.dp)
+                    )
+                }
+                IconButton(onClick = {
+                    viewModel.logoutUser(navigator);
+                }) {
+                    Icon(
+                        Icons.Default.Logout,
+                        contentDescription = "",
+                        tint = Color.DarkGray
                     )
                 }
             }

@@ -17,11 +17,14 @@ import com.example.frontend.domain.use_case.get_profile_data.GetUserProfilePhoto
 import com.example.frontend.domain.use_case.get_user_posts.GetUserPostsUseCase
 import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 import com.example.frontend.domain.use_case.refresh_page.RefreshPageUseCase
+import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -258,5 +261,26 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+
+    fun logoutUser(navigator : DestinationsNavigator){
+        Log.d("LOGOUT", "Logout user");
+        GlobalScope.launch(Dispatchers.Main){
+            DataStoreManager.deleteAllPreferences(context)
+
+            Log.d("LOGOUT", "Cleared preferences");
+
+            navigator.navigate(LoginScreenDestination()){
+                popUpTo(ProfileSettingsScreenDestination.route){
+                    inclusive = true
+                    saveState = false
+                }
+            }
+
+            Log.d("Navigator", navigator.toString());
+            Log.d("LOGOUT", "Logged out user");
+
+        }
     }
 }

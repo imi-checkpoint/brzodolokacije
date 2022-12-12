@@ -14,6 +14,7 @@ import com.example.frontend.domain.DataStoreManager.decodeToken
 import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.presentation.destinations.LoginScreenDestination
+import com.example.frontend.presentation.destinations.ProfileSettingsScreenDestination
 import com.example.frontend.presentation.location.components.LocationState
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.internal.Contexts.getApplication
@@ -104,6 +105,4 @@ class LocationViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
-
 }
