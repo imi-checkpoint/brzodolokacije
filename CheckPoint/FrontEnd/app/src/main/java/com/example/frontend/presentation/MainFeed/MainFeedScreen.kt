@@ -84,12 +84,14 @@ fun MainFeedScreen(
 //                    )
 
                     OutlinedTextField(
-                        value = viewModel.nazivSorta(),
+                        value = viewModel.nazivSorta().trim(),
                         onValueChange = {},
-                        Modifier.wrapContentWidth(),
+                        modifier = Modifier.width(200.dp),
                         readOnly = true,
                         label = {
-                            Text(text = "Sort")
+                            Text(
+                                text = "Sort",
+                            )
                         },
                         trailingIcon = {
                             Icon(

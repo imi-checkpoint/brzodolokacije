@@ -149,7 +149,7 @@ fun LoginScreen(
 
             if(state.token != null){
                 navigator.navigate(
-                    MainLocationScreenDestination()
+                    MainFeedScreenDestination()
                 ){
                     popUpTo(LoginScreenDestination.route){
                         inclusive = true;

@@ -1,13 +1,15 @@
 package com.example.frontend.presentation.newpost
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
-import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.lazy.items
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,43 +18,49 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 
-import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.frontend.domain.model.Location
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.NovPostMapScreenDestination
-import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.PointOfInterest
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import java.io.File
 
 @Destination
 @Composable
-fun NovPostScreen(navigator: DestinationsNavigator,
-                  viewModel : NovPostViewModel = hiltViewModel()){
-    val context = LocalContext.current
+fun NovPostScreen(
+    navigator: DestinationsNavigator,
+    viewModel : NovPostViewModel = hiltViewModel()
+){
     val state = viewModel.state.value
 
+    val context = LocalContext.current
 
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
@@ -63,120 +71,147 @@ fun NovPostScreen(navigator: DestinationsNavigator,
     }
 
     viewModel.proveriConstants()
-    val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
-    val result = remember {
-        mutableStateOf<Bitmap>(myImage)
-    }
-    var expanded = remember { mutableStateOf(false) }
+
     var selected = remember {
         mutableStateOf(0)
     }
-    val choseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
-        if(it != null)
-        {
-        if(Build.VERSION.SDK_INT < 29){
-            result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
 
-            viewModel.parsePhoto(result.value)
-        }
-        else {
-            val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
-            result.value = ImageDecoder.decodeBitmap(source)
-            viewModel.parsePhoto(result.value)
-        }
-        }
+
+    var setLocationStep by remember{ mutableStateOf(true) }
+    var choosePhotosStep by remember{ mutableStateOf(false) }
+
+
+    var markerLatLng = remember {
+        mutableStateOf<LatLng?>(null)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        IconButton(onClick = {
-            navigator.popBackStack()
-        }
-        ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "",
-                tint = Color.DarkGray)
-        }
+    var markerPOI = remember {
+        mutableStateOf<PointOfInterest?>(null)
     }
+    var imeLokacije = remember {
+        mutableStateOf("")
+    }
+
     Column(
         Modifier
-            .padding(24.dp)
+            .padding(20.dp)
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-
-        verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
-
     ) {
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(viewModel.givePhotos()) { item ->
-                slika(navigator, photo = item, viewModel)
-            }
-        }
-        //Image(bitmap = result.value.asImageBitmap(),"",Modifier.fillMaxWidth())
-        var description = remember {
-            mutableStateOf("")
-        }
-        TextField(
-            value = description.value,
-            onValueChange = { description.value = it },
-            label = { Text("Description") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            maxLines = 5
-        )
-
-        var location = remember {
-            mutableStateOf<Location>(Location(0, "", 0.0, 0.0))
-        }
-        Text(text = viewModel.getLocation())
-        Button(onClick = { choseImage.launch("image/*") }) {
-            Text("Add picture")
-        }
-        Button(onClick = { expanded.value = true }) {
-            Text("Izaberi lokaciju")
-        }
-        Button(
-            onClick = {
-                viewModel.savePost(
-                    navigator,
-                    description.value,
-                    location.value.id
-                )
-            },
-            enabled = viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""
-        ) {
-            Text("Post")
-        }
-
-
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false },
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .wrapContentWidth()
-                .height(300.dp),
-
-
-        ) {
-            viewModel.dajLokacije().forEachIndexed { index, item ->
-                DropdownMenuItem(onClick = {
-                    viewModel.setLocation(item.id)
+                .fillMaxWidth()
+        ){
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                IconButton(onClick = {
+                    if(setLocationStep)
+                        navigator.popBackStack()
+                    else if(choosePhotosStep){
+                        setLocationStep = true;
+                        choosePhotosStep = false;
+                    }
                 }
                 ) {
-                    Text(item.name)
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "",
+                        tint = Color.DarkGray)
+                }
+
+                Spacer(Modifier.width(10.dp));
+
+                Text(
+                    text = "New post",
+                    fontSize = 20.sp
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.End
+            ){
+                if(setLocationStep){
+                    IconButton(
+                        onClick = {
+                            if((markerPOI.value != null || markerLatLng.value != null) && imeLokacije.value != ""){
+                                setLocationStep = false;
+                                choosePhotosStep = true;
+
+                                if (markerLatLng.value != null) {
+                                    viewModel.saveLocation(imeLokacije.value, markerLatLng.value!!, navigator)
+                                }
+                                else {
+                                    viewModel.saveLocation(
+                                        markerPOI.value!!.name,
+                                        markerPOI.value!!.latLng,
+                                        navigator)
+                                }
+                            }
+                            else{
+                                //alert da ne moze da ne izabere lokaciju a da ide dalje
+                                Toast.makeText(
+                                    context,
+                                    if(imeLokacije.value != "") "You need to choose location!" else "You need to add location name!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowForward,
+                            contentDescription = "",
+                            tint = Color.DarkGray)
+                    }
+                }
+                else if(choosePhotosStep){
+                    Button(
+                        onClick = {
+                            if(viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""){
+                                viewModel.savePost(
+                                    navigator,
+                                    viewModel.description.value,
+                                    viewModel.location.value.id
+                                )
+                            }
+                            else{
+                                //alert da ne moze da ne izabere objavi bez slika
+                                Toast.makeText(
+                                    context,
+                                    if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.getLocation() == "") "You need to choose location" else "Error",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                        }
+                    ) {
+                        Text("Post")
+                    }
                 }
             }
         }
-        Button(onClick = { navigator.navigate(NovPostMapScreenDestination)}) {
-            Text("Izaberi lokaciju sa mape")
-        }
+        Spacer(Modifier.height(5.dp));
 
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ){
+            if(choosePhotosStep){
+                ChoosePhotos(viewModel = viewModel, navigator = navigator, context = context)
+            }
+            if(setLocationStep){
+                SetLocation(viewModel = viewModel, navigator = navigator, context = context, changeLocationName = {
+                    imeLokacije.value = it
+                }, changeMarkerLatLng = {
+                    markerLatLng.value = it
+                }, changeMarkerPOI = {
+                    markerPOI.value = it
+                })
+            }
+        }
     }
 }
 
@@ -186,11 +221,14 @@ fun slika(
     photo:SlikaState,
     viewModel : NovPostViewModel
 ){
+    val configuration = LocalConfiguration.current;
+    val screenWidth = configuration.screenWidthDp.dp;
+
     Row(
         Modifier
             .border(width = 2.dp, color = Color.DarkGray, shape = RoundedCornerShape(20.dp))
             .wrapContentHeight()
-            .width(300.dp)
+            .width(screenWidth - 40.dp)
             .padding(20.dp)
 
     ){
@@ -200,20 +238,243 @@ fun slika(
                     .fillMaxWidth()
                     .padding(0.dp, 0.dp, 0.dp, 5.dp)
             )
-            IconButton(onClick = { viewModel.deletePhoto(photo.slika) },
-                Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .border(width = 0.dp, color = Color.Gray, shape = RoundedCornerShape(50.dp))
-                    .background(color = Color.LightGray, shape = RoundedCornerShape(50.dp))
-                    .padding(10.dp, 10.dp, 10.dp, 5.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Back",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp),
-                )
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ){
+                IconButton(onClick = { viewModel.deletePhoto(photo.slika) },
+                    Modifier
+                        .height(50.dp)
+                        .border(width = 0.dp, color = Color.Gray, shape = RoundedCornerShape(50.dp))
+                        .background(color = Color.LightGray, shape = RoundedCornerShape(50.dp))
+                        .padding(10.dp, 10.dp, 10.dp, 5.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Black,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ChoosePhotos(
+    viewModel : NovPostViewModel,
+    navigator : DestinationsNavigator,
+    context : Context
+) {
+    val context = LocalContext.current
+    val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(), android.R.mipmap.sym_def_app_icon)
+    val result = remember {
+        mutableStateOf<Bitmap>(myImage)
+    }
+
+    val maxChars = 100;
+    TextField(
+        value = viewModel.description.value,
+        modifier = Modifier.fillMaxWidth(),
+        onValueChange = {
+            if(it.length <= maxChars){
+                viewModel.description.value = it
+            }
+            else{
+                Toast.makeText(
+                    context,
+                    "Character limit reached!",
+                    Toast.LENGTH_LONG
+                ).show()
+            } },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.LightGray,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+        label = {
+            Text("Enter description") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        maxLines = 5
+    )
+
+    val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
+        if(it != null)
+        {
+            if(Build.VERSION.SDK_INT < 29){
+                result.value = MediaStore.Images.Media.getBitmap(context.contentResolver,it)
+
+                viewModel.parsePhoto(result.value)
+            }
+            else {
+                val source = ImageDecoder.createSource(context.contentResolver,it as Uri)
+                result.value = ImageDecoder.decodeBitmap(source)
+                viewModel.parsePhoto(result.value)
+            }
+        }
+    }
+
+    Spacer(Modifier.height(5.dp));
+
+    Row(
+        Modifier.clickable{
+            chooseImage.launch("image/*");
+        }
+    ){
+        Text("Add picture", fontSize = 20.sp)
+        Icon(
+            imageVector = Icons.Default.AddAPhoto,
+            contentDescription = "Add photo",
+            tint = Color.Black,
+            modifier = Modifier.size(25.dp),
+        )
+    }
+
+    Spacer(Modifier.height(10.dp));
+
+    //ovde da bude slider izabranih slika, ako ih ima
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(viewModel.givePhotos()) { item ->
+            slika(navigator, photo = item, viewModel)
+        }
+    }
+}
+
+@Composable
+fun SetLocation(
+    viewModel : NovPostViewModel,
+    navigator : DestinationsNavigator,
+    context : Context,
+    changeMarkerLatLng: (LatLng?) -> Unit = {},
+    changeMarkerPOI : (PointOfInterest?) -> Unit = {},
+    changeLocationName : (String) -> Unit = {}
+) {
+
+    val uiSettings = remember {
+        MapUiSettings(zoomControlsEnabled = false)
+    }
+    var markerLatLng = remember {
+        mutableStateOf<LatLng?>(null)
+    }
+    var markerPOI = remember {
+        mutableStateOf<PointOfInterest?>(null)
+    }
+
+    val camPosState = rememberCameraPositionState {
+        position = CameraPosition( LatLng(50.0,25.0),5F,0F,0F)
+    }
+    val builder = LatLngBounds.Builder()
+    var imeLokacije = remember {
+        mutableStateOf("")
+    }
+    val localDensity = LocalDensity.current
+    var mapWidth by remember {
+        mutableStateOf(44)
+    }
+
+    var mapHeight by remember {
+        mutableStateOf(20)
+    }
+
+    Row(
+
+    ){
+        Icon(
+            Icons.Default.LocationOn,
+            contentDescription = "",
+            tint = Color.DarkGray)
+        Text(
+            "Choose location from map"
+        )
+    }
+
+    Spacer(Modifier.height(10.dp));
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
+
+        TextField(
+            value = imeLokacije.value, onValueChange = {
+                if (markerLatLng.value != null) {
+                    imeLokacije.value = it
+                    changeLocationName(it)
+                }
+                else{
+                    Toast.makeText(
+                        context,
+                        "You need to choose location from map first",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            label = { Text("Search location") },
+            singleLine = true,
+        )
+    }
+
+    Spacer(Modifier.height(5.dp));
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ){
+        //mapica
+
+
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .onGloballyPositioned { coords ->
+                    mapWidth = with(localDensity) { coords.size.width }
+                    mapHeight = with(localDensity) { coords.size.height }
+                },
+            uiSettings = uiSettings,
+            onMapLoaded = {
+
+            },
+            cameraPositionState = camPosState,
+            onMapClick = {
+                markerLatLng.value = it
+                changeMarkerLatLng(it)
+                if(markerPOI.value != null){
+                    imeLokacije.value = ""
+                    changeLocationName("")
+                    markerPOI.value = null
+                    changeMarkerPOI(null)
+                }
+                else{
+                    imeLokacije.value = imeLokacije.value
+                    changeLocationName(imeLokacije.value)
+                }
+
+            },
+            onPOIClick = {
+                markerLatLng.value = null
+                changeMarkerLatLng(null)
+                markerPOI.value = it
+                changeMarkerPOI(it)
+                imeLokacije.value = it.name
+                changeLocationName(it.name)
+            },
+        ) {
+            if (markerLatLng.value != null) {
+                Marker(position = markerLatLng.value!!, title = imeLokacije.value)
+            }
+            if (markerPOI.value != null) {
+                Marker(position = markerPOI.value!!.latLng, title = markerPOI.value!!.name)
             }
         }
     }

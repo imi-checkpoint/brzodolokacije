@@ -5,10 +5,12 @@ import android.app.Application
 import android.graphics.Bitmap
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.frontend.common.Resource
+import com.example.frontend.data.remote.dto.LocationDTO
 import com.example.frontend.domain.DataStoreManager
 import com.example.frontend.domain.model.Location
 import com.example.frontend.domain.use_case.add_post.AddPhotoUseCase
@@ -17,9 +19,12 @@ import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.domain.use_case.get_locations.SaveLocationUseCase
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
+import com.example.frontend.presentation.newpost.components.NovPostMapState
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.posts.components.PostsState
+import com.example.frontend.presentation.user_list.components.UserListState
+import com.google.android.gms.maps.model.LatLng
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,99 +51,106 @@ class NovPostViewModel@Inject constructor(
 ): ViewModel() {
     private val _state = mutableStateOf(NovPostState())
     val state: State<NovPostState> = _state
+
+    private val _locationState = mutableStateOf(NovPostMapState())
+    val locationState : State<NovPostMapState> = _locationState;
+
     val context = application.baseContext
 
+    var access_token = "";
+    var refresh_token = "";
+
+    val description = mutableStateOf("")
+    val location = mutableStateOf(Location(0,"",0.0,0.0));
+
     init {
-        ucitajLokacije("")
+        GlobalScope.launch(Dispatchers.Main){
+            access_token = DataStoreManager.getStringValue(context, "access_token").trim();
+            refresh_token = DataStoreManager.getStringValue(context, "access_token").trim();
+
+            ucitajLokacije("")
+        }
     }
 
     fun savePost(navigator: DestinationsNavigator, description: String, locationId: Long) {
-        GlobalScope.launch(Dispatchers.Main) {
-            var access_token = DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            println(_state.value.selected)
-            addPostUseCase("Bearer " + access_token, description, _state.value.selected).map { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        var i = 0
-                        for (photo: SlikaState in _state.value.slike) {
-                            addPhoto(navigator, result.data!!.toLong(), i, photo)
-                            i++;
-                        }
-                    }
-                    is Resource.Error -> {
-                        println(result.message)
-                    }
-                    is Resource.Loading -> {
-                        println(result.message)
+        println(_state.value.selected)
+        addPostUseCase("Bearer " + access_token, description, _state.value.selected).map { result ->
+            when (result) {
+                is Resource.Success -> {
+                    var i = 0
+                    for (photo: SlikaState in _state.value.slike) {
+                        addPhoto(navigator, result.data!!.toLong(), i, photo)
+                        i++;
                     }
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Error -> {
+                    println(result.message)
+                }
+                is Resource.Loading -> {
+                    println(result.message)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun addPhoto(navigator : DestinationsNavigator, postId: Long, order: Int, slikaState: SlikaState) {
-        GlobalScope.launch(Dispatchers.IO) {
-            var access_token =  DataStoreManager.getStringValue(context, "access_token").trim();
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token").trim();
-            val path = context.getExternalFilesDir(null)!!.absolutePath
-            val tempFile = File(path, "tempFileName${postId}-${order}.jpg")
-            val fOut = FileOutputStream(tempFile)
-            slikaState.slika.compress(Bitmap.CompressFormat.JPEG, 85, fOut)
-            fOut.flush()
-            fOut.close()
-            val file = MultipartBody.Part.createFormData(
-                "photo", tempFile.name,
-                RequestBody.create(MediaType.parse("image/*"), tempFile)
-            )
+        val path = context.getExternalFilesDir(null)!!.absolutePath
+        val tempFile = File(path, "tempFileName${postId}-${order}.jpg")
+        val fOut = FileOutputStream(tempFile)
+        slikaState.slika.compress(Bitmap.CompressFormat.JPEG, 85, fOut)
+        fOut.flush()
+        fOut.close()
+        val file = MultipartBody.Part.createFormData(
+            "photo", tempFile.name,
+            RequestBody.create(MediaType.parse("image/*"), tempFile)
+        )
 
-            addPhotoUseCase("Bearer " + access_token, postId, order, file).map { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        tempFile.delete()
-                        var flag = true
+        addPhotoUseCase("Bearer " + access_token, postId, order, file).map { result ->
+            when (result) {
+                is Resource.Success -> {
+                    tempFile.delete()
+                    var flag = true
 
-                        var lista = replaceSlikaState(slikaState.slika)
-                        println(lista)
-                        for (i: SlikaState in lista) {
-                            if (i.isLoading) {
-                                flag = false
-                                break;
-                            }
-                        }
-                        if (flag == true) {
-                            navigator.navigate(
-                                MainLocationScreenDestination()
-                            )
-                        } else {
-                            println("Nisu sve poslate")
+                    var lista = replaceSlikaState(slikaState.slika)
+                    println(lista)
+                    for (i: SlikaState in lista) {
+                        if (i.isLoading) {
+                            flag = false
+                            break;
                         }
                     }
-                    is Resource.Error -> {
-                        if(result.message?.contains("403") == true){
-                            GlobalScope.launch(Dispatchers.Main){
-                                DataStoreManager.deleteAllPreferences(context);
-                            }
-                        }
-
-                        println("Greska" + result.message)
-                        tempFile.delete()
-                    }
-                    is Resource.Loading -> {
-                        var lista: List<SlikaState> = emptyList()
-                        for (i: SlikaState in _state.value.slike) {
-                            lista = if (i.slika == slikaState.slika) {
-                                lista + SlikaState(isLoading = true, slika = i.slika)
-                            } else {
-                                lista + i
-                            }
-                        }
-                        _state.value = NovPostState(slike = lista, lokacije = _state.value.lokacije, selected = _state.value.selected)
-                        println("Loading " + lista)
+                    if (flag == true) {
+                        navigator.navigate(
+                            MainLocationScreenDestination()
+                        )
+                    } else {
+                        println("Nisu sve poslate")
                     }
                 }
-            }.launchIn(viewModelScope)
-        }
+                is Resource.Error -> {
+                    if(result.message?.contains("403") == true){
+                        GlobalScope.launch(Dispatchers.Main){
+                            DataStoreManager.deleteAllPreferences(context);
+                        }
+                    }
+
+                    println("Greska" + result.message)
+                    tempFile.delete()
+                }
+                is Resource.Loading -> {
+                    var lista: List<SlikaState> = emptyList()
+                    for (i: SlikaState in _state.value.slike) {
+                        lista = if (i.slika == slikaState.slika) {
+                            lista + SlikaState(isLoading = true, slika = i.slika)
+                        } else {
+                            lista + i
+                        }
+                    }
+                    _state.value = NovPostState(slike = lista, lokacije = _state.value.lokacije, selected = _state.value.selected)
+                    println("Loading " + lista)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun parsePhoto(photo: Bitmap) {
@@ -173,66 +185,110 @@ class NovPostViewModel@Inject constructor(
         return lista
     }
 
-    fun ucitajLokacije(ime:String){
-        GlobalScope.launch(Dispatchers.Main) {
-            var access_token = DataStoreManager.getStringValue(context, "access_token");
-            var refresh_token = DataStoreManager.getStringValue(context, "refresh_token");
-            if(ime == ""){
-                getAllLocationsUseCase("Bearer " + access_token).map { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!, selected = _state.value.selected)
-                            println("Stigle lokacije "+result.data!!)
-                        }
-                        is Resource.Error -> {
-                            println(result.message)
-                        }
-                        is Resource.Loading -> {
-                            println(result.message)
-                        }
+    fun ucitajLokacije(ime:String) {
+        if (ime == "") {
+            getAllLocationsUseCase("Bearer " + access_token).map { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _state.value = NovPostState(
+                            slike = _state.value.slike,
+                            lokacije = result.data!!,
+                            selected = _state.value.selected
+                        )
+                        println("Stigle lokacije " + result.data!!)
                     }
-                }.launchIn(viewModelScope)
-            }
-            else{
-                getLocationsKeywordUseCase("Bearer " + access_token, ime).map { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            _state.value = NovPostState(slike = _state.value.slike, lokacije = result.data!!, selected = _state.value.selected)
-                            println("Stigle lokacije za rec $ime "+result.data!!)
-                        }
-                        is Resource.Error -> {
-                            println(result.message)
-                        }
-                        is Resource.Loading -> {
-                            println(result.message)
-                        }
+                    is Resource.Error -> {
+                        println(result.message)
                     }
-                }.launchIn(viewModelScope)
+                    is Resource.Loading -> {
+                        println(result.message)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        } else {
+            getLocationsKeywordUseCase("Bearer " + access_token, ime).map { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _state.value = NovPostState(
+                            slike = _state.value.slike,
+                            lokacije = result.data!!,
+                            selected = _state.value.selected
+                        )
+                        println("Stigle lokacije za rec $ime " + result.data!!)
+                    }
+                    is Resource.Error -> {
+                        println(result.message)
+                    }
+                    is Resource.Loading -> {
+                        println(result.message)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+        fun dajLokacije(): List<Location> {
+            return _state.value.lokacije
+        }
+
+        fun setLocation(id: Long) {
+            _state.value = NovPostState(
+                lokacije = _state.value.lokacije,
+                slike = _state.value.slike,
+                selected = id
+            )
+        }
+
+        fun getLocation(): String {
+            for (loc: Location in _state.value.lokacije)
+                if (loc.id == _state.value.selected) return loc.name
+            return ""
+        }
+
+        fun proveriConstants() {
+            if (Constants.locationId != 0L) {
+                _state.value = NovPostState(
+                    slike = _state.value.slike,
+                    lokacije = _state.value.lokacije,
+                    selected = Constants.locationId
+                )
+                Constants.locationId = 0L
+                ucitajLokacije("")
+            } else {
+                _state.value = NovPostState(
+                    slike = _state.value.slike,
+                    lokacije = _state.value.lokacije,
+                    selected = _state.value.selected
+                )
             }
         }
-    }
 
-    fun dajLokacije():List<Location>{
-        return _state.value.lokacije
-    }
+        fun saveLocation(name: String, position: LatLng, navigator: DestinationsNavigator) {
+            saveLocationUseCase(
+                "Bearer " + access_token,
+                LocationDTO(0, name, position.latitude, position.longitude)
+            ).map { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        println(result.data!!)
+                        _locationState.value = NovPostMapState(result.data!!)
+                        Constants.locationId = result.data!!.id
+                    }
+                    is Resource.Error -> {
+                        if (result.message?.contains("403") == true) {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                DataStoreManager.deleteAllPreferences(context);
+                            }
+                        }
 
-    fun setLocation(id:Long){
-        _state.value = NovPostState(lokacije = _state.value.lokacije, slike = _state.value.slike, selected = id)
-    }
-    fun getLocation():String{
-        for(loc:Location in _state.value.lokacije)
-            if(loc.id == _state.value.selected) return loc.name
-        return ""
-    }
-    fun proveriConstants(){
-        if(Constants.locationId != 0L){
-            _state.value = NovPostState(slike = _state.value.slike, lokacije = _state.value.lokacije, selected = Constants.locationId)
-            Constants.locationId = 0L
-            ucitajLokacije("")
+                        println("Error1")
+                        println(result.message);
+                    }
+                    is Resource.Loading -> {
+                        println("Loading1")
+                        println(result.message)
+                    }
+                }
+            }.launchIn(viewModelScope)
         }
-        else{
-            _state.value = NovPostState(slike = _state.value.slike, lokacije = _state.value.lokacije, selected = _state.value.selected)
-        }
-    }
-
 }
