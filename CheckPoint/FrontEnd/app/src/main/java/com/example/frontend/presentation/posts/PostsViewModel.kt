@@ -58,6 +58,7 @@ class PostsViewModel @Inject constructor(
     val stateLikeOrUnlike : State<PostStringState> = _stateLikeOrUnlike;
 
     init {
+        Constants.sort = 1;
         savedStateHandle.get<Long>(LOCATION_ID)?.let { locationId ->
             Log.d("Location id", locationId.toString())
             locId = locationId;

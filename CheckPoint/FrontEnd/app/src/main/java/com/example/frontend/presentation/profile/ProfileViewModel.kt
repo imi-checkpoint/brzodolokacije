@@ -174,7 +174,7 @@ class ProfileViewModel @Inject constructor(
         getUserPostsUseCase("Bearer "+access_token, userId).onEach { result ->
             when(result){
                 is Resource.Success -> {
-                    _postsState.value = UserPostsState(userPosts = result.data ?: null)
+                    _postsState.value = UserPostsState(userPosts = result.data?.reversed() ?: null)
                 }
                 is Resource.Error -> {
                     Log.d("PROFILE", "Error getting user posts");

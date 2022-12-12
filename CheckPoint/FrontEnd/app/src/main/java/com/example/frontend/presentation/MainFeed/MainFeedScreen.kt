@@ -113,8 +113,8 @@ fun MainFeedScreen(
                             .height(300.dp),
                     ) {
                         listOf(
-                            "Date dsc",
                             "Date asc",
+                            "Date dsc",
                             "Likes asc",
                             "Likes dsc",
                             "Comments asc",

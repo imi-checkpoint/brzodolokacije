@@ -122,12 +122,13 @@ fun PostsScreen(
                     .height(300.dp),
                 ) {
                 listOf(
-                    "Date dsc",
                     "Date asc",
+                    "Date dsc",
                     "Likes asc",
                     "Likes dsc",
                     "Comments asc",
-                    "Comments dsc")
+                    "Comments dsc"
+                )
                         .forEachIndexed  { index, item ->
                             DropdownMenuItem(onClick = {
                                 Constants.sort = index

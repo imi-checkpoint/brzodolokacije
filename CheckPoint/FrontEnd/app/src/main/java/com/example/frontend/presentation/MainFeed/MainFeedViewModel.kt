@@ -42,6 +42,7 @@ class MainFeedViewModel @Inject constructor (
 
     var allPosts = mutableStateOf<List<Post>?>(null);
     init {
+        Constants.sort = 1;
         getPostsIFollow()
     }
 
