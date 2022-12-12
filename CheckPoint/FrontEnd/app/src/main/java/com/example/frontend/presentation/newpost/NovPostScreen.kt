@@ -54,10 +54,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PointOfInterest
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
@@ -510,11 +507,14 @@ fun SetLocation(
                 changeLocationName(it.name)
             },
         ) {
+            val markerState : MarkerState = rememberMarkerState()
             if (viewModel.markerLatLng.value != null) {
-                Marker(position = viewModel.markerLatLng.value!!, title = viewModel.imeLokacije.value)
+                markerState.position = viewModel.markerLatLng.value!!
+                Marker(state = markerState, title = viewModel.imeLokacije.value)
             }
             if (viewModel.markerPOI.value != null) {
-                Marker(position = viewModel.markerPOI.value!!.latLng, title =viewModel. markerPOI.value!!.name)
+                markerState.position = viewModel.markerPOI.value!!.latLng;
+                Marker(state = markerState, title =viewModel. markerPOI.value!!.name)
             }
         }
     }

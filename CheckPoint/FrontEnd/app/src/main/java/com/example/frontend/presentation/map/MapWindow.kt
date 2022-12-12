@@ -46,6 +46,11 @@ fun MapWindow(
 
     val camPosState = rememberCameraPositionState{
     }
+    if(posts!=null && posts.size > 0){
+        val postLocation = LatLng(posts[0].location.lat, posts[0].location.lng)
+        camPosState.position = CameraPosition.fromLatLngZoom(postLocation, 1f);
+    }
+
     val builder = LatLngBounds.Builder()
 
     val localDensity = LocalDensity.current
@@ -99,8 +104,10 @@ fun MapWindow(
 
                 val postLocation = LatLng(post.location.lat, post.location.lng);
 
+                val markerState : MarkerState = rememberMarkerState()
+                markerState.position = postLocation
                 Marker(
-                    position = postLocation,
+                    state = markerState,
                     title = post.location.name,
                     snippet = "Go to post",
 //                    onInfoWindowClick = {
@@ -119,10 +126,10 @@ fun MapWindow(
                 )
             }
 
-            if(!posts.isEmpty())
-            {
-                updateCamera(camPosState, builder, mapWidth, mapHeight)
-            }
+//            if(!posts.isEmpty())
+//            {
+//                updateCamera(camPosState, builder, mapWidth, mapHeight)
+//            }
         }
     }
 }
@@ -134,6 +141,7 @@ fun updateCamera(
     height : Int
 ){
     val padding = (width * 0.20).toInt();
+
     cameraPositionState.move(
         update = CameraUpdateFactory.newLatLngBounds(
             builder.build(),

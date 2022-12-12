@@ -118,9 +118,15 @@ fun PostScreen(
         }
 
         if(state.isLoading || stateGetComments.isLoading){
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
         else if (state.error != "" || stateGetComments.error != "") {
             Text("An error occured while loading this post!");
@@ -450,8 +456,11 @@ fun MapView(
             val postLocation = LatLng(post.location.lat, post.location.lng)
             builder.include(postLocation)
 
+            val markerState : MarkerState = rememberMarkerState()
+            markerState.position = postLocation
+
             Marker(
-                position = postLocation,
+                state = markerState,
                 title = post.location.name,
                 snippet = "User post location",
                 onInfoWindowClick = {},

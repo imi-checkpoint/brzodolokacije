@@ -115,11 +115,14 @@ fun NovPostMapScreen (
                 imeLokacije.value = it.name
             },
         ) {
+            val markerState : MarkerState = rememberMarkerState()
             if (markerLatLng.value != null) {
-                Marker(position = markerLatLng.value!!, title = imeLokacije.value)
+                markerState.position = markerLatLng.value!!
+                Marker(state = markerState, title = imeLokacije.value)
             }
             if (markerPOI.value != null) {
-                Marker(position = markerPOI.value!!.latLng, title = markerPOI.value!!.name)
+                markerState.position = markerPOI.value!!.latLng
+                Marker(state = markerState, title = markerPOI.value!!.name)
             }
         }
     }

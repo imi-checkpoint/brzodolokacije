@@ -73,6 +73,9 @@ fun MainLocationScreen(
         mutableStateOf(20)
     }
 
+    val camPosState = rememberCameraPositionState{
+    }
+
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
@@ -106,8 +109,13 @@ fun MainLocationScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         else{
+
             if(state.locations.isEmpty()){
                 Text("No posts from searched location")
+            }
+            else{
+                val oneLocation = LatLng(state.locations[0].lat, state.locations[0].lng)
+                camPosState.position = CameraPosition.fromLatLngZoom(oneLocation, 1f);
             }
             GoogleMap(
                 modifier = Modifier
@@ -119,10 +127,13 @@ fun MainLocationScreen(
                 uiSettings = uiSettings,
                 onMapLoaded = {
                     },
+                cameraPositionState = camPosState
             ) {
                 state.locations.forEach{ location->
+                    val markerState : MarkerState = rememberMarkerState()
+                    markerState.position = LatLng(location.lat, location.lng)
                     Marker(
-                        position = LatLng(location.lat, location.lng),
+                        state = markerState,
                         title = location.name,
                         snippet = "See all posts",
 //                        onInfoWindowClick = {
