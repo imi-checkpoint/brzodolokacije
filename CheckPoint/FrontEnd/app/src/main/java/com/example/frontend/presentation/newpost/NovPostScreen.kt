@@ -399,20 +399,20 @@ fun SetLocation(
     val uiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false)
     }
-    var markerLatLng = remember {
-        mutableStateOf<LatLng?>(null)
-    }
-    var markerPOI = remember {
-        mutableStateOf<PointOfInterest?>(null)
-    }
+//    var markerLatLng = remember {
+//        mutableStateOf<LatLng?>(null)
+//    }
+//    var markerPOI = remember {
+//        mutableStateOf<PointOfInterest?>(null)
+//    }
 
     val camPosState = rememberCameraPositionState {
         position = CameraPosition( LatLng(50.0,25.0),5F,0F,0F)
     }
     val builder = LatLngBounds.Builder()
-    var imeLokacije = remember {
-        mutableStateOf("")
-    }
+//    var imeLokacije = remember {
+//        mutableStateOf("")
+//    }
     val localDensity = LocalDensity.current
     var mapWidth by remember {
         mutableStateOf(44)
@@ -443,9 +443,9 @@ fun SetLocation(
     ) {
 
         TextField(
-            value = imeLokacije.value, onValueChange = {
-                if (markerLatLng.value != null) {
-                    imeLokacije.value = it
+            value = viewModel.imeLokacije.value, onValueChange = {
+                if (viewModel.markerLatLng.value != null) {
+                    viewModel.imeLokacije.value = it
                     changeLocationName(it)
                 }
                 else{
@@ -487,34 +487,34 @@ fun SetLocation(
             },
             cameraPositionState = camPosState,
             onMapClick = {
-                markerLatLng.value = it
+                viewModel.markerLatLng.value = it
                 changeMarkerLatLng(it)
-                if(markerPOI.value != null){
-                    imeLokacije.value = ""
+                if(viewModel.markerPOI.value != null){
+                    viewModel.imeLokacije.value = ""
                     changeLocationName("")
-                    markerPOI.value = null
+                    viewModel.markerPOI.value = null
                     changeMarkerPOI(null)
                 }
                 else{
-                    imeLokacije.value = imeLokacije.value
-                    changeLocationName(imeLokacije.value)
+                    viewModel.imeLokacije.value = viewModel.imeLokacije.value
+                    changeLocationName(viewModel.imeLokacije.value)
                 }
 
             },
             onPOIClick = {
-                markerLatLng.value = null
+                viewModel.markerLatLng.value = null
                 changeMarkerLatLng(null)
-                markerPOI.value = it
+                viewModel.markerPOI.value = it
                 changeMarkerPOI(it)
-                imeLokacije.value = it.name
+                viewModel.imeLokacije.value = it.name
                 changeLocationName(it.name)
             },
         ) {
-            if (markerLatLng.value != null) {
-                Marker(position = markerLatLng.value!!, title = imeLokacije.value)
+            if (viewModel.markerLatLng.value != null) {
+                Marker(position = viewModel.markerLatLng.value!!, title = viewModel.imeLokacije.value)
             }
-            if (markerPOI.value != null) {
-                Marker(position = markerPOI.value!!.latLng, title = markerPOI.value!!.name)
+            if (viewModel.markerPOI.value != null) {
+                Marker(position = viewModel.markerPOI.value!!.latLng, title =viewModel. markerPOI.value!!.name)
             }
         }
     }
