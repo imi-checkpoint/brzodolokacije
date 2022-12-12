@@ -46,6 +46,8 @@ class PostsViewModel @Inject constructor(
     val context = application.baseContext
     var locId = 0L;
 
+    var allPosts = mutableStateOf<List<Post>?>(null);
+
     var access_token = "";
     var refresh_token = "";
 
@@ -76,6 +78,7 @@ class PostsViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _state.value = PostsState(posts = result.data)
+                        allPosts.value = getPosts()
                         println(result.data)
                     }
                     is Resource.Error -> {
@@ -160,6 +163,7 @@ class PostsViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
+                    allPosts.value = getPosts()
                 }
                 is Resource.Error -> {
                     _stateLikeOrUnlike.value = PostStringState(error = result.message ?:

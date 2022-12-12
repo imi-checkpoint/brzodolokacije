@@ -95,9 +95,9 @@ fun PostsScreen(
         }
         Row(Modifier.fillMaxWidth()){
             OutlinedTextField(
-                value = viewModel.nazivSorta(),
+                value = viewModel.nazivSorta().trim(),
                 onValueChange = {},
-                Modifier.wrapContentWidth(),
+                Modifier.width(200.dp),
                 readOnly = true,
                 label = {
                     Text(text = "Sort")
@@ -121,14 +121,22 @@ fun PostsScreen(
                     .wrapContentWidth()
                     .height(300.dp),
                 ) {
-                listOf("Date dsc","Date asc","Likes asc","Likes dsc","Comments asc","Comments dsc").forEachIndexed  { index, item ->
-                    DropdownMenuItem(onClick = {
-                        Constants.sort = index
-                        expanded.value = false
-                    }
-                    ) {
-                        Text(item)
-                    }
+                listOf(
+                    "Date dsc",
+                    "Date asc",
+                    "Likes asc",
+                    "Likes dsc",
+                    "Comments asc",
+                    "Comments dsc")
+                        .forEachIndexed  { index, item ->
+                            DropdownMenuItem(onClick = {
+                                Constants.sort = index
+                                expanded.value = false
+                                viewModel.allPosts.value = viewModel.getPosts()
+                            }
+                            ) {
+                                Text(item)
+                            }
                 }
             }
         }

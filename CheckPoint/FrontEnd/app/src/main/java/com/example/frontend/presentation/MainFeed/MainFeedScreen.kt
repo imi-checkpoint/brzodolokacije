@@ -123,6 +123,7 @@ fun MainFeedScreen(
                             DropdownMenuItem(onClick = {
                                 Constants.sort = index
                                 expanded.value = false
+                                viewModel.allPosts.value = viewModel.getPosts()
                             }
                             ) {
                                 Text(item)
