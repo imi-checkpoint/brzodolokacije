@@ -85,7 +85,7 @@ class LoginViewModel @Inject constructor(
 
                         saveUserId(LoginToken(result.data!!.access_token, result.data!!.refresh_token));
 
-                        _authState.value = AuthState(isAuthorized = true, isLoading = false);
+                        _authState.value = AuthState(isAuthorized = true, isLoading = true); ////////////////
                     }
 
                 }

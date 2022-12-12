@@ -1,6 +1,12 @@
 package com.example.frontend.presentation.login
 
+import android.app.Activity
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
@@ -15,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -29,6 +36,7 @@ import com.example.frontend.presentation.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.spec.DestinationStyle
 
 @RootNavGraph(start = true)
 @Destination
@@ -38,6 +46,11 @@ fun LoginScreen(
     viewModel : LoginViewModel = hiltViewModel()
 )
 {
+    val context : Context = LocalContext.current
+    val onBack = { Toast.makeText(context, "Goodbye", Toast.LENGTH_SHORT).show()}
+    BackPressHandler(onBackPressed = onBack);
+
+
     val state = viewModel.state.value
     val authState = viewModel.authState.value
 
@@ -60,6 +73,16 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             CircularProgressIndicator()
+
+            if(state.token != null){
+                navigator.navigate(
+                    MainFeedScreenDestination()
+                ){
+                    popUpTo(LoginScreenDestination.route){
+                        inclusive = true;
+                    }
+                }
+            }
         }
     }
     else{
@@ -158,5 +181,32 @@ fun LoginScreen(
             }
         }
 
+    }
+}
+
+@Composable
+fun BackPressHandler(
+    backPressedDispatcher: OnBackPressedDispatcher? = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher,
+    onBackPressed : () -> Unit
+){
+    val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+
+    val activity = (LocalContext.current as? Activity)
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                currentOnBackPressed()
+                activity?.finish()
+            }
+        }
+    }
+
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher?.addCallback(backCallback)
+
+        onDispose {
+            backCallback.remove()
+        }
     }
 }

@@ -393,9 +393,17 @@ fun ButtonSection(
                     modifier = Modifier.size(20.dp)
                 )
             }
+            else{
+                Icon(
+                    Icons.Default.Remove,
+                    contentDescription ="",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             Spacer(modifier = Modifier.width(5.dp))
             Text(
-                text = if (viewModel.state.value.profileData!!.amFollowing) "Following" else "Follow",
+                text = if (viewModel.state.value.profileData!!.amFollowing) "Unfollow" else "Follow",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = if (viewModel.state.value.profileData!!.amFollowing) Color.DarkGray else Color.White

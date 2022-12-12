@@ -1,7 +1,12 @@
 package com.example.frontend.presentation.register
 
+import android.app.Activity
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
@@ -11,9 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -39,6 +42,10 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel()
 )
 {
+    val context : Context = LocalContext.current
+    val onBack = { Toast.makeText(context, "Goodbye", Toast.LENGTH_SHORT).show()}
+    BackPressHandler(onBackPressed = onBack);
+
     val state = viewModel.state.value;
 
     var emailFocusRequester = FocusRequester()
@@ -156,5 +163,33 @@ fun RegisterScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
 
+    }
+}
+
+
+@Composable
+fun BackPressHandler(
+    backPressedDispatcher: OnBackPressedDispatcher? = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher,
+    onBackPressed : () -> Unit
+){
+    val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+
+    val activity = (LocalContext.current as? Activity)
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                currentOnBackPressed()
+                activity?.finish()
+            }
+        }
+    }
+
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher?.addCallback(backCallback)
+
+        onDispose {
+            backCallback.remove()
+        }
     }
 }
