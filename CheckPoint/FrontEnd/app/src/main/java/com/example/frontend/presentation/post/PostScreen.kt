@@ -462,7 +462,6 @@ fun MapView(
             Marker(
                 state = markerState,
                 title = post.location.name,
-                snippet = "User post location",
                 onInfoWindowClick = {},
                 onInfoWindowLongClick = {},
                 icon = BitmapDescriptorFactory.defaultMarker(
@@ -537,13 +536,13 @@ fun PostDescriptionAndLikes(
                         )
                     }
                     Text(
-                        text = "${post.numberOfLikes} likes",
+                        text = "${likeCount} likes",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
                 Row {
                     Text(
-                        text = "${post.numberOfComments} comments",
+                        text = "${viewModel.commentCount.value} comments",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -632,13 +631,15 @@ fun AddFirstCommentCard(
                         innerTextField()
                     }
                 },
-                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 14.sp)
+                textStyle = LocalTextStyle.current.copy(color = Color.DarkGray, fontSize = 14.sp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
-                    viewModel.addComment(post.postId, 0L, newCommentText)
-                    newCommentText = ""
+                    if (newCommentText.trim().isNotBlank()) {
+                        viewModel.addComment(post.postId, 0L, newCommentText)
+                        newCommentText = ""
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White
@@ -727,15 +728,17 @@ fun AddSecondCommentCard(
                         innerTextField()
                     }
                 },
-                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 12.sp)
+                textStyle = LocalTextStyle.current.copy(color = Color.DarkGray, fontSize = 12.sp)
             )
 
             Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
-                    viewModel.addComment(post.postId, viewModel.parentCommentId.value, newSecondCommentText)
-                    newSecondCommentText = ""
-                    viewModel.replyToUsername.value = ""
+                    if (newSecondCommentText.trim().isNotBlank()) {
+                        viewModel.addComment(post.postId, viewModel.parentCommentId.value, newSecondCommentText)
+                        newSecondCommentText = ""
+                        viewModel.replyToUsername.value = ""
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White
@@ -842,7 +845,7 @@ fun CommentCard(
             ) {
                 if (comment.canDelete) {
                     IconButton(onClick = {
-                        viewModel.deleteCommentById(comment.id, post.postId)
+                        viewModel.deleteCommentById(comment.id, post.postId, 1, comment.subCommentList.size)
                     }, modifier = Modifier
                         .size(20.dp)
                         .padding(end = 5.dp)
@@ -953,7 +956,7 @@ fun SubCommentCard(
             ) {
                 if (subComment.canDelete) {
                     IconButton(onClick = {
-                        viewModel.deleteCommentById(subComment.id, post.postId)
+                        viewModel.deleteCommentById(subComment.id, post.postId, 2, 0)
                     }, modifier = Modifier
                         .size(19.dp)
                         .padding(end = 5.dp)

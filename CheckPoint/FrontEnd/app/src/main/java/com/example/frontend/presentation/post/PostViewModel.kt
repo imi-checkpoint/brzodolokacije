@@ -4,9 +4,7 @@ import Constants
 import Constants.Companion.POST_ID
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,6 +67,8 @@ class PostViewModel @Inject constructor(
     private val _stateDeleteComment = mutableStateOf(DeleteCommentState())
     val stateDeleteComment : State<DeleteCommentState> = _stateDeleteComment
 
+    var commentCount = mutableStateOf(0)
+
     private val _stateGetProfilePicture = mutableStateOf(ProfilePictureState())
     val stateGetProfilePicture : State<ProfilePictureState> = _stateGetProfilePicture
     var currentPicture = ""
@@ -102,6 +102,7 @@ class PostViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _state.value = PostState(post = result.data)
+                    commentCount.value = result.data!!.numberOfComments
                     println(result.data)
                     getFirstCommentsByPostId(result.data!!.postId)
                 }
@@ -181,11 +182,12 @@ class PostViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _stateAddComment.value = AddCommentState(message = result.data ?: "")
-                        println("SACUVAN KOMENTAR " + result.data)
+
                         parentCommentId.value = 0L;
-                        //getPost();
+                        commentCount.value += 1
                         getFirstCommentsByPostId(postId)
-                        Constants.refreshComments = 1L;
+                        //Constants.refreshComments = 1L
+                        Constants.singlePostPageChanged = true
                     }
                     is Resource.Error -> {
                         _stateAddComment.value = AddCommentState(error = result.message ?:
@@ -206,7 +208,8 @@ class PostViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
-                    Constants.postLikeChangedSinglePostPage = true
+                    //Constants.postLikeChangedSinglePostPage = true
+                    Constants.singlePostPageChanged = true
                 }
                 is Resource.Error -> {
                     _stateLikeOrUnlike.value = PostStringState(error = result.message ?:
@@ -224,7 +227,7 @@ class PostViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun deleteCommentById(commentId: Long, postId: Long)
+    fun deleteCommentById(commentId: Long, postId: Long, order: Int, size: Int)
     {
         GlobalScope.launch(Dispatchers.Main){
 
@@ -232,10 +235,14 @@ class PostViewModel @Inject constructor(
                 when(result){
                     is Resource.Success -> {
                         _stateDeleteComment.value = DeleteCommentState(message = result.data ?: "")
-                        println("OBRISAN KOMENTAR " + result.data)
-                        //getPost();
+
                         getFirstCommentsByPostId(postId)
-                        Constants.refreshComments = 1L;
+                        if (order == 1)
+                            commentCount.value = commentCount.value - 1 - size
+                        else
+                            commentCount.value = commentCount.value - 1
+                        //Constants.refreshComments = 1L
+                        Constants.singlePostPageChanged = true
                     }
                     is Resource.Error -> {
                         _stateDeleteComment.value = DeleteCommentState(error = result.message ?:
