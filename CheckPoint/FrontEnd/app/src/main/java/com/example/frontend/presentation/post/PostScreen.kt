@@ -407,7 +407,9 @@ fun MapView(
         MapUiSettings(zoomControlsEnabled = false)
     }
 
+    val postLocation = LatLng(post.location.lat, post.location.lng)
     val camPosState = rememberCameraPositionState{
+        position = CameraPosition.fromLatLngZoom(postLocation, 1f);
     }
     val builder = LatLngBounds.Builder()
 
@@ -454,7 +456,8 @@ fun MapView(
         ){
 
             val postLocation = LatLng(post.location.lat, post.location.lng)
-            builder.include(postLocation)
+//            builder.include(postLocation)
+
 
             val markerState : MarkerState = rememberMarkerState()
             markerState.position = postLocation
@@ -469,7 +472,7 @@ fun MapView(
                 )
             )
 
-            updateMapCamera(camPosState, builder, mapWidth, mapHeight, postLocation)
+//            updateMapCamera(camPosState, builder, mapWidth, mapHeight, postLocation)
         }
     }
 }
@@ -485,6 +488,7 @@ fun updateMapCamera(
     cameraPositionState.move(
         update = CameraUpdateFactory.newLatLngBounds(builder.build(), width, height, padding)
     )
+
 }
 
 

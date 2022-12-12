@@ -21,6 +21,8 @@ import com.example.frontend.domain.use_case.get_locations.GetAllLocationsUseCase
 import com.example.frontend.domain.use_case.get_locations.GetLocationsKeywordUseCase
 import com.example.frontend.domain.use_case.get_locations.SaveLocationUseCase
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
+import com.example.frontend.presentation.destinations.NovPostScreenDestination
+import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.example.frontend.presentation.newpost.components.NovPostMapState
 import com.example.frontend.presentation.newpost.components.NovPostState
 import com.example.frontend.presentation.newpost.components.SlikaState
@@ -93,6 +95,9 @@ class NovPostViewModel@Inject constructor(
                 is Resource.Success -> {
                     var i = 0
                     Log.d("SAVE POST", "Adding photos");
+
+                    Log.d("SAVE POST", "Slike koje treba dodati su ${_state.value.slike.toString()}")
+
                     for (photo: SlikaState in _state.value.slike) {
                         addPhoto(navigator, result.data!!.toLong(), i, photo)
                         i++;
@@ -148,8 +153,9 @@ class NovPostViewModel@Inject constructor(
                             Toast.LENGTH_LONG
                         ).show();
 
+                        navigator.popBackStack()
                         navigator.navigate(
-                            MainLocationScreenDestination()
+                            PostScreenDestination(postId)
                         )
                     } else {
                         println("Nisu sve poslate")

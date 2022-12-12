@@ -91,65 +91,54 @@ fun NovPostScreen(
     var choosePhotosStep by remember{ mutableStateOf(false) }
 
 
-    if(state.isLoading){
-        Column(
+    Column(
+        Modifier
+            .padding(20.dp)
+            .fillMaxSize()
+    ) {
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
         ){
-            CircularProgressIndicator();
-        }
-    }
-    else{
-        Column(
-            Modifier
-                .padding(20.dp)
-                .fillMaxSize()
-        ) {
-
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ){
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    IconButton(onClick = {
-                        if(setLocationStep)
-                            navigator.popBackStack()
-                        else if(choosePhotosStep){
-                            setLocationStep = true;
-                            choosePhotosStep = false;
-                        }
+                IconButton(onClick = {
+                    if(setLocationStep)
+                        navigator.popBackStack()
+                    else if(choosePhotosStep){
+                        setLocationStep = true;
+                        choosePhotosStep = false;
                     }
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "",
-                            tint = Color.DarkGray)
-                    }
-
-                    Spacer(Modifier.width(10.dp));
-
-                    Text(
-                        text = "New post",
-                        fontSize = 20.sp
-                    )
+                }
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "",
+                        tint = Color.DarkGray)
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.End
-                ){
-                    if(setLocationStep){
-                        IconButton(
-                            onClick = {
-                                if((viewModel.markerPOI.value != null || viewModel.markerLatLng.value != null) && viewModel.imeLokacije.value != ""){
-                                    setLocationStep = false;
-                                    choosePhotosStep = true;
+                Spacer(Modifier.width(10.dp));
+
+                Text(
+                    text = "New post",
+                    fontSize = 20.sp
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.End
+            ){
+                if(setLocationStep){
+                    IconButton(
+                        onClick = {
+                            if((viewModel.markerPOI.value != null || viewModel.markerLatLng.value != null) && viewModel.imeLokacije.value != ""){
+                                setLocationStep = false;
+                                choosePhotosStep = true;
 
 //                                    if (markerLatLng.value != null) {
 //                                        viewModel.saveLocation(imeLokacije.value, markerLatLng.value!!, navigator)
@@ -160,89 +149,88 @@ fun NovPostScreen(
 //                                            markerPOI.value!!.latLng,
 //                                            navigator)
 //                                    }
-                                }
-                                else{
-                                    //alert da ne moze da ne izabere lokaciju a da ide dalje
-                                    Toast.makeText(
-                                        context,
-                                        if(viewModel.imeLokacije.value != "") "You need to choose location!" else "You need to add location name!",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
                             }
-                        ) {
-                            Icon(
-                                Icons.Default.ArrowForward,
-                                contentDescription = "",
-                                tint = Color.DarkGray)
+                            else{
+                                //alert da ne moze da ne izabere lokaciju a da ide dalje
+                                Toast.makeText(
+                                    context,
+                                    if(viewModel.imeLokacije.value != "") "You need to choose location!" else "You need to add location name!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowForward,
+                            contentDescription = "",
+                            tint = Color.DarkGray)
                     }
-                    else if(choosePhotosStep){
-                        Button(
-                            onClick = {
-                                Log.d("PHOTOS", viewModel.givePhotos().toString());
-                                Log.d("DESCRIPTION", viewModel.description.value);
-                                if (viewModel.markerLatLng.value != null){
-                                    Log.d("LOCATION", viewModel.markerLatLng.value.toString());
-                                }
-                                else{
-                                    Log.d("LOCATION", viewModel.markerPOI.value?.latLng.toString());
-                                }
-                                Log.d("LOCATION NAME", viewModel.imeLokacije.value);
+                }
+                else if(choosePhotosStep){
+                    Button(
+                        onClick = {
+                            Log.d("PHOTOS", viewModel.givePhotos().toString());
+                            Log.d("DESCRIPTION", viewModel.description.value);
+                            if (viewModel.markerLatLng.value != null){
+                                Log.d("LOCATION", viewModel.markerLatLng.value.toString());
+                            }
+                            else{
+                                Log.d("LOCATION", viewModel.markerPOI.value?.latLng.toString());
+                            }
+                            Log.d("LOCATION NAME", viewModel.imeLokacije.value);
 
 
 
-                                if(viewModel.givePhotos().isNotEmpty() && viewModel.imeLokacije.value!=""){
+                            if(viewModel.givePhotos().isNotEmpty() && viewModel.imeLokacije.value!=""){
 //                                    viewModel.savePost(
 //                                        navigator,
 //                                        viewModel.description.value,
 //                                        viewModel.location.value.id
 //                                    )
 
-                                    if (viewModel.markerLatLng.value != null) {
-                                        viewModel.saveLocation(viewModel.imeLokacije.value, viewModel.markerLatLng.value!!, navigator)
-                                    }
-                                    else {
-                                        viewModel.saveLocation(
-                                            viewModel.markerPOI.value!!.name,
-                                            viewModel.markerPOI.value!!.latLng,
-                                            navigator)
-                                    }
+                                if (viewModel.markerLatLng.value != null) {
+                                    viewModel.saveLocation(viewModel.imeLokacije.value, viewModel.markerLatLng.value!!, navigator)
                                 }
-                                else{
-                                    //alert da ne moze da ne izabere objavi bez slika
-                                    Toast.makeText(
-                                        context,
-                                        if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.imeLokacije.value == "") "You need to choose location" else "Error",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                else {
+                                    viewModel.saveLocation(
+                                        viewModel.markerPOI.value!!.name,
+                                        viewModel.markerPOI.value!!.latLng,
+                                        navigator)
                                 }
                             }
-                        ) {
-                            Text("Post")
+                            else{
+                                //alert da ne moze da ne izabere objavi bez slika
+                                Toast.makeText(
+                                    context,
+                                    if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.imeLokacije.value == "") "You need to choose location" else "Error",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
+                    ) {
+                        Text("Post")
                     }
                 }
             }
-            Spacer(Modifier.height(5.dp));
+        }
+        Spacer(Modifier.height(5.dp));
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ){
-                if(choosePhotosStep){
-                    ChoosePhotos(viewModel = viewModel, navigator = navigator, context = context)
-                }
-                if(setLocationStep){
-                    SetLocation(viewModel = viewModel, navigator = navigator, context = context, changeLocationName = {
-                        viewModel.imeLokacije.value = it
-                    }, changeMarkerLatLng = {
-                        viewModel.markerLatLng.value = it
-                    }, changeMarkerPOI = {
-                        viewModel.markerPOI.value = it
-                    })
-                }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ){
+            if(choosePhotosStep){
+                ChoosePhotos(viewModel = viewModel, navigator = navigator, context = context)
+            }
+            if(setLocationStep){
+                SetLocation(viewModel = viewModel, navigator = navigator, context = context, changeLocationName = {
+                    viewModel.imeLokacije.value = it
+                }, changeMarkerLatLng = {
+                    viewModel.markerLatLng.value = it
+                }, changeMarkerPOI = {
+                    viewModel.markerPOI.value = it
+                })
             }
         }
     }

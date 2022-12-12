@@ -283,11 +283,11 @@ class ProfileSettingsViewModel @Inject constructor(
             DataStoreManager.deleteAllPreferences(context)
 
             Log.d("LOGOUT", "Cleared preferences");
+            Log.d("Navigator", navigator.toString());
 
             navigator.navigate(LoginScreenDestination()){
                 popUpTo(ProfileSettingsScreenDestination.route){
                     inclusive = true
-                    saveState = false
                 }
             }
 
