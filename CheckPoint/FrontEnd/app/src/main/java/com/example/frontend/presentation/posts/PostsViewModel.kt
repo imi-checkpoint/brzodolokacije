@@ -179,11 +179,15 @@ class PostsViewModel @Inject constructor(
     }
 
     fun proveriConstants(){
-        if(Constants.refreshComments != 0L || Constants.postLikeChangedSinglePostPage){
+        /*if(Constants.refreshComments != 0L || Constants.postLikeChangedSinglePostPage){
             Log.d("REFRESH COMM", "Refresh");
             Constants.refreshComments = 0L
             Constants.postLikeChangedSinglePostPage = false
             Log.d("Location id", locId.toString())
+            getAllPostsForLocation(locId)
+        }*/
+        if (Constants.singlePostPageChanged) {
+            Constants.singlePostPageChanged = false
             getAllPostsForLocation(locId)
         }
     }

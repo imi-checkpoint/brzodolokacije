@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
@@ -124,7 +126,6 @@ fun ProfileScreen(
                     navigator = navigator,
                     viewModel = viewModel
                 )
-                Spacer(modifier = Modifier.height(4.dp))
 
                 ProfileSection(navigator, state, pictureState, viewModel.savedUserId);
                 Spacer(modifier = Modifier.height(25.dp))
@@ -132,7 +133,7 @@ fun ProfileScreen(
                 //ako nije moj profil
                 if(viewModel.savedUserId != viewModel.loginUserId){
                     ButtonSection(viewModel, modifier = Modifier.fillMaxWidth());
-                    Spacer(modifier = Modifier.height(25.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
 
                 if(viewModel.savedUserId != 0L){
@@ -286,7 +287,7 @@ fun ProfileSection(
                 }
             }
             
-            Spacer(modifier = Modifier.width(16.dp))
+            //Spacer(modifier = Modifier.width(8.dp))
 
             StatSection(navigator, state, userId, modifier.weight(7f))
 
@@ -294,26 +295,6 @@ fun ProfileSection(
     }
 }
 
-@Composable
-fun RoundImage(
-    image: Painter,
-    modifier: Modifier = Modifier
-)
-{
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = CircleShape
-            )
-            .padding(3.dp)
-            .clip(CircleShape)
-    )
-}
 
 @Composable
 fun StatSection(
@@ -387,83 +368,42 @@ fun ButtonSection(
     val height = 35.dp
 
     Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
             .fillMaxWidth()
-//            .background(color = Color.Magenta)
+            .padding(horizontal = 20.dp)
 
     ){
-        ActionButton(
-            text = "Follow",
-            icon = Icons.Default.Add,
-            viewModel = viewModel,
+
+        Button(
+            onClick = {
+                viewModel.followUnfollowUser()
+            },
+            colors = androidx.compose.material.ButtonDefaults.buttonColors(
+                backgroundColor = if (viewModel.state.value.profileData!!.amFollowing) Color.White else Color.DarkGray
+            ),
             modifier = Modifier
-                .defaultMinSize(minWidth = minWidth)
-                .height(height)
-        )
-
-        ActionButton(
-            text = "Message",
-            viewModel = viewModel,
-            modifier = Modifier
-                .defaultMinSize(minWidth = minWidth)
-                .height(height)
-        )
-    }
-}
-
-@Composable
-fun ActionButton(
-    modifier: Modifier = Modifier,
-    viewModel : ProfileViewModel,
-    text : String? = null,
-    icon : ImageVector? = null
-){
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = RoundedCornerShape(5.dp)
-            )
-            .padding(6.dp)
-            .clickable {
-                if (text == "Follow") {
-                    //Constants.refreshPhotoConstant = viewModel.loginUserId
-                    viewModel.followUnfollowUser();
-                } else if (text == "Message") {
-                    //message this user
-
-                }
+                .fillMaxWidth()
+                .height(40.dp)
+        ) {
+            if (!viewModel.state.value.profileData!!.amFollowing) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription ="",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
             }
-    ){
-        if(text != null){
+            Spacer(modifier = Modifier.width(5.dp))
             Text(
-                text =
-                if(text == "Follow")
-                {
-                    if(viewModel.state.value.profileData?.amFollowing == true)
-                        "Unfollow"
-                    else
-                        "Follow"
-                }
-                else text,
+                text = if (viewModel.state.value.profileData!!.amFollowing) "Following" else "Follow",
+                fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp
-            )
-        }
-
-        if(icon != null){
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.Black
+                color = if (viewModel.state.value.profileData!!.amFollowing) Color.DarkGray else Color.White
             )
         }
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -480,30 +420,44 @@ fun UserPostsSection(
     Row(
         modifier = Modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.Center
     ){
         Button(onClick = {
             list = true;
             map = false;
         },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if(list == true) Color.DarkGray else Color.LightGray,
+                containerColor = if(list) Color.DarkGray else Color.LightGray,
                 contentColor = Color.White
-            )
+            ),
+            //modifier = Modifier.width(120.dp).height(45.dp),
+            modifier = Modifier.width(110.dp).height(45.dp),
+            shape = RoundedCornerShape(6.dp)
         ) {
-            Text(text = "LIST" , Modifier.padding(8.dp))
+            Text(
+                text = "POSTS",
+                letterSpacing = 1.2.sp
+            )
         }
+
+        Spacer(modifier = Modifier.width(20.dp))
 
         Button(onClick = {
             list = false;
             map = true;
         },
             colors = ButtonDefaults.buttonColors(
-                containerColor =if(map == true) Color.DarkGray else Color.LightGray,
+                containerColor = if(map) Color.DarkGray else Color.LightGray,
                 contentColor = Color.White
-            )
+            ),
+            //modifier = Modifier.width(120.dp).height(45.dp),
+            modifier = Modifier.width(110.dp).height(45.dp),
+            shape = RoundedCornerShape(6.dp)
         ) {
-            Text(text = "MAP" , Modifier.padding(8.dp))
+            Text(
+                text = "MAPS",
+                letterSpacing = 1.2.sp
+            )
         }
     }
 
@@ -583,7 +537,7 @@ fun PostsSection(
                 modifier = Modifier
                     .fillMaxWidth(),
                 placeholder = {
-                    Text("Search user posts")
+                    Text("Search by location name")
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.LightGray,
@@ -591,9 +545,10 @@ fun PostsSection(
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(20.dp)
+                //shape = RoundedCornerShape(10.dp)
             )
 
+            Spacer(modifier = Modifier.height(6.dp))
             LazyColumn{
                 items(searchPosts){
                         post -> PostCard(post = post, navigator = navigator, viewModel)
@@ -634,10 +589,6 @@ fun PostCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier
-                            .clickable{
-                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
-                            },
                         verticalAlignment = Alignment.CenterVertically
                     ){
                         val photo = post.image
@@ -740,8 +691,8 @@ fun MapSection(
     Column(
         modifier = Modifier
             .padding(
-                horizontal = 20.dp,
-                vertical = 20.dp
+                horizontal = 35.dp,
+                vertical = 40.dp
             )
             .border(
                 width = Dp.Hairline,
@@ -763,10 +714,7 @@ fun DeletePostButton(
         onClick = {
             viewModel.deletePostById(post.postId, post.location.id)
         },
-        modifier = Modifier
-            .clip(RectangleShape)
-            .border(BorderStroke(1.dp, Color.LightGray))
-            .size(30.dp)
+        modifier = Modifier.size(30.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Delete,

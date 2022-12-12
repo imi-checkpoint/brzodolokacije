@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -152,9 +153,10 @@ public class PostServiceImpl implements PostService {
                 )
         );
 
-        LocalDate onlyDate = post.getTime().toLocalDate();
-        String formattedDate = onlyDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-        postDTO.setDate(formattedDate);
+        String formattedDate = post.getTime().toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = post.getTime().toLocalTime().format(formatter);
+        postDTO.setDate(formattedDate + " " + formattedTime);
 
         return  postDTO;
     }

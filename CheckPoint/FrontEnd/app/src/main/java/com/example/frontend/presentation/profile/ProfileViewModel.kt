@@ -201,10 +201,13 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun proveriConstants(){
-        if(this.loginUserId == this.savedUserId && (Constants.refreshFollowUnfollowConstant != 0L || Constants.refreshProfileConstant != 0L || Constants.refreshPhotoConstant != 0L)){
+        if(Constants.singlePostPageChanged || (this.loginUserId == this.savedUserId && (Constants.refreshFollowUnfollowConstant != 0L || Constants.refreshProfileConstant != 0L || Constants.refreshPhotoConstant != 0L))){
             Constants.refreshPhotoConstant = 0L
             Constants.refreshFollowUnfollowConstant = 0L
             Constants.refreshProfileConstant = 0L
+            //Constants.postLikeChangedSinglePostPage = false
+            //Constants.refreshComments = 0L
+            Constants.singlePostPageChanged = false
             getProfileData()
         }
     }

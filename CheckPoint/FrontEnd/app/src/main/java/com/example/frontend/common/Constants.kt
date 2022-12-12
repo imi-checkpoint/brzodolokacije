@@ -17,9 +17,11 @@ public class Constants{
         var refreshPhotoConstant:Long = 0
         var refreshFollowUnfollowConstant:Long = 0
         var refreshProfileConstant:Long = 0
-        var refreshComments:Long = 0
+        //var refreshComments:Long = 0
 
 
-        var postLikeChangedSinglePostPage: Boolean = false
+        //var postLikeChangedSinglePostPage: Boolean = false
+
+        var singlePostPageChanged: Boolean = false
     }
 }
