@@ -3,6 +3,8 @@ package com.example.frontend.presentation.newpost
 import Constants
 import android.app.Application
 import android.graphics.Bitmap
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +27,7 @@ import com.example.frontend.presentation.newpost.components.SlikaState
 import com.example.frontend.presentation.posts.components.PostsState
 import com.example.frontend.presentation.user_list.components.UserListState
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PointOfInterest
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +52,7 @@ class NovPostViewModel@Inject constructor(
     application: Application,
 
 ): ViewModel() {
-    private val _state = mutableStateOf(NovPostState())
+    private var _state = mutableStateOf(NovPostState())
     val state: State<NovPostState> = _state
 
     private val _locationState = mutableStateOf(NovPostMapState())
@@ -63,6 +66,10 @@ class NovPostViewModel@Inject constructor(
     val description = mutableStateOf("")
     val location = mutableStateOf(Location(0,"",0.0,0.0));
 
+    var markerLatLng = mutableStateOf<LatLng?>(null)
+    var markerPOI =  mutableStateOf<PointOfInterest?>(null)
+    var imeLokacije = mutableStateOf("")
+
     init {
         GlobalScope.launch(Dispatchers.Main){
             access_token = DataStoreManager.getStringValue(context, "access_token").trim();
@@ -73,8 +80,15 @@ class NovPostViewModel@Inject constructor(
     }
 
     fun savePost(navigator: DestinationsNavigator, description: String, locationId: Long) {
-        println(_state.value.selected)
-        addPostUseCase("Bearer " + access_token, description, _state.value.selected).map { result ->
+        Log.d("SAVE POST", "Selected location id ${_state.value.selected}")
+        Log.d("SAVE POST", "Description is ${description}");
+        var desc = "";
+        if(description == "")
+            desc = " ";
+        else
+            desc = description;
+
+        addPostUseCase("Bearer " + access_token, desc, _state.value.selected).map { result ->
             when (result) {
                 is Resource.Success -> {
                     var i = 0
@@ -82,12 +96,16 @@ class NovPostViewModel@Inject constructor(
                         addPhoto(navigator, result.data!!.toLong(), i, photo)
                         i++;
                     }
+                    _state.value = NovPostState(isLoading = false);
                 }
                 is Resource.Error -> {
+                    Log.d("SAVE POST ERROR", "Error is ${result.message}")
                     println(result.message)
+                    _state.value = NovPostState(error = result.message ?: "Unexpected error");
                 }
                 is Resource.Loading -> {
                     println(result.message)
+                    _state.value = NovPostState(isLoading = true);
                 }
             }
         }.launchIn(viewModelScope)
@@ -105,6 +123,7 @@ class NovPostViewModel@Inject constructor(
             RequestBody.create(MediaType.parse("image/*"), tempFile)
         )
 
+        Log.d("ADD PHOTO", "Adding images");
         addPhotoUseCase("Bearer " + access_token, postId, order, file).map { result ->
             when (result) {
                 is Resource.Success -> {
@@ -120,6 +139,13 @@ class NovPostViewModel@Inject constructor(
                         }
                     }
                     if (flag == true) {
+                        //toast
+                        Toast.makeText(
+                            context,
+                            "Post successfully added",
+                            Toast.LENGTH_LONG
+                        ).show();
+
                         navigator.navigate(
                             MainLocationScreenDestination()
                         )
@@ -128,6 +154,7 @@ class NovPostViewModel@Inject constructor(
                     }
                 }
                 is Resource.Error -> {
+                    _state.value = NovPostState(error = result.message ?: "Unexpected error");
                     if(result.message?.contains("403") == true){
                         GlobalScope.launch(Dispatchers.Main){
                             DataStoreManager.deleteAllPreferences(context);
@@ -273,6 +300,8 @@ class NovPostViewModel@Inject constructor(
                         println(result.data!!)
                         _locationState.value = NovPostMapState(result.data!!)
                         Constants.locationId = result.data!!.id
+
+                        savePost(navigator, description.value, result.data!!.id);
                     }
                     is Resource.Error -> {
                         if (result.message?.contains("403") == true) {

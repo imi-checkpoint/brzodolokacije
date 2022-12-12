@@ -70,8 +70,10 @@ public class PostController {
         log.info("Saving new post.");
         AppUser user = jwtService.getAppUserFromJWT(request);
         if (user != null){
+            log.info("Found user");
             return postService.savePost(description, user.getId(), locationId);
         }
+        log.info("Error saving post");
         return -1l;
     }
 

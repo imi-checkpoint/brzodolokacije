@@ -13,11 +13,14 @@ import android.widget.Toast
 import androidx.compose.foundation.lazy.items
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -28,7 +31,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -36,11 +42,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.frontend.domain.model.Photo
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.NovPostMapScreenDestination
 import com.example.frontend.presentation.newpost.components.SlikaState
+import com.google.accompanist.pager.*
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -51,7 +60,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.util.*
+import kotlin.math.absoluteValue
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Destination
 @Composable
 fun NovPostScreen(
@@ -70,6 +82,7 @@ fun NovPostScreen(
         }
     }
 
+
     viewModel.proveriConstants()
 
     var selected = remember {
@@ -81,135 +94,146 @@ fun NovPostScreen(
     var choosePhotosStep by remember{ mutableStateOf(false) }
 
 
-    var markerLatLng = remember {
-        mutableStateOf<LatLng?>(null)
-    }
-    var markerPOI = remember {
-        mutableStateOf<PointOfInterest?>(null)
-    }
-    var imeLokacije = remember {
-        mutableStateOf("")
-    }
-
-    Column(
-        Modifier
-            .padding(20.dp)
-            .fillMaxSize()
-    ) {
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+    if(state.isLoading){
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                IconButton(onClick = {
-                    if(setLocationStep)
-                        navigator.popBackStack()
-                    else if(choosePhotosStep){
-                        setLocationStep = true;
-                        choosePhotosStep = false;
-                    }
-                }
-                ) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = "",
-                        tint = Color.DarkGray)
-                }
-
-                Spacer(Modifier.width(10.dp));
-
-                Text(
-                    text = "New post",
-                    fontSize = 20.sp
-                )
-            }
+            CircularProgressIndicator();
+        }
+    }
+    else{
+        Column(
+            Modifier
+                .padding(20.dp)
+                .fillMaxSize()
+        ) {
 
             Row(
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
             ){
-                if(setLocationStep){
-                    IconButton(
-                        onClick = {
-                            if((markerPOI.value != null || markerLatLng.value != null) && imeLokacije.value != ""){
-                                setLocationStep = false;
-                                choosePhotosStep = true;
-
-                                if (markerLatLng.value != null) {
-                                    viewModel.saveLocation(imeLokacije.value, markerLatLng.value!!, navigator)
-                                }
-                                else {
-                                    viewModel.saveLocation(
-                                        markerPOI.value!!.name,
-                                        markerPOI.value!!.latLng,
-                                        navigator)
-                                }
-                            }
-                            else{
-                                //alert da ne moze da ne izabere lokaciju a da ide dalje
-                                Toast.makeText(
-                                    context,
-                                    if(imeLokacije.value != "") "You need to choose location!" else "You need to add location name!",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    IconButton(onClick = {
+                        if(setLocationStep)
+                            navigator.popBackStack()
+                        else if(choosePhotosStep){
+                            setLocationStep = true;
+                            choosePhotosStep = false;
                         }
+                    }
                     ) {
                         Icon(
-                            Icons.Default.ArrowForward,
+                            Icons.Default.ArrowBack,
                             contentDescription = "",
                             tint = Color.DarkGray)
                     }
-                }
-                else if(choosePhotosStep){
-                    Button(
-                        onClick = {
-                            if(viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""){
-                                viewModel.savePost(
-                                    navigator,
-                                    viewModel.description.value,
-                                    viewModel.location.value.id
-                                )
-                            }
-                            else{
-                                //alert da ne moze da ne izabere objavi bez slika
-                                Toast.makeText(
-                                    context,
-                                    if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.getLocation() == "") "You need to choose location" else "Error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
 
+                    Spacer(Modifier.width(10.dp));
+
+                    Text(
+                        text = "New post",
+                        fontSize = 20.sp
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.End
+                ){
+                    if(setLocationStep){
+                        IconButton(
+                            onClick = {
+                                if((viewModel.markerPOI.value != null || viewModel.markerLatLng.value != null) && viewModel.imeLokacije.value != ""){
+                                    setLocationStep = false;
+                                    choosePhotosStep = true;
+
+//                                    if (markerLatLng.value != null) {
+//                                        viewModel.saveLocation(imeLokacije.value, markerLatLng.value!!, navigator)
+//                                    }
+//                                    else {
+//                                        viewModel.saveLocation(
+//                                            markerPOI.value!!.name,
+//                                            markerPOI.value!!.latLng,
+//                                            navigator)
+//                                    }
+                                }
+                                else{
+                                    //alert da ne moze da ne izabere lokaciju a da ide dalje
+                                    Toast.makeText(
+                                        context,
+                                        if(viewModel.imeLokacije.value != "") "You need to choose location!" else "You need to add location name!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.ArrowForward,
+                                contentDescription = "",
+                                tint = Color.DarkGray)
                         }
-                    ) {
-                        Text("Post")
+                    }
+                    else if(choosePhotosStep){
+                        Button(
+                            onClick = {
+                                if(viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""){
+//                                    viewModel.savePost(
+//                                        navigator,
+//                                        viewModel.description.value,
+//                                        viewModel.location.value.id
+//                                    )
+
+                                    if (viewModel.markerLatLng.value != null) {
+                                        viewModel.saveLocation(viewModel.imeLokacije.value, viewModel.markerLatLng.value!!, navigator)
+                                    }
+                                    else {
+                                        viewModel.saveLocation(
+                                            viewModel.markerPOI.value!!.name,
+                                            viewModel.markerPOI.value!!.latLng,
+                                            navigator)
+                                    }
+                                }
+                                else{
+                                    //alert da ne moze da ne izabere objavi bez slika
+                                    Toast.makeText(
+                                        context,
+                                        if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.getLocation() == "") "You need to choose location" else "Error",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        ) {
+                            Text("Post")
+                        }
                     }
                 }
             }
-        }
-        Spacer(Modifier.height(5.dp));
+            Spacer(Modifier.height(5.dp));
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ){
-            if(choosePhotosStep){
-                ChoosePhotos(viewModel = viewModel, navigator = navigator, context = context)
-            }
-            if(setLocationStep){
-                SetLocation(viewModel = viewModel, navigator = navigator, context = context, changeLocationName = {
-                    imeLokacije.value = it
-                }, changeMarkerLatLng = {
-                    markerLatLng.value = it
-                }, changeMarkerPOI = {
-                    markerPOI.value = it
-                })
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ){
+                if(choosePhotosStep){
+                    ChoosePhotos(viewModel = viewModel, navigator = navigator, context = context)
+                }
+                if(setLocationStep){
+                    SetLocation(viewModel = viewModel, navigator = navigator, context = context, changeLocationName = {
+                        viewModel.imeLokacije.value = it
+                    }, changeMarkerLatLng = {
+                        viewModel.markerLatLng.value = it
+                    }, changeMarkerPOI = {
+                        viewModel.markerPOI.value = it
+                    })
+                }
             }
         }
     }
@@ -263,6 +287,8 @@ fun slika(
 }
 
 
+@OptIn(ExperimentalPagerApi::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChoosePhotos(
     viewModel : NovPostViewModel,
@@ -337,13 +363,15 @@ fun ChoosePhotos(
     Spacer(Modifier.height(10.dp));
 
     //ovde da bude slider izabranih slika, ako ih ima
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(viewModel.givePhotos()) { item ->
-            slika(navigator, photo = item, viewModel)
-        }
-    }
+//    LazyRow(
+//        horizontalArrangement = Arrangement.spacedBy(10.dp)
+//    ) {
+//        items(viewModel.givePhotos()) { item ->
+//            slika(navigator, photo = item, viewModel)
+//        }
+//    }
+    if(viewModel.givePhotos().isNotEmpty())
+        ImageSlider(photos = viewModel.givePhotos(), viewModel)
 }
 
 @Composable
@@ -480,3 +508,126 @@ fun SetLocation(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@ExperimentalPagerApi
+@Composable
+fun ImageSlider(
+    photos: List<SlikaState>,
+    viewModel : NovPostViewModel
+){
+    val pagerState = rememberPagerState(
+        pageCount = photos.size,
+        initialPage = 0
+    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = 1.dp,
+        shape = RectangleShape
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+            ){
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ){
+                    IconButton(
+                        onClick = {
+                            Log.d("DELETE", "Deleting picture ${pagerState.currentPage}")
+                            viewModel.deletePhoto(photos[pagerState.currentPage].slika)
+                                  },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.Black,
+                            modifier = Modifier.size(25.dp),
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+            ){
+
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(0.dp, 15.dp, 0.dp, 15.dp)
+                ) {
+                        page->
+                    Card(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+                                lerp(
+                                    start = 0.85f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                ).also { scale ->
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
+
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            }
+                            .fillMaxWidth()
+                    ){
+
+//                        val decoder = Base64.getDecoder()
+//                        val photoBytes = decoder.decode(photo.photo.data)
+//                        if(photoBytes.size>1) {
+//                            val mapa: Bitmap =
+//                                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)
+//                            print(mapa.byteCount)
+//                            if (mapa != null) {
+//                                Image(
+//                                    bitmap = mapa.asImageBitmap(),
+//                                    contentDescription = "",
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            }
+//                        }
+
+                        val photo = photos[page]
+                        Image(
+                            bitmap = photo.slika.asImageBitmap(),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                indicatorWidth = 6.dp,
+                indicatorHeight = 6.dp,
+                activeColor = Color.Blue,
+                inactiveColor = Color.LightGray
+            )
+        }
+    }
+}

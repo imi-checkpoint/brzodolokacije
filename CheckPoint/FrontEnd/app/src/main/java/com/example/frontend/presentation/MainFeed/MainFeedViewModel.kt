@@ -3,6 +3,7 @@ package com.example.frontend.presentation.MainFeed
 import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.common.Resource
@@ -13,6 +14,7 @@ import com.example.frontend.domain.use_case.post_likes.LikeOrUnlikePostUseCase
 import com.example.frontend.presentation.MainFeed.components.MainFeedState
 import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.posts.components.PostsState
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -38,6 +40,7 @@ class MainFeedViewModel @Inject constructor (
     val state : State<MainFeedState> = _state
     val context = application.baseContext
 
+    var allPosts = mutableStateOf<List<Post>?>(null);
     init {
         getPostsIFollow()
     }
@@ -50,6 +53,7 @@ class MainFeedViewModel @Inject constructor (
                 when(result){
                     is Resource.Success -> {
                         _state.value = MainFeedState(posts = result.data!!)
+                        allPosts.value = getPosts();
                     }
                     is Resource.Error -> {
                         _state.value = MainFeedState(error = result.message!!)
@@ -110,6 +114,7 @@ class MainFeedViewModel @Inject constructor (
             when(result){
                 is Resource.Success -> {
                     _stateLikeOrUnlike.value = PostStringState(message = result.data ?: "")
+                    allPosts.value = getPosts()
                 }
                 is Resource.Error -> {
                     _stateLikeOrUnlike.value = PostStringState(error = result.message ?:

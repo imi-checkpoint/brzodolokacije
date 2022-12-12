@@ -67,10 +67,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Long savePost(String description, Long userId, Long locationId) {
         Location location = locationService.getLocationById(locationId);
+        log.info("Service saving post");
         if (location != null) {
+            log.info("Saving post");
             Post p = postRepository.save(new Post(description.trim(), LocalDateTime.now(), appUserService.getUserById(userId), location));
             return p.getId();
         }
+        log.info("Location not found");
         return -1l;
     }
 

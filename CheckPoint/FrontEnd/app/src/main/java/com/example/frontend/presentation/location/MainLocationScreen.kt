@@ -72,6 +72,7 @@ fun MainLocationScreen(
     var mapHeight by remember {
         mutableStateOf(20)
     }
+
     if(state.error.contains("403")){
         navigator.navigate(LoginScreenDestination){
             popUpTo(MainLocationScreenDestination.route){
@@ -112,7 +113,7 @@ fun MainLocationScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .onGloballyPositioned { coords ->
-                            mapWidth = with(localDensity) { coords.size.width }
+                        mapWidth = with(localDensity) { coords.size.width }
                         mapHeight = with(localDensity) { coords.size.height }
                     },
                 uiSettings = uiSettings,
@@ -123,10 +124,11 @@ fun MainLocationScreen(
                     Marker(
                         position = LatLng(location.lat, location.lng),
                         title = location.name,
-                        /*onInfoWindowClick = {
-                            it.hideInfoWindow()
-                            navigator.navigate(PostsScreenDestination(location.id))
-                        }*/
+                        snippet = "See all posts",
+//                        onInfoWindowClick = {
+//                            it.hideInfoWindow()
+//                            navigator.navigate(PostsScreenDestination(location.id))
+//                        }
                         onInfoWindowLongClick = {
                             it.hideInfoWindow()
                             navigator.navigate(PostsScreenDestination(location.id))

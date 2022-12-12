@@ -749,7 +749,7 @@ fun MapSection(
                 shape = RoundedCornerShape(5.dp)
             )
     ) {
-        MapWindow(userId, posts)
+        MapWindow(userId, posts, navigator);
     }
 }
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.domain.model.Post
+import com.example.frontend.presentation.destinations.PostScreenDestination
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -33,6 +35,7 @@ import com.google.maps.android.compose.*
 fun MapWindow(
     userId : Long,
     posts : List<Post>,
+    navigator : DestinationsNavigator,
     viewModel: MapViewModel = hiltViewModel()
 )
 {
@@ -99,12 +102,20 @@ fun MapWindow(
                 Marker(
                     position = postLocation,
                     title = post.location.name,
-                    snippet = "User post location",
-                    onInfoWindowClick = {},
-                    onInfoWindowLongClick = {},
+                    snippet = "Go to post",
+//                    onInfoWindowClick = {
+//                        it.hideInfoWindow()
+//                        Log.d("CLICK", "Window click");
+//                        navigator.navigate(PostScreenDestination(post.postId))
+//                    },
+                    onInfoWindowLongClick = {
+                        it.hideInfoWindow()
+                        Log.d("CLICK", "Window long click");
+                        navigator.navigate(PostScreenDestination(post.postId))
+                    },
                     icon = BitmapDescriptorFactory.defaultMarker(
                         BitmapDescriptorFactory.HUE_AZURE
-                    )
+                    ),
                 )
             }
 
@@ -131,4 +142,7 @@ fun updateCamera(
             padding
         )
     )
+//    cameraPositionState.move(
+//        update = CameraUpdateFactory.zoomOut()
+//    )
 }

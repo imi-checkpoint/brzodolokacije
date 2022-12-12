@@ -131,7 +131,7 @@ fun MainFeedScreen(
                     }
                 }
             }
-            AllMPosts(viewModel.getPosts(), navigator, viewModel)
+            AllMPosts(viewModel.allPosts.value, navigator, viewModel)
         }
     }
 }
