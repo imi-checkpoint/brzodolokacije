@@ -453,7 +453,6 @@ fun MapView(
             Marker(
                 position = postLocation,
                 title = post.location.name,
-                snippet = "User post location",
                 onInfoWindowClick = {},
                 onInfoWindowLongClick = {},
                 icon = BitmapDescriptorFactory.defaultMarker(
@@ -623,7 +622,7 @@ fun AddFirstCommentCard(
                         innerTextField()
                     }
                 },
-                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 14.sp)
+                textStyle = LocalTextStyle.current.copy(color = Color.DarkGray, fontSize = 14.sp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Button(
@@ -720,7 +719,7 @@ fun AddSecondCommentCard(
                         innerTextField()
                     }
                 },
-                textStyle = LocalTextStyle.current.copy(color = Color.Gray, fontSize = 12.sp)
+                textStyle = LocalTextStyle.current.copy(color = Color.DarkGray, fontSize = 12.sp)
             )
 
             Spacer(modifier = Modifier.width(10.dp))
