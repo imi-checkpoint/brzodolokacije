@@ -129,9 +129,13 @@ class MainFeedViewModel @Inject constructor (
 
     fun proveriConstants()
     {
-        if(Constants.refreshComments != 0L || Constants.postLikeChangedSinglePostPage){
+        /*if(Constants.refreshComments != 0L || Constants.postLikeChangedSinglePostPage){
             Constants.refreshComments = 0L
             Constants.postLikeChangedSinglePostPage = false
+            getPostsIFollow()
+        }*/
+        if(Constants.singlePostPageChanged) {
+            Constants.singlePostPageChanged = false
             getPostsIFollow()
         }
     }

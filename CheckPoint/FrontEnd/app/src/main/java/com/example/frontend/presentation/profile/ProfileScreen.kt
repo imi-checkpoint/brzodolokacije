@@ -124,7 +124,6 @@ fun ProfileScreen(
                     navigator = navigator,
                     viewModel = viewModel
                 )
-                Spacer(modifier = Modifier.height(4.dp))
 
                 ProfileSection(navigator, state, pictureState, viewModel.savedUserId);
                 Spacer(modifier = Modifier.height(25.dp))
@@ -294,26 +293,6 @@ fun ProfileSection(
     }
 }
 
-@Composable
-fun RoundImage(
-    image: Painter,
-    modifier: Modifier = Modifier
-)
-{
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = CircleShape
-            )
-            .padding(3.dp)
-            .clip(CircleShape)
-    )
-}
 
 @Composable
 fun StatSection(
@@ -634,10 +613,6 @@ fun PostCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier
-                            .clickable{
-                                navigator.navigate(ProfileScreenDestination(post.appUserId, post.appUserUsername))
-                            },
                         verticalAlignment = Alignment.CenterVertically
                     ){
                         val photo = post.image
@@ -763,10 +738,7 @@ fun DeletePostButton(
         onClick = {
             viewModel.deletePostById(post.postId, post.location.id)
         },
-        modifier = Modifier
-            .clip(RectangleShape)
-            .border(BorderStroke(1.dp, Color.LightGray))
-            .size(30.dp)
+        modifier = Modifier.size(30.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
