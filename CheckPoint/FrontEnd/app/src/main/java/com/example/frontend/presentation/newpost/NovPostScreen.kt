@@ -183,7 +183,19 @@ fun NovPostScreen(
                     else if(choosePhotosStep){
                         Button(
                             onClick = {
-                                if(viewModel.givePhotos().isNotEmpty() && viewModel.getLocation()!=""){
+                                Log.d("PHOTOS", viewModel.givePhotos().toString());
+                                Log.d("DESCRIPTION", viewModel.description.value);
+                                if (viewModel.markerLatLng.value != null){
+                                    Log.d("LOCATION", viewModel.markerLatLng.value.toString());
+                                }
+                                else{
+                                    Log.d("LOCATION", viewModel.markerPOI.value?.latLng.toString());
+                                }
+                                Log.d("LOCATION NAME", viewModel.imeLokacije.value);
+
+
+
+                                if(viewModel.givePhotos().isNotEmpty() && viewModel.imeLokacije.value!=""){
 //                                    viewModel.savePost(
 //                                        navigator,
 //                                        viewModel.description.value,
@@ -204,7 +216,7 @@ fun NovPostScreen(
                                     //alert da ne moze da ne izabere objavi bez slika
                                     Toast.makeText(
                                         context,
-                                        if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.getLocation() == "") "You need to choose location" else "Error",
+                                        if(viewModel.givePhotos().isEmpty()) "You need to add photos!" else if(viewModel.imeLokacije.value == "") "You need to choose location" else "Error",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }

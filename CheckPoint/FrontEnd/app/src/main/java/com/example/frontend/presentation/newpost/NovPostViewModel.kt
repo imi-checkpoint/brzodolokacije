@@ -80,7 +80,7 @@ class NovPostViewModel@Inject constructor(
     }
 
     fun savePost(navigator: DestinationsNavigator, description: String, locationId: Long) {
-        Log.d("SAVE POST", "Selected location id ${_state.value.selected}")
+        Log.d("SAVE POST", "Selected location id ${locationId}")
         Log.d("SAVE POST", "Description is ${description}");
         var desc = "";
         if(description == "")
@@ -88,15 +88,15 @@ class NovPostViewModel@Inject constructor(
         else
             desc = description;
 
-        addPostUseCase("Bearer " + access_token, desc, _state.value.selected).map { result ->
+        addPostUseCase("Bearer " + access_token, desc, locationId).map { result ->
             when (result) {
                 is Resource.Success -> {
                     var i = 0
+                    Log.d("SAVE POST", "Adding photos");
                     for (photo: SlikaState in _state.value.slike) {
                         addPhoto(navigator, result.data!!.toLong(), i, photo)
                         i++;
                     }
-                    _state.value = NovPostState(isLoading = false);
                 }
                 is Resource.Error -> {
                     Log.d("SAVE POST ERROR", "Error is ${result.message}")
@@ -105,7 +105,9 @@ class NovPostViewModel@Inject constructor(
                 }
                 is Resource.Loading -> {
                     println(result.message)
-                    _state.value = NovPostState(isLoading = true);
+                    val slike = _state.value.slike;
+                    val lokacije = _state.value.lokacije;
+                    _state.value = NovPostState(isLoading = true, slike = slike, lokacije = lokacije);
                 }
             }
         }.launchIn(viewModelScope)
@@ -291,6 +293,7 @@ class NovPostViewModel@Inject constructor(
         }
 
         fun saveLocation(name: String, position: LatLng, navigator: DestinationsNavigator) {
+            Log.d("SAVE LOCATION", "Position is ${position.toString()}")
             saveLocationUseCase(
                 "Bearer " + access_token,
                 LocationDTO(0, name, position.latitude, position.longitude)
