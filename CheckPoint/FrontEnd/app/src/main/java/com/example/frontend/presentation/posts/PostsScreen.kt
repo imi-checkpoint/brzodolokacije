@@ -147,7 +147,7 @@ fun PostsScreen(
             Text("An error occured while loading posts!");
         }
         else{
-            AllPosts(viewModel.getPosts(), navigator, viewModel)
+            AllPosts(viewModel.allPosts.value, navigator, viewModel)
         }
     }
 }
