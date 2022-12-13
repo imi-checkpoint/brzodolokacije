@@ -81,6 +81,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public String deletePost(Long userId, Long postId) {
         Post post = getPostById(postId);
+        Location location = post.getLocation();
         if (post == null)
             return "Post with that id does not exist!";
         if (!(post.getUser().getId().equals(userId)))
@@ -88,6 +89,11 @@ public class PostServiceImpl implements PostService {
         
         postRepository.deleteById(postId);
         photoService.deletePhotosByPostId(postId);
+        if (location.getPostList().isEmpty()) { //brisi lokaciju koja nema postove
+            locationService.deleteLocation(location.getId());
+            return "Location deleted";
+        }
+
         return "Deleted";
     }
 
