@@ -97,7 +97,8 @@ fun PostsScreen(
             OutlinedTextField(
                 value = viewModel.nazivSorta().trim(),
                 onValueChange = {},
-                Modifier.width(200.dp),
+                //Modifier.width(200.dp),
+                Modifier.fillMaxWidth(),
                 readOnly = true,
                 label = {
                     Text(text = "Sort")

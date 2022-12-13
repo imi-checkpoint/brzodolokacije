@@ -11,6 +11,7 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -62,6 +64,7 @@ import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.profile_settings.components.ProfilePictureState
 import com.example.frontend.presentation.profile_settings.components.ProfileSettingsUserState
+import com.example.frontend.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
@@ -128,7 +131,7 @@ fun ProfileSettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(horizontal = 28.dp, vertical = 28.dp)
     ) {
         Row(
             modifier = Modifier
@@ -145,7 +148,7 @@ fun ProfileSettingsScreen(
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "",
-                        tint = Color.DarkGray
+                        tint = MyColorTopBar
                     )
                 }
             }
@@ -159,7 +162,7 @@ fun ProfileSettingsScreen(
                     Icon(
                         Icons.Default.Logout,
                         contentDescription = "",
-                        tint = Color.DarkGray
+                        tint = MyColorTopBar
                     )
                 }
             }
@@ -231,13 +234,13 @@ fun ProfilePicture(
                         choseImage.launch("image/*")
                     },
                         modifier = Modifier
-                            .border(0.dp, Color.Gray, RectangleShape)
+                            .border(0.dp, MyColorTopBar, RectangleShape)
                             .size(30.dp)
                     ) {
                         Icon(
                             Icons.Filled.ModeEdit,
                             contentDescription = "",
-                            tint = Color.DarkGray,
+                            tint = MyColorTopBar,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -263,8 +266,7 @@ fun UsernameAndEmail(
 
         Text(
             text = "${state.user?.username}",
-            fontWeight = FontWeight.Medium,
-            fontFamily = FontFamily.SansSerif,
+            fontFamily = FontFamily.Monospace,
             color = Color.DarkGray,
             fontSize = 25.sp
         )
@@ -288,17 +290,15 @@ fun UsernameAndEmail(
         Button(onClick = {
             viewModel.changeEmail(navigator)
         },
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White
-            ),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = MyColorTopBar),
             modifier = Modifier
                 .height(38.dp)
-                .width(110.dp)
+                .width(120.dp)
         ) {
             Text(
                 text = "Update email",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
                 color = Color.White
             )
         }
@@ -368,17 +368,15 @@ fun Passwords(
         Button(onClick = {
             viewModel.changePassword()
         },
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White
-            ),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = MyColorTopBar),
             modifier = Modifier
                 .height(40.dp)
-                .width(130.dp)
+                .width(135.dp)
         ) {
             Text(
                 text = "Update password",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
                 color = Color.White
             )
         }

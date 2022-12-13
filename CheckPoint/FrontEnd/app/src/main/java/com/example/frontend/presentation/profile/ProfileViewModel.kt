@@ -221,6 +221,9 @@ class ProfileViewModel @Inject constructor(
             when(result){
                 is Resource.Success -> {
                     _stateDelete.value = PostStringState(message = result.data ?: "")
+                    if (result.data!! == "Location deleted") {
+                        Constants.locationDeletedUpdateMap = true;
+                    }
                     getUserPosts(savedUserId)
                 }
                 is Resource.Error -> {

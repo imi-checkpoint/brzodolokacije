@@ -49,6 +49,7 @@ import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.NovPostMapScreenDestination
 import com.example.frontend.presentation.newpost.components.SlikaState
+import com.example.frontend.ui.theme.MyColorTopBar
 import com.google.accompanist.pager.*
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -163,7 +164,7 @@ fun NovPostScreen(
                         Icon(
                             Icons.Default.ArrowForward,
                             contentDescription = "",
-                            tint = Color.DarkGray)
+                            tint = MyColorTopBar)
                     }
                 }
                 else if(choosePhotosStep){
@@ -301,7 +302,7 @@ fun ChoosePhotos(
     val maxChars = 100;
     TextField(
         value = viewModel.description.value,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
         onValueChange = {
             if(it.length <= maxChars){
                 viewModel.description.value = it
@@ -341,7 +342,7 @@ fun ChoosePhotos(
         }
     }
 
-    Spacer(Modifier.height(5.dp));
+    Spacer(Modifier.height(20.dp));
 
     Row(
         Modifier.clickable{
@@ -357,7 +358,7 @@ fun ChoosePhotos(
         )
     }
 
-    Spacer(Modifier.height(10.dp));
+    Spacer(Modifier.height(15.dp))
 
     //ovde da bude slider izabranih slika, ako ih ima
 //    LazyRow(
@@ -408,7 +409,7 @@ fun SetLocation(
     }
 
     Row(
-
+        Modifier.padding(top = 10.dp)
     ){
         Icon(
             Icons.Default.LocationOn,
@@ -448,12 +449,13 @@ fun SetLocation(
         )
     }
 
-    Spacer(Modifier.height(5.dp));
+    //Spacer(Modifier.height(5.dp));
 
     Row(
         Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .padding(top = 20.dp, bottom = 15.dp)
     ){
         //mapica
 
@@ -528,7 +530,7 @@ fun ImageSlider(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.dp),
+                .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
@@ -622,10 +624,9 @@ fun ImageSlider(
             HorizontalPagerIndicator(
                 pagerState = pagerState,
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                indicatorWidth = 6.dp,
-                indicatorHeight = 6.dp,
-                activeColor = Color.Blue,
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 5.dp),
+                activeColor = MyColorTopBar,
                 inactiveColor = Color.LightGray
             )
         }

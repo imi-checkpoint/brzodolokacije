@@ -43,7 +43,7 @@ import com.example.frontend.domain.model.Photo
 import com.example.frontend.domain.model.Post
 import com.example.frontend.presentation.destinations.*
 import com.example.frontend.presentation.posts.components.PostStringState
-import com.example.frontend.ui.theme.MyColorTopBarBlue
+import com.example.frontend.ui.theme.*
 import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -89,7 +89,8 @@ fun MainFeedScreen(
                     OutlinedTextField(
                         value = viewModel.nazivSorta().trim(),
                         onValueChange = {},
-                        modifier = Modifier.width(200.dp),
+                        //Modifier.width(200.dp),
+                        Modifier.fillMaxWidth(),
                         readOnly = true,
                         label = {
                             Text(
@@ -424,7 +425,7 @@ fun ProfileMTopBar(
                     onClick = {
                         navigator.navigate(MainFeedScreenDestination())
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBarBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBar),
                     contentPadding = PaddingValues(start = 8.dp, end = 15.dp)
                 ) {
                     Icon(
@@ -449,17 +450,17 @@ fun ProfileMTopBar(
                     },
                     contentPadding = PaddingValues(start = 5.dp, end = 8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    border = BorderStroke(1.2.dp, MyColorTopBarBlue)
+                    border = BorderStroke(1.2.dp, MyColorTopBar)
                 ) {
                     Icon(
                         Icons.Default.Explore,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                     Spacer(Modifier.width(5.dp))
                     Text(
                         text = "Explore",
-                        color = MyColorTopBarBlue,
+                        color = MyColorTopBar,
                         fontFamily = FontFamily.SansSerif
                     )
                 }
@@ -476,7 +477,7 @@ fun ProfileMTopBar(
                     Icon(
                         Icons.Default.AddCircle,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                 }
 
@@ -489,7 +490,7 @@ fun ProfileMTopBar(
                     Icon(
                         Icons.Default.Person,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                 }
             }

@@ -23,5 +23,7 @@ public class Constants{
         //var postLikeChangedSinglePostPage: Boolean = false
 
         var singlePostPageChanged: Boolean = false
+
+        var locationDeletedUpdateMap: Boolean = false
     }
 }
