@@ -1,7 +1,6 @@
 public class Constants{
     companion object {
 //        const val BASE_URL = "http://147.91.204.115:10060/"; //server
-        const val BASE_URL = "http://192.168.8.101:8080/";
 
         const val LOCATION_ID = "locationId"
 
@@ -12,7 +11,7 @@ public class Constants{
         const val POST_ID = "postId"
 
         var locationId:Long = 0
-        var sort:Int = 0
+        var sort:Int = 1
 
         var refreshPhotoConstant:Long = 0
         var refreshFollowUnfollowConstant:Long = 0
