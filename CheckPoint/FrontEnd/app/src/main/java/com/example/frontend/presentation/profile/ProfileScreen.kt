@@ -55,6 +55,7 @@ import com.example.frontend.presentation.posts.components.PostStringState
 import com.example.frontend.presentation.profile.components.UserPostsState
 import com.example.frontend.presentation.profile.components.ProfileDataState
 import com.example.frontend.presentation.profile.components.ProfilePictureState
+import com.example.frontend.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -167,7 +168,7 @@ fun TopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.Black,
+                    tint = MyColorTopBar,
                     modifier = modifier.size(24.dp),
                 )
             }
@@ -199,7 +200,7 @@ fun TopBar(
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Back",
-                        tint = Color.Black,
+                        tint = MyColorTopBar,
                         modifier = modifier.size(24.dp)
                     )
                 }
@@ -209,7 +210,7 @@ fun TopBar(
                     Icon(
                         Icons.Default.Logout,
                         contentDescription = "",
-                        tint = Color.DarkGray
+                        tint = MyColorTopBar
                     )
                 }
             }
@@ -389,7 +390,7 @@ fun ButtonSection(
                 viewModel.followUnfollowUser()
             },
             colors = androidx.compose.material.ButtonDefaults.buttonColors(
-                backgroundColor = if (viewModel.state.value.profileData!!.amFollowing) Color.White else Color.DarkGray
+                backgroundColor = if (viewModel.state.value.profileData!!.amFollowing) Color.White else MyColorTopBar
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -416,7 +417,7 @@ fun ButtonSection(
                 text = if (viewModel.state.value.profileData!!.amFollowing) "Unfollow" else "Follow",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = if (viewModel.state.value.profileData!!.amFollowing) Color.DarkGray else Color.White
+                color = if (viewModel.state.value.profileData!!.amFollowing) MyColorTopBar else Color.White
             )
         }
     }
@@ -445,7 +446,7 @@ fun UserPostsSection(
             map = false;
         },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if(list) Color.DarkGray else Color.LightGray,
+                containerColor = if(list) MyColorTopBar else Color.LightGray,
                 contentColor = Color.White
             ),
             //modifier = Modifier.width(120.dp).height(45.dp),
@@ -465,7 +466,7 @@ fun UserPostsSection(
             map = true;
         },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if(map) Color.DarkGray else Color.LightGray,
+                containerColor = if(map) MyColorTopBar else Color.LightGray,
                 contentColor = Color.White
             ),
             //modifier = Modifier.width(120.dp).height(45.dp),
@@ -473,7 +474,7 @@ fun UserPostsSection(
             shape = RoundedCornerShape(6.dp)
         ) {
             Text(
-                text = "MAPS",
+                text = "MAP",
                 letterSpacing = 1.2.sp
             )
         }
@@ -555,7 +556,10 @@ fun PostsSection(
                 modifier = Modifier
                     .fillMaxWidth(),
                 placeholder = {
-                    Text("Search by location name")
+                    Text(
+                        text = "Search posts by location name",
+                        fontSize = 15.sp
+                    )
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.LightGray,

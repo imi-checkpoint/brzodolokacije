@@ -17,8 +17,10 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,6 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -79,9 +84,9 @@ fun UserListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp)
+                .padding(horizontal = 27.dp, vertical = 10.dp)
         ){
-            UserListTopBar(modifier = Modifier.padding(20.dp), viewModel.typeOfUsers);
+            UserListTopBar(modifier = Modifier.padding(vertical = 15.dp), viewModel.typeOfUsers, navigator);
             Spacer(modifier = Modifier.height(5.dp))
 
             UserListSearchBar(searchText, onChange = {
@@ -107,16 +112,54 @@ fun UserListScreen(
 @Composable
 fun UserListTopBar(
     modifier: Modifier = Modifier,
-    userListType : String
+    userListType : String,
+    navigator : DestinationsNavigator
 )
 {
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-
     ){
 
-        Text(userListType)
+        Row(
+            horizontalArrangement = Arrangement.Start
+        ){
+            IconButton(onClick = {
+                navigator.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = modifier.size(24.dp),
+                )
+            }
+        }
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ){
+            Text(
+                text = userListType,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.End,
+        ){
+            IconButton(onClick = {
+                /* */
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Back",
+                    tint = Color.Transparent,
+                    modifier = modifier.size(24.dp)
+                )
+            }
+        }
 
     }
 }
@@ -161,7 +204,7 @@ fun UserListSearchBar(
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        shape = RoundedCornerShape(20.dp)
+        //shape = RoundedCornerShape(20.dp)
     )
 }
 

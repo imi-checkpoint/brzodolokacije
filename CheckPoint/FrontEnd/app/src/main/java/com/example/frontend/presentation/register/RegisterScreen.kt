@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.R
@@ -32,6 +34,7 @@ import com.example.frontend.presentation.InputType
 import com.example.frontend.presentation.TextInput
 import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.RegisterScreenDestination
+import com.example.frontend.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -60,7 +63,7 @@ fun RegisterScreen(
 
     Column(
         Modifier
-            .padding(24.dp)
+            .padding(start = 30.dp, end = 30.dp, top = 24.dp, bottom = 24.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.Bottom),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -123,13 +126,18 @@ fun RegisterScreen(
         Button(onClick = {
             viewModel.register(mailValue.value , usernameValue.value, passwordValue.value, passwordRepeatValue.value, navigator)
         },
-            modifier =Modifier.fillMaxWidth(),
+            modifier =Modifier.width(150.dp),
+            shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.DarkGray,
+                containerColor = MyColorTopBar,
                 contentColor = Color.White
             )
         ) {
-            Text(text = "REGISTER" , Modifier.padding(8.dp))
+            Text(
+                text = "REGISTER",
+                letterSpacing = 1.2.sp,
+                modifier = Modifier.padding(8.dp)
+            )
         }
 
 

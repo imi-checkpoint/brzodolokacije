@@ -100,6 +100,8 @@ fun MainLocationScreen(
     {
         ProfileTopBar(navigator, viewModel)
 
+        Spacer(Modifier.height(10.dp))
+
         LocationSearchBar(searchText, onChange = {
             searchText = it
             if(searchText == ""){
@@ -110,7 +112,7 @@ fun MainLocationScreen(
             }
         })
         
-        Spacer(Modifier.height(10.dp));
+        Spacer(Modifier.height(15.dp));
 
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -127,6 +129,7 @@ fun MainLocationScreen(
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(vertical = 10.dp)
                     .onGloballyPositioned { coords ->
                         mapWidth = with(localDensity) { coords.size.width }
                         mapHeight = with(localDensity) { coords.size.height }
@@ -142,7 +145,8 @@ fun MainLocationScreen(
                     Marker(
                         state = markerState,
                         title = location.name,
-                        snippet = "See all posts",
+                        //snippet = "See all posts",
+                        snippet = "Click long for all posts",
 //                        onInfoWindowClick = {
 //                            it.hideInfoWindow()
 //                            navigator.navigate(PostsScreenDestination(location.id))
@@ -198,8 +202,8 @@ fun LocationSearchBar(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(20.dp)
+        )//,
+        //shape = RoundedCornerShape(20.dp)
     )
 }
 
@@ -297,17 +301,17 @@ fun ProfileTopBar(
                 },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     contentPadding = PaddingValues(start = 8.dp, end = 15.dp),
-                    border = BorderStroke(1.2.dp, MyColorTopBarBlue)
+                    border = BorderStroke(1.2.dp, MyColorTopBar)
                 ){
                     Icon(
                         Icons.Default.Home,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                     Spacer(Modifier.width(5.dp))
                     Text(
                         text = "Feed",
-                        color = MyColorTopBarBlue,
+                        color = MyColorTopBar,
                         fontFamily = FontFamily.SansSerif
                     )
                 }
@@ -320,7 +324,7 @@ fun ProfileTopBar(
                     navigator.navigate(MainLocationScreenDestination())
                 },
                     contentPadding = PaddingValues(start = 5.dp, end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBarBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = MyColorTopBar),
                 ){
                     Icon(
                         Icons.Default.Explore,
@@ -346,7 +350,7 @@ fun ProfileTopBar(
                     Icon(
                         Icons.Default.AddCircle,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                 }
 
@@ -360,7 +364,7 @@ fun ProfileTopBar(
                     Icon(
                         Icons.Default.Person,
                         contentDescription = "",
-                        tint = MyColorTopBarBlue
+                        tint = MyColorTopBar
                     )
                 }
             }

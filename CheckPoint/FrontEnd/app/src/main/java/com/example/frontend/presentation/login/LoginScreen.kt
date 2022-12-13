@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -21,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.R
 import com.example.frontend.presentation.InputType
@@ -33,6 +36,7 @@ import com.example.frontend.presentation.destinations.LoginScreenDestination
 import com.example.frontend.presentation.destinations.MainFeedScreenDestination
 import com.example.frontend.presentation.destinations.MainLocationScreenDestination
 import com.example.frontend.presentation.destinations.RegisterScreenDestination
+import com.example.frontend.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -92,9 +96,9 @@ fun LoginScreen(
 
         Column(
             Modifier
-                .padding(24.dp)
+                .padding(start = 30.dp, end = 30.dp, top = 50.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.Bottom),
+            verticalArrangement = Arrangement.spacedBy(18.dp, alignment = Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
 
@@ -129,17 +133,21 @@ fun LoginScreen(
                 onChange = {passwordValue = it}
             )
 
-
             Button(onClick = {
                 viewModel.login(usernameValue.trim(), passwordValue.trim());
             },
-                modifier =Modifier.fillMaxWidth(),
+                modifier =Modifier.width(150.dp),
+                shape = RoundedCornerShape(5.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.DarkGray,
+                    containerColor = MyColorTopBar,
                     contentColor = Color.White
                 )
             ) {
-                Text(text = "SIGN IN" , Modifier.padding(8.dp))
+                Text(
+                    text = "SIGN IN",
+                    letterSpacing = 1.2.sp,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
 
             Divider(
