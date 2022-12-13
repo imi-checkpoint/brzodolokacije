@@ -1,6 +1,9 @@
 package com.example.frontend.presentation.register
 
+import android.content.Context
+import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -31,47 +34,83 @@ class RegisterViewModel @Inject constructor(
     private val _state = mutableStateOf(RegisterState())
     val state : State<RegisterState> = _state
 
+    private val _stateValidation = mutableStateOf(RegisterState())
+    val stateValidation : State<RegisterState> = _stateValidation
 
-    fun register(mailNotTrimmed:String , usernameNotTrimmed:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
+
+    fun register(mailNotTrimmed:String , usernameNotTrimmed:String, password:String,
+                 passwordRepeat:String, navigator : DestinationsNavigator, context : Context
+    )
     {
+        Log.d("REGISTER", "Username ${usernameNotTrimmed}, mail ${mailNotTrimmed}, password ${password}, passwordRepeat ${passwordRepeat}");
+
         var username = usernameNotTrimmed.trim()
         var mail = mailNotTrimmed.trim()
 
         if(username.length == 0){
-            _state.value = RegisterState(error = "Username cant be empty");
+            _stateValidation.value = RegisterState(error = "Username cant be empty");
         }
         else if(password.length<7){
             println("kratka sifra")
-            _state.value = RegisterState(error = "Password must be at least 7 characters");
+            _stateValidation.value = RegisterState(error = "Password must be at least 7 characters");
         }
         else if(password != passwordRepeat){
             println("sifre nisu iste")
-            _state.value = RegisterState(error = "Passwords don't match!");
+            _stateValidation.value = RegisterState(error = "Passwords don't match!");
         }
         else if(!Patterns.EMAIL_ADDRESS.matcher(mail).matches()){
             println("email nije dobar")
-            _state.value = RegisterState(error = "Email not valid");
+            _stateValidation.value = RegisterState(error = "Email not valid");
         }
         else{
+            _stateValidation.value = RegisterState(error = "");
             var user = RegisterUser(mail, username, password );
             registerUseCase(user).onEach { result ->
                 when(result){
                     is Resource.Success -> {
-                        _state.value = RegisterState(message = result.data ?: "")
+                        result.data?.let { Log.d("REGISTER", it) };
+                        if(result.data == "Successfully registered.")
+                        {
+                            _state.value = RegisterState(message = result.data ?: "")
 
-                        navigator.navigate(
-                            LoginScreenDestination()
-                        )
+                            navigator.navigate(
+                                LoginScreenDestination()
+                            )
+                        }
+                        else{
+                            _state.value = RegisterState(error = result.data ?: "")
+
+                            Toast.makeText(
+                                context,
+                                result.data,
+                                Toast.LENGTH_LONG
+                            ).show();
+                        }
                     }
                     is Resource.Error -> {
+                        Log.d("Error", "Error is ${result.message}");
                         _state.value = RegisterState(error = result.message ?:
                         "An unexpected error occured")
+
+                        Toast.makeText(
+                            context,
+                            result.message,
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
                     is Resource.Loading -> {
                         _state.value = RegisterState(isLoading = true)
                     }
                 }
             }.launchIn(viewModelScope)
+        }
+
+        if(_stateValidation.value.error.isNotEmpty()){
+            Toast.makeText(
+                context,
+                _stateValidation.value.error,
+                Toast.LENGTH_LONG
+            ).show();
         }
     }
 

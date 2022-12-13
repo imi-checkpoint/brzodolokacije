@@ -50,6 +50,7 @@ fun RegisterScreen(
     BackPressHandler(onBackPressed = onBack);
 
     val state = viewModel.state.value;
+    val stateValidation = viewModel.stateValidation.value;
 
     var emailFocusRequester = FocusRequester()
     var passwordFocusRequester = FocusRequester()
@@ -124,7 +125,7 @@ fun RegisterScreen(
 
 
         Button(onClick = {
-            viewModel.register(mailValue.value , usernameValue.value, passwordValue.value, passwordRepeatValue.value, navigator)
+            viewModel.register(mailValue.value , usernameValue.value, passwordValue.value, passwordRepeatValue.value, navigator, context)
         },
             modifier =Modifier.width(150.dp),
             shape = RoundedCornerShape(5.dp),
@@ -163,9 +164,21 @@ fun RegisterScreen(
         }
 
 
-        if(state.error.isNotBlank()){//doslo je do greske tokom logina
-            Text(state.error);
-        }
+//        if(state.error.isNotBlank()){//doslo je do greske tokom registera
+//            Toast.makeText(
+//                context,
+//                "That email is taken!",
+//                Toast.LENGTH_LONG
+//            ).show();
+//        }
+
+//        if(stateValidation.error.isNotBlank()){//validacija
+//            Toast.makeText(
+//                context,
+//                stateValidation.error,
+//                Toast.LENGTH_LONG
+//            ).show();
+//        }
 
         if(state.isLoading){
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))

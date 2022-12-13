@@ -171,7 +171,12 @@ fun LoginScreen(
             }
 
             if(state.error.isNotBlank()){//doslo je do greske tokom logina
-                Text("Wrong credentials!");
+//                Text("Wrong credentials!");
+                Toast.makeText(
+                    context,
+                    "Wrong credentials!",
+                    Toast.LENGTH_LONG
+                ).show();
             }
 
             if(state.isLoading){

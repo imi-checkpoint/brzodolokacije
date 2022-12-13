@@ -353,7 +353,7 @@ fun ChoosePhotos(
         Icon(
             imageVector = Icons.Default.AddAPhoto,
             contentDescription = "Add photo",
-            tint = Color.Black,
+            tint = MaterialTheme.colorScheme.outline,
             modifier = Modifier.size(25.dp),
         )
     }
@@ -444,7 +444,7 @@ fun SetLocation(
             },
             modifier = Modifier
                 .fillMaxWidth(),
-            label = { Text("Search location") },
+            label = { Text("Enter location name") },
             singleLine = true,
         )
     }
@@ -550,12 +550,13 @@ fun ImageSlider(
                             Log.d("DELETE", "Deleting picture ${pagerState.currentPage}")
                             viewModel.deletePhoto(photos[pagerState.currentPage].slika)
                                   },
+                        modifier = Modifier
+                            .size(30.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
-                            tint = Color.Black,
-                            modifier = Modifier.size(25.dp),
+                            tint = MaterialTheme.colorScheme.outline
                         )
                     }
                 }
