@@ -1,5 +1,6 @@
 package com.example.frontend.presentation.location
 
+import Constants
 import android.app.Application
 import android.content.Context
 import android.os.Build
@@ -104,5 +105,13 @@ class LocationViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun proveriConstants()
+    {
+        if (Constants.locationDeletedUpdateMap == true) {
+            Constants.locationDeletedUpdateMap = false;
+            getAllLocations()
+        }
     }
 }

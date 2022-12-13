@@ -64,6 +64,8 @@ fun MainLocationScreen(
     val state = viewModel.state.value
     var searchText by remember{ mutableStateOf("") }
 
+    viewModel.proveriConstants()
+
     val context = LocalContext.current
     val uiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false)
