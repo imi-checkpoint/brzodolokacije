@@ -34,7 +34,7 @@ class RegisterViewModel @Inject constructor(
 
     fun register(mail:String , username:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
     {
-        if(!username.length.equals("")){
+        if(username.length == 0){
             _state.value = RegisterState(error = "Username cant be empty");
         }
         else if(password.length<7){
