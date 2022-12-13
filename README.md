@@ -16,6 +16,15 @@ You can download apk on following link
 > Username: `admin`  
 > Password: `Po1ntCheck`
 
+
+Test user accounts
+> Username: `user1`
+> Password: `testuser1`
+
+> Username: `user2`
+> Password: `testuser2`
+
+
 ### Docker
 For simple running application on server you should move to same folder built jar file, Dockerfile, docker-compose.yml and default profile picture.  
 After that you can just type following command in terminal
