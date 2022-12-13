@@ -60,7 +60,7 @@ class RegisterViewModel @Inject constructor(
                         _state.value = RegisterState(message = result.data ?: "")
 
                         navigator.navigate(
-                            MainFeedScreenDestination()
+                            LoginScreenDestination()
                         )
                     }
                     is Resource.Error -> {
