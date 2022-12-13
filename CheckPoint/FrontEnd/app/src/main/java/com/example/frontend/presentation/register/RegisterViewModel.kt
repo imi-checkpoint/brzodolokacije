@@ -32,8 +32,11 @@ class RegisterViewModel @Inject constructor(
     val state : State<RegisterState> = _state
 
 
-    fun register(mail:String , username:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
+    fun register(mailNotTrimmed:String , usernameNotTrimmed:String, password:String, passwordRepeat:String, navigator : DestinationsNavigator)
     {
+        var username = usernameNotTrimmed.trim()
+        var mail = mailNotTrimmed.trim()
+
         if(username.length == 0){
             _state.value = RegisterState(error = "Username cant be empty");
         }
@@ -43,7 +46,7 @@ class RegisterViewModel @Inject constructor(
         }
         else if(password != passwordRepeat){
             println("sifre nisu iste")
-            _state.value = RegisterState(error = "Passwords dont't match!");
+            _state.value = RegisterState(error = "Passwords don't match!");
         }
         else if(!Patterns.EMAIL_ADDRESS.matcher(mail).matches()){
             println("email nije dobar")
