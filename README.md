@@ -12,8 +12,8 @@ For application developmen were used following technologies.
 
 
 You can download apk on following link
-> `http://147.91.204.115:10069/`
-> Username: `admin`
+> `http://147.91.204.115:10069/`  
+> Username: `admin`  
 > Password: `Po1ntCheck`
 
 ### Docker
