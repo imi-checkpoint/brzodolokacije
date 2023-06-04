@@ -1,6 +1,6 @@
 # CheckPoint
 ## _Social Media Mobile Application for travelling purposes_
-For application developmen were used following technologies.
+For application development we used the following technologies:
 
 - Kotlin
 - SpringBoot
@@ -11,13 +11,13 @@ For application developmen were used following technologies.
 - Node
 
 
-You can download apk on following link
+You can download the application on the following link:
 > `http://147.91.204.115:10069/`  
 > Username: `admin`  
 > Password: `Po1ntCheck`
 
 
-Test user accounts
+Test user accounts:
 > Username: `user1`
 > Password: `testuser1`
 
@@ -26,8 +26,8 @@ Test user accounts
 
 
 ### Docker
-For simple running application on server you should move to same folder built jar file, Dockerfile, docker-compose.yml and default profile picture.  
-After that you can just type following command in terminal
+For simple running application on a server, you should move to the same folder built jar file, Dockerfile, docker-compose.yml and default profile picture.  
+After that, you can just type the following command in terminal:
 ```sh
 docker-compose up -d
 ```
